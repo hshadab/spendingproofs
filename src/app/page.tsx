@@ -263,10 +263,10 @@ export default function Home() {
             </Link>
             <div className="hidden md:flex items-center gap-6 text-sm text-gray-400">
               <Link href="#problem" className="hover:text-white transition-colors">Problem</Link>
-              <Link href="#solution" className="hover:text-white transition-colors">Solution</Link>
-              <Link href="#model" className="hover:text-white transition-colors">Model</Link>
               <Link href="#why-arc" className="hover:text-white transition-colors">Why Arc</Link>
-              <Link href="#why-jolt" className="hover:text-white transition-colors">Why Jolt-Atlas</Link>
+              <Link href="#use-cases" className="hover:text-white transition-colors">Use Cases</Link>
+              <Link href="#composable" className="hover:text-white transition-colors">Build On</Link>
+              <Link href="#enterprise" className="hover:text-white transition-colors">Enterprise</Link>
               <Link href="#roadmap" className="hover:text-white transition-colors">Roadmap</Link>
               <Link href="/demo" className="hover:text-white transition-colors">Demo</Link>
             </div>
@@ -296,18 +296,18 @@ export default function Home() {
             <div>
               <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-3 py-1 text-sm text-purple-400 mb-6">
                 <Bot className="w-4 h-4" />
-                Agentic Commerce Infrastructure
+                Composable Primitive for Arc Ecosystem
               </div>
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-                zkML Spending Proofs for
+                The Trust Primitive for
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-purple-600">
-                  Agentic Commerce on Arc
+                  Autonomous USDC Agents
                 </span>
               </h1>
               <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-                Jolt-Atlas zkML spending policy proofs let agents prove they followed spending rules—cryptographically—before
-                every USDC transaction on Arc.
+                Agents need deterministic finality, predictable USDC fees, and cryptographic policy enforcement.
+                That combination only exists on Arc. Spending Proofs make it composable.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <a
@@ -716,67 +716,370 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why Arc */}
+      {/* Why Agents Require Arc */}
       <section id="why-arc" className="py-16 px-6 border-t border-gray-800 bg-[#0d1117]/50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Why Arc for Agentic Commerce</h2>
+            <h2 className="text-3xl font-bold mb-4">Why Agents Require Arc</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Arc is purpose-built for the machine economy. Every design decision
-              optimizes for autonomous agents operating with stablecoins.
+              These aren&apos;t nice-to-haves. Autonomous agents break on other chains.
+              Arc&apos;s architecture is the only viable foundation for agent commerce.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6">
-              <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center mb-4">
-                <DollarSign className="w-5 h-5 text-green-400" />
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <div className="bg-[#0a0a0a] border border-red-500/20 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <XCircle className="w-5 h-5 text-red-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-red-300">Without Predictable Fees</h3>
+                  <p className="text-sm text-gray-400">
+                    Agents budget in USDC. A 10x gas spike on Ethereum bankrupts the agent mid-transaction.
+                    The agent can&apos;t complete its task, user funds are stuck, trust is broken.
+                  </p>
+                </div>
               </div>
-              <h3 className="font-semibold mb-2">USDC Native Gas</h3>
-              <p className="text-sm text-gray-400">
-                Pay fees in stablecoins. Agents don&apos;t need volatile tokens—predictable
-                costs for every transaction.
-              </p>
+            </div>
+
+            <div className="bg-[#0a0a0a] border border-green-500/20 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <DollarSign className="w-5 h-5 text-green-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-green-300">Arc: USDC-Native Gas</h3>
+                  <p className="text-sm text-gray-400">
+                    Fees paid in USDC. Agents budget accurately. No token swaps, no volatility exposure,
+                    no failed transactions from gas estimation errors.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#0a0a0a] border border-red-500/20 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <XCircle className="w-5 h-5 text-red-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-red-300">Without Deterministic Finality</h3>
+                  <p className="text-sm text-gray-400">
+                    A shopping agent waits 12 confirmations on Ethereum. The deal expires.
+                    On Solana, a reorg reverses the payment. The agent already shipped the goods.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#0a0a0a] border border-green-500/20 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Zap className="w-5 h-5 text-green-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-green-300">Arc: Sub-Second Deterministic Finality</h3>
+                  <p className="text-sm text-gray-400">
+                    Transaction is final. No reorgs, no probabilistic waiting. Agents chain operations
+                    instantly—proof, payment, delivery in one atomic flow.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#0a0a0a] border border-red-500/20 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <XCircle className="w-5 h-5 text-red-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-red-300">Without Opt-in Privacy</h3>
+                  <p className="text-sm text-gray-400">
+                    Agent spending patterns are public. Competitors front-run deals.
+                    MEV bots extract value from every agent transaction. Strategies are exposed.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#0a0a0a] border border-green-500/20 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Lock className="w-5 h-5 text-green-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-green-300">Arc: Opt-in Privacy</h3>
+                  <p className="text-sm text-gray-400">
+                    Confidential transactions when strategy matters. Public when transparency is needed.
+                    Agents choose per-transaction. No MEV extraction, no front-running.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Enterprise Rails callout */}
+          <div className="bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-500/20 rounded-xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Globe className="w-5 h-5 text-purple-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Enterprise-Grade Rails Required</h3>
+                <p className="text-sm text-gray-400">
+                  Enterprise agents need compliance, audit trails, and institutional custody.
+                  Arc&apos;s Circle-backed infrastructure with StableFX and Payments Network provides
+                  production-grade rails that enterprises actually deploy on—not testnet experiments.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Real Use Cases */}
+      <section id="use-cases" className="py-16 px-6 border-t border-gray-800">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Real Use Cases Today</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Not hypothetical. These agents exist. They need policy proofs to unlock real economic autonomy.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <ShoppingCart className="w-6 h-6 text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">AI Shopping Agents</h3>
+                  <p className="text-sm text-gray-400 mb-3">
+                    Autonomous agents that browse, compare, and purchase products on behalf of users.
+                    Need cryptographic proof they stayed within budget before merchant releases goods.
+                  </p>
+                  <div className="text-xs text-purple-400">
+                    Arc requirement: Sub-second finality for instant checkout
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6">
-              <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-5 h-5 text-blue-400" />
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Gauge className="w-6 h-6 text-cyan-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Subscription Managers</h3>
+                  <p className="text-sm text-gray-400 mb-3">
+                    Agents that optimize SaaS spend by upgrading, downgrading, or canceling subscriptions.
+                    Proof ensures agent followed cost-saving rules, not upsell prompts.
+                  </p>
+                  <div className="text-xs text-cyan-400">
+                    Arc requirement: USDC gas for predictable monthly costs
+                  </div>
+                </div>
               </div>
-              <h3 className="font-semibold mb-2">Sub-Second Finality</h3>
-              <p className="text-sm text-gray-400">
-                Deterministic confirmation times. Agents can chain transactions
-                without waiting for block confirmations.
-              </p>
             </div>
 
             <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <GitBranch className="w-6 h-6 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Multi-Agent Marketplaces</h3>
+                  <p className="text-sm text-gray-400 mb-3">
+                    Agents hiring other agents for subtasks. Each agent proves it followed its delegated
+                    budget. Parent agent verifies before releasing child agent payments.
+                  </p>
+                  <div className="text-xs text-amber-400">
+                    Arc requirement: Deterministic finality for chained payments
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Globe className="w-6 h-6 text-green-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Enterprise Expense Agents</h3>
+                  <p className="text-sm text-gray-400 mb-3">
+                    Corporate agents with department-level spending authority. Proof provides audit trail
+                    that agent followed company policy—not just approval, but cryptographic compliance.
+                  </p>
+                  <div className="text-xs text-green-400">
+                    Arc requirement: Enterprise rails with Circle integration
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Build On Spending Proofs - Composable Primitive */}
+      <section id="composable" className="py-16 px-6 border-t border-gray-800 bg-[#0d1117]/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Build On Spending Proofs</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              A composable primitive designed to be integrated, extended, and built upon.
+              Not an application—infrastructure for the Arc ecosystem.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-6 mb-8">
+            <div className="bg-[#0a0a0a] border border-purple-500/30 rounded-xl p-6">
               <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center mb-4">
-                <Lock className="w-5 h-5 text-purple-400" />
+                <Layers className="w-5 h-5 text-purple-400" />
               </div>
-              <h3 className="font-semibold mb-2">Optional Privacy</h3>
+              <h3 className="font-semibold mb-2">Wallet Integration</h3>
               <p className="text-sm text-gray-400">
-                Confidential transactions when needed. Agents can protect
-                sensitive business logic and trading strategies.
+                Smart wallets embed spending proofs as authorization layer. Every agent transaction
+                carries cryptographic policy compliance. Wallets become agent-native.
               </p>
             </div>
 
-            <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6">
-              <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4">
-                <Globe className="w-5 h-5 text-amber-400" />
+            <div className="bg-[#0a0a0a] border border-cyan-500/30 rounded-xl p-6">
+              <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-4">
+                <Shield className="w-5 h-5 text-cyan-400" />
               </div>
-              <h3 className="font-semibold mb-2">Enterprise Infrastructure</h3>
+              <h3 className="font-semibold mb-2">Protocol Gating</h3>
               <p className="text-sm text-gray-400">
-                Circle-backed with StableFX and Payments Network.
-                Production-grade rails for real-world commerce.
+                DeFi protocols require spending proofs before executing trades. Insurance protocols
+                verify agent behavior before paying claims. Proof as access control.
               </p>
+            </div>
+
+            <div className="bg-[#0a0a0a] border border-amber-500/30 rounded-xl p-6">
+              <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4">
+                <Bot className="w-5 h-5 text-amber-400" />
+              </div>
+              <h3 className="font-semibold mb-2">Agent Frameworks</h3>
+              <p className="text-sm text-gray-400">
+                LangChain, AutoGPT, and custom frameworks add policy proofs as middleware.
+                One integration enables every agent built on that framework.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-500/20 rounded-xl p-6">
+            <h4 className="font-semibold mb-3">SDK Integration Pattern</h4>
+            <div className="grid md:grid-cols-3 gap-4 text-sm">
+              <div className="bg-[#0a0a0a]/50 rounded-lg p-4">
+                <div className="text-purple-400 font-mono text-xs mb-2">1. IMPORT</div>
+                <code className="text-gray-400 text-xs">import &#123; PolicyProofs &#125; from &apos;@arc/policy-proofs&apos;</code>
+              </div>
+              <div className="bg-[#0a0a0a]/50 rounded-lg p-4">
+                <div className="text-cyan-400 font-mono text-xs mb-2">2. PROVE</div>
+                <code className="text-gray-400 text-xs">const proof = await client.prove(inputs)</code>
+              </div>
+              <div className="bg-[#0a0a0a]/50 rounded-lg p-4">
+                <div className="text-green-400 font-mono text-xs mb-2">3. ATTACH</div>
+                <code className="text-gray-400 text-xs">tx.setProofAttestation(proof.hash)</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Enterprise Path */}
+      <section id="enterprise" className="py-16 px-6 border-t border-gray-800">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Path to Enterprise</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              From prototype to production. Clear milestones for enterprise deployment.
+            </p>
+          </div>
+
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-purple-500 via-cyan-500 to-green-500 hidden lg:block" />
+
+            <div className="space-y-8 lg:space-y-0">
+              {/* Step 1 */}
+              <div className="lg:grid lg:grid-cols-2 lg:gap-8 relative">
+                <div className="lg:text-right lg:pr-12">
+                  <div className="inline-flex items-center gap-2 bg-purple-500/10 text-purple-400 text-xs px-2 py-1 rounded mb-2">
+                    <Rocket className="w-3 h-3" />
+                    Phase 1: Prototype
+                  </div>
+                  <h3 className="font-semibold mb-2">SDK Integration</h3>
+                  <p className="text-sm text-gray-400">
+                    Install SDK. Generate first proof in development. Validate agent behavior
+                    against policy model. No infrastructure changes required.
+                  </p>
+                </div>
+                <div className="hidden lg:flex items-center justify-start pl-12">
+                  <div className="w-4 h-4 bg-purple-500 rounded-full ring-4 ring-purple-500/20" />
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="lg:grid lg:grid-cols-2 lg:gap-8 relative">
+                <div className="hidden lg:flex items-center justify-end pr-12">
+                  <div className="w-4 h-4 bg-cyan-500 rounded-full ring-4 ring-cyan-500/20" />
+                </div>
+                <div className="lg:pl-12">
+                  <div className="inline-flex items-center gap-2 bg-cyan-500/10 text-cyan-400 text-xs px-2 py-1 rounded mb-2">
+                    <Gauge className="w-3 h-3" />
+                    Phase 2: Testnet
+                  </div>
+                  <h3 className="font-semibold mb-2">Arc Testnet Deployment</h3>
+                  <p className="text-sm text-gray-400">
+                    Connect to Arc Testnet. Submit proof attestations on-chain. Test sub-second
+                    finality with real network conditions. Validate USDC gas economics.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="lg:grid lg:grid-cols-2 lg:gap-8 relative">
+                <div className="lg:text-right lg:pr-12">
+                  <div className="inline-flex items-center gap-2 bg-green-500/10 text-green-400 text-xs px-2 py-1 rounded mb-2">
+                    <Globe className="w-3 h-3" />
+                    Phase 3: Production
+                  </div>
+                  <h3 className="font-semibold mb-2">Enterprise Mainnet</h3>
+                  <p className="text-sm text-gray-400">
+                    Deploy on Arc Mainnet with Circle-backed USDC. Connect to StableFX for FX.
+                    Enterprise custody through Fireblocks. Full audit trail for compliance.
+                  </p>
+                </div>
+                <div className="hidden lg:flex items-center justify-start pl-12">
+                  <div className="w-4 h-4 bg-green-500 rounded-full ring-4 ring-green-500/20" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 grid md:grid-cols-3 gap-4 text-center">
+            <div className="bg-[#0a0a0a] border border-gray-800 rounded-lg p-4">
+              <div className="text-2xl font-bold text-purple-400">1 Day</div>
+              <div className="text-xs text-gray-500">SDK to first proof</div>
+            </div>
+            <div className="bg-[#0a0a0a] border border-gray-800 rounded-lg p-4">
+              <div className="text-2xl font-bold text-cyan-400">1 Week</div>
+              <div className="text-xs text-gray-500">Testnet integration</div>
+            </div>
+            <div className="bg-[#0a0a0a] border border-gray-800 rounded-lg p-4">
+              <div className="text-2xl font-bold text-green-400">Production Ready</div>
+              <div className="text-xs text-gray-500">Enterprise deployment</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Why Jolt-Atlas zkML */}
-      <section id="why-jolt" className="py-16 px-6 border-t border-gray-800">
+      <section id="why-jolt" className="py-16 px-6 border-t border-gray-800 bg-[#0d1117]/50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Why Jolt-Atlas zkML</h2>
