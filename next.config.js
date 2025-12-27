@@ -9,6 +9,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  transpilePackages: ['@rainbow-me/rainbowkit'],
+  webpack: (config) => {
+    config.resolve.fallback = { fs: false, net: false, tls: false };
+    config.externals.push('pino-pretty', 'encoding');
+    return config;
+  },
 };
 
 module.exports = nextConfig;

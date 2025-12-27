@@ -295,19 +295,20 @@ export default function Home() {
             {/* Left: Title and CTA */}
             <div>
               <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-3 py-1 text-sm text-purple-400 mb-6">
-                <Bot className="w-4 h-4" />
-                Composable Primitive for Arc Ecosystem
+                <Shield className="w-4 h-4" />
+                Trust Primitive for Agentic Commerce on Arc
               </div>
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-                The Trust Primitive for
+                zkML Spending Proofs for
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-purple-600">
-                  Autonomous USDC Agents
+                  USDC Agents on Arc
                 </span>
               </h1>
               <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-                Agents need deterministic finality, predictable USDC fees, and cryptographic policy enforcement.
-                That combination only exists on Arc. Spending Proofs make it composable.
+                Cryptographic proof of policy compliance for autonomous USDC agents.
+                Prove your agent followed its spending rules—without revealing them.
+                Built on Jolt-Atlas. Designed for Arc.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <a
