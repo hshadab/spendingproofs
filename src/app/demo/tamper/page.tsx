@@ -11,12 +11,10 @@ import {
   spendingInputToNumeric,
 } from '@/lib/spendingModel';
 import { useProofGeneration } from '@/hooks/useProofGeneration';
-import { useOnChainVerify } from '@/hooks/useOnChainVerify';
 
 export default function TamperPage() {
   const [originalInputs, setOriginalInputs] = useState<SpendingModelInput>(createDefaultInput());
   const { state, generateProof, reset } = useProofGeneration();
-  const { verifyInputs } = useOnChainVerify();
   const [proofGenerated, setProofGenerated] = useState(false);
 
   const handleGenerateProof = async () => {

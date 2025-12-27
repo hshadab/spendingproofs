@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount } from 'wagmi';
 import { PaymentFlow, type PaymentStep, type StepStatus } from '@/components/PaymentFlow';
 import { ProofViewer } from '@/components/ProofViewer';
 import { PolicySliders } from '@/components/PolicySliders';
@@ -15,10 +13,10 @@ import {
   runSpendingModel,
 } from '@/lib/spendingModel';
 import { useProofGeneration } from '@/hooks/useProofGeneration';
-import { Check, AlertCircle } from 'lucide-react';
+import { Check, AlertCircle, Wallet } from 'lucide-react';
 
 export default function PaymentPage() {
-  const { isConnected, address } = useAccount();
+  const [isConnected, setIsConnected] = useState(false);
   const [policy, setPolicy] = useState<SpendingPolicy>(DEFAULT_SPENDING_POLICY);
   const [input, setInput] = useState<SpendingModelInput>(createDefaultInput());
   const { state, generateProof, reset } = useProofGeneration();
@@ -32,11 +30,14 @@ export default function PaymentPage() {
   });
   const [policyResult, setPolicyResult] = useState<ReturnType<typeof runSpendingModel> | null>(null);
 
+  const handleConnect = () => {
+    setIsConnected(true);
+  };
+
   const handlePolicyCheck = () => {
     setStepStatuses((prev) => ({ ...prev, policy: 'active' }));
     setCurrentStep('policy');
 
-    // Run policy check
     const result = runSpendingModel(input, policy);
     setPolicyResult(result);
 
@@ -71,7 +72,6 @@ export default function PaymentPage() {
     setStepStatuses((prev) => ({ ...prev, submit: 'active' }));
     setCurrentStep('submit');
 
-    // Simulate on-chain submission
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     setStepStatuses((prev) => ({ ...prev, submit: 'complete', payment: 'pending' }));
@@ -81,7 +81,6 @@ export default function PaymentPage() {
   const handleExecutePayment = async () => {
     setStepStatuses((prev) => ({ ...prev, payment: 'active' }));
 
-    // Simulate payment
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     setStepStatuses((prev) => ({ ...prev, payment: 'complete' }));
@@ -115,7 +114,20 @@ export default function PaymentPage() {
 
       {/* Wallet Connection */}
       <div className="mb-6 flex justify-end">
-        <ConnectButton />
+        {isConnected ? (
+          <div className="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm">
+            <Wallet className="w-4 h-4" />
+            <span>0x1234...5678 (Demo)</span>
+          </div>
+        ) : (
+          <button
+            onClick={handleConnect}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
+          >
+            <Wallet className="w-4 h-4" />
+            Connect Wallet
+          </button>
+        )}
       </div>
 
       {!isConnected ? (
@@ -123,7 +135,13 @@ export default function PaymentPage() {
           <p className="text-slate-600 dark:text-slate-400 mb-4">
             Connect your wallet to start the payment flow
           </p>
-          <ConnectButton />
+          <button
+            onClick={handleConnect}
+            className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors mx-auto"
+          >
+            <Wallet className="w-5 h-5" />
+            Connect Wallet
+          </button>
         </div>
       ) : (
         <>
@@ -263,7 +281,7 @@ export default function PaymentPage() {
                     Payment Complete!
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                    Your agent's purchase was verified with a cryptographic proof and the payment was executed on Arc.
+                    Your agent&apos;s purchase was verified with a cryptographic proof and the payment was executed on Arc.
                   </p>
                   <button
                     onClick={handleReset}
