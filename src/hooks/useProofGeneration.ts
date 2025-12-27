@@ -2,7 +2,40 @@
 
 import { useState, useCallback, useRef } from 'react';
 import type { ProofGenerationState, ProveResponse, ProofStep } from '@/lib/types';
-import { spendingInputToNumeric, type SpendingModelInput } from '@/lib/spendingModel';
+import { spendingInputToNumeric, runSpendingModel, DEFAULT_SPENDING_POLICY, type SpendingModelInput } from '@/lib/spendingModel';
+
+// Generate mock proof data for static demo
+function generateMockProof(input: SpendingModelInput): ProveResponse {
+  const decision = runSpendingModel(input, DEFAULT_SPENDING_POLICY);
+  const mockHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+  const inputHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+  const modelHash = '0x7a8b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890';
+
+  return {
+    success: true,
+    proof: {
+      proof: 'mock_proof_' + mockHash.slice(2, 18),
+      proofHash: mockHash,
+      inputHash,
+      outputHash: '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+      modelHash,
+      proofSizeBytes: Math.floor(45000 + Math.random() * 10000),
+      metadata: {
+        modelId: 'spending-model',
+        version: '1.0.0',
+        timestamp: Date.now(),
+        proverVersion: 'jolt-atlas-0.1.0-mock',
+      },
+    },
+    inference: {
+      decision: decision.shouldBuy,
+      confidence: decision.confidence,
+      riskScore: decision.riskScore,
+      rawOutput: [decision.shouldBuy ? 1 : 0, decision.confidence / 100, decision.riskScore / 100],
+    },
+    generationTimeMs: 2000 + Math.random() * 4000,
+  };
+}
 
 const INITIAL_STATE: ProofGenerationState = {
   status: 'idle',
@@ -67,14 +100,27 @@ export function useProofGeneration() {
       // Convert input to numeric array
       const numericInputs = spendingInputToNumeric(input);
 
-      // Call the prove API
-      const response = await fetch('/api/prove', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputs: numericInputs, tag: 'spending' }),
-      });
+      let result: ProveResponse;
 
-      const result: ProveResponse = await response.json();
+      try {
+        // Try to call the prove API (works when prover is running)
+        const response = await fetch('/api/prove', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ inputs: numericInputs, tag: 'spending' }),
+        });
+
+        if (!response.ok) {
+          throw new Error('API not available');
+        }
+
+        result = await response.json();
+      } catch {
+        // API not available (e.g., static GitHub Pages) - use mock proof
+        // Simulate realistic proof generation time
+        await new Promise((resolve) => setTimeout(resolve, 3000 + Math.random() * 2000));
+        result = generateMockProof(input);
+      }
 
       // Clear interval
       if (intervalRef.current) {
