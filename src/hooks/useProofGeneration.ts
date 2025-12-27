@@ -9,31 +9,33 @@ function generateMockProof(input: SpendingModelInput): ProveResponse {
   const decision = runSpendingModel(input, DEFAULT_SPENDING_POLICY);
   const mockHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
   const inputHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+  const outputHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
   const modelHash = '0x7a8b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890';
+  const generationTime = 2000 + Math.random() * 4000;
 
   return {
     success: true,
     proof: {
       proof: 'mock_proof_' + mockHash.slice(2, 18),
       proofHash: mockHash,
-      inputHash,
-      outputHash: '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
-      modelHash,
-      proofSizeBytes: Math.floor(45000 + Math.random() * 10000),
       metadata: {
-        modelId: 'spending-model',
-        version: '1.0.0',
-        timestamp: Date.now(),
+        modelHash,
+        inputHash,
+        outputHash,
+        proofSize: Math.floor(45000 + Math.random() * 10000),
+        generationTime,
         proverVersion: 'jolt-atlas-0.1.0-mock',
       },
+      tag: 'spending',
+      timestamp: Date.now(),
     },
     inference: {
-      decision: decision.shouldBuy,
-      confidence: decision.confidence,
-      riskScore: decision.riskScore,
+      output: decision.shouldBuy ? 1 : 0,
       rawOutput: [decision.shouldBuy ? 1 : 0, decision.confidence / 100, decision.riskScore / 100],
+      decision: decision.shouldBuy ? 'approve' : 'reject',
+      confidence: decision.confidence,
     },
-    generationTimeMs: 2000 + Math.random() * 4000,
+    generationTimeMs: generationTime,
   };
 }
 
