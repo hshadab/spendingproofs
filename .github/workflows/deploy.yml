@@ -33,7 +33,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
+        run: npm run build 2>&1 || (echo "BUILD FAILED" && exit 1)
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
