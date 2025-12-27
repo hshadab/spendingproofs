@@ -251,7 +251,7 @@ program
   .option('--rpc <url>', 'RPC URL', 'https://rpc.testnet.arc.network')
   .option('--contract <address>', 'Proof attestation contract', '0xBE9a5DF7C551324CB872584C6E5bF56799787952')
   .option('--json', 'Output as JSON')
-  .action(async (proofHash: string, options) => {
+  .action(async (proofHash: string, options: { rpc: string; contract: string; json?: boolean }) => {
     try {
       const functionSelector = '0x8f742d16';
       const paddedHash = proofHash.replace('0x', '').padStart(64, '0');
