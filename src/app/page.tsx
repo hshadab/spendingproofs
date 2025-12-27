@@ -299,10 +299,10 @@ export default function Home() {
                 Agentic Commerce Infrastructure
               </div>
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-                zkML for
+                zkML Spending Proofs for
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-purple-600">
-                  Trustless USDC Agents on Arc
+                  Agentic Commerce on Arc
                 </span>
               </h1>
               <p className="text-xl text-gray-400 mb-8 leading-relaxed">
@@ -935,24 +935,24 @@ export default function Home() {
                 NEXT
               </div>
               <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center mb-4 mt-2">
-                <Layers className="w-5 h-5 text-purple-400" />
+                <Shield className="w-5 h-5 text-purple-400" />
               </div>
-              <h3 className="font-semibold mb-2">Batched Inference</h3>
+              <h3 className="font-semibold mb-2">On-Chain Verification</h3>
               <p className="text-sm text-gray-400 mb-4">
-                Process multiple spending decisions in a single proof for high-throughput agent operations.
+                Full cryptographic SNARK verification on Arc—not just attestation, but mathematical proof validation.
               </p>
               <ul className="space-y-1 text-xs text-gray-500">
                 <li className="flex items-center gap-1.5">
                   <ArrowRight className="w-3 h-3 text-purple-400" />
-                  Multi-sample batching
+                  HyperKZG verifier contract
                 </li>
                 <li className="flex items-center gap-1.5">
                   <ArrowRight className="w-3 h-3 text-purple-400" />
-                  Aggregated proofs
+                  BN254 pairing precompile
                 </li>
                 <li className="flex items-center gap-1.5">
                   <ArrowRight className="w-3 h-3 text-purple-400" />
-                  Reduced gas costs
+                  Trustless policy enforcement
                 </li>
               </ul>
             </div>
@@ -963,20 +963,20 @@ export default function Home() {
                 FUTURE
               </div>
               <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-4 mt-2">
-                <GitBranch className="w-5 h-5 text-cyan-400" />
+                <Layers className="w-5 h-5 text-cyan-400" />
               </div>
-              <h3 className="font-semibold mb-2">Advanced Architectures</h3>
+              <h3 className="font-semibold mb-2">Batched &amp; Advanced Models</h3>
               <p className="text-sm text-gray-400 mb-4">
-                Expand beyond MLPs to support attention mechanisms and transformer-based policy models.
+                Multi-sample batching and expanded model support for high-throughput agent operations.
               </p>
               <ul className="space-y-1 text-xs text-gray-500">
                 <li className="flex items-center gap-1.5">
                   <ArrowRight className="w-3 h-3 text-cyan-400" />
-                  Attention layers
+                  Batched inference
                 </li>
                 <li className="flex items-center gap-1.5">
                   <ArrowRight className="w-3 h-3 text-cyan-400" />
-                  Extended einsum ops
+                  Attention layers
                 </li>
                 <li className="flex items-center gap-1.5">
                   <ArrowRight className="w-3 h-3 text-cyan-400" />
