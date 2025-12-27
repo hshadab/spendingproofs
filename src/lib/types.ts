@@ -9,6 +9,7 @@ export interface ProofMetadata {
   proofSize: number;
   generationTime: number;
   proverVersion: string;
+  txIntentHash?: string; // Binds proof to specific transaction intent
 }
 
 export interface ProofData {
@@ -63,4 +64,38 @@ export interface ProofGenerationState {
   steps: ProofStep[];
   result?: ProveResponse;
   error?: string;
+}
+
+/**
+ * Unified spending proof representation for enforcement demos
+ */
+export interface SpendingProof {
+  proofHash: string;
+  inputHash: string;
+  modelHash: string;
+  decision: {
+    shouldBuy: boolean;
+    confidence: number;
+    riskScore: number;
+  };
+  timestamp: number;
+  proofSizeBytes: number;
+  generationTimeMs: number;
+  verified: boolean;
+  txIntentHash?: string;
+}
+
+/**
+ * Transaction intent structure for proof binding
+ */
+export interface TxIntent {
+  chainId: number;
+  usdcAddress: string;
+  sender: string;
+  recipient: string;
+  amount: bigint;
+  nonce: bigint;
+  expiry: number;
+  policyId: string;
+  policyVersion: number;
 }

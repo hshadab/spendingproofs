@@ -5,6 +5,7 @@ import { Shield, AlertTriangle, Play } from 'lucide-react';
 import { TamperPanel } from '@/components/TamperPanel';
 import { ProofViewer } from '@/components/ProofViewer';
 import { ProofProgress } from '@/components/ProofProgress';
+import { AttackDemos } from '@/components/AttackDemos';
 import {
   type SpendingModelInput,
   createDefaultInput,
@@ -180,6 +181,11 @@ export default function TamperPage() {
           >
             Reset Demo
           </button>
+
+          {/* Attack Demos */}
+          <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800">
+            <AttackDemos />
+          </div>
         </div>
       )}
     </div>

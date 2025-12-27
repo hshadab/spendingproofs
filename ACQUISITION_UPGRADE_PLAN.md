@@ -270,16 +270,16 @@ Private page linking:
 4. ✅ Add PolicyRegistry concept
 
 ### Week 2: High Value
-5. Add txIntentHash binding
-6. Add replay attack demo
-7. Split view (Agent vs Verifier)
+5. ✅ Add txIntentHash binding
+6. ✅ Add replay attack demo
+7. ✅ Split view (Agent vs Verifier)
 
 ### Week 3: Polish
-8. Proof semantics documentation
-9. Attack demos (model substitution, policy downgrade)
-10. Copy updates
+8. ✅ Proof semantics documentation
+9. ✅ Attack demos (model substitution, policy downgrade)
+10. ✅ Copy updates
 
-### Week 4: Reproducibility
+### Week 4: Reproducibility (Future)
 11. Docker compose setup
 12. E2E test script
 13. Circle integration path demos

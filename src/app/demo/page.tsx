@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Play, CreditCard, AlertTriangle, ArrowLeft, Shield } from 'lucide-react';
+import { Play, CreditCard, AlertTriangle, ArrowLeft, Shield, Lock, Users } from 'lucide-react';
 
 export default function DemoHub() {
   return (
@@ -56,6 +56,60 @@ export default function DemoHub() {
                   <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Policy Config</span>
                   <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Real Proofs</span>
                   <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Decision Visualization</span>
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          {/* Split View */}
+          <Link
+            href="/demo/splitview"
+            className="group p-6 bg-[#0d1117] border border-gray-800 rounded-xl hover:border-cyan-500/50 transition-colors"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-cyan-500/10 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                <Users className="w-6 h-6 text-cyan-400" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xl font-semibold">Agent vs Verifier View</h2>
+                  <span className="text-xs text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded">NEW</span>
+                </div>
+                <p className="text-gray-400 mb-4">
+                  Side-by-side comparison of what the agent sees vs what the verifier sees.
+                  Demonstrates the privacy-preserving nature of spending proofs.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Privacy Demo</span>
+                  <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Two-Party Protocol</span>
+                  <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Public Signals</span>
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          {/* Enforcement */}
+          <Link
+            href="/demo/enforcement"
+            className="group p-6 bg-[#0d1117] border border-gray-800 rounded-xl hover:border-red-500/50 transition-colors"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
+                <Lock className="w-6 h-6 text-red-400" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xl font-semibold">SpendingGate Enforcement</h2>
+                  <span className="text-xs text-red-400 bg-red-500/10 px-2 py-1 rounded">NEW</span>
+                </div>
+                <p className="text-gray-400 mb-4">
+                  See how transactions REVERT without valid proofs. Hard enforcement vs advisory attestation.
+                  Test no-proof, valid-proof, modified-amount, and replay scenarios.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Hard Enforcement</span>
+                  <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Revert Demo</span>
+                  <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Replay Protection</span>
                 </div>
               </div>
             </div>
@@ -119,14 +173,14 @@ export default function DemoHub() {
         {/* Technical Info */}
         <div className="mt-12 p-6 bg-[#0d1117] border border-gray-800 rounded-xl">
           <h3 className="font-semibold mb-4">Technical Details</h3>
-          <div className="grid md:grid-cols-2 gap-6 text-sm">
+          <div className="grid md:grid-cols-3 gap-6 text-sm">
             <div>
               <h4 className="text-gray-400 mb-2">Proof System</h4>
               <ul className="space-y-1 text-gray-500">
                 <li>JOLT-Atlas SNARK (HyperKZG/BN254)</li>
-                <li>45-55KB proof size</li>
-                <li>4-12 second generation</li>
-                <li>&lt;150ms verification</li>
+                <li>~48KB proof size</li>
+                <li>2.1s p50 / 3.8s p90 proving</li>
+                <li>45ms verification</li>
               </ul>
             </div>
             <div>
@@ -135,7 +189,16 @@ export default function DemoHub() {
                 <li>Chain ID: 5042002</li>
                 <li>USDC native gas</li>
                 <li>Sub-second finality</li>
-                <li>Attestation contract deployed</li>
+                <li>SpendingGate enforcement</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-gray-400 mb-2">Security Features</h4>
+              <ul className="space-y-1 text-gray-500">
+                <li>PolicyRegistry verification</li>
+                <li>txIntentHash binding</li>
+                <li>Replay protection</li>
+                <li>Model substitution defense</li>
               </ul>
             </div>
           </div>

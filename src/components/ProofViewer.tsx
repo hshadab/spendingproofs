@@ -116,6 +116,17 @@ export function ProofViewer({ proof, inference }: ProofViewerProps) {
               {truncateHash(proof.metadata.outputHash)}
             </span>
           </div>
+          {proof.metadata.txIntentHash && (
+            <div className="flex justify-between py-2 border-b border-slate-100 border-gray-800">
+              <span className="text-gray-500 flex items-center gap-1">
+                txIntentHash
+                <span className="text-xs text-purple-400">(binding)</span>
+              </span>
+              <span className="font-mono text-purple-400">
+                {truncateHash(proof.metadata.txIntentHash)}
+              </span>
+            </div>
+          )}
           <div className="flex justify-between py-2 border-b border-slate-100 border-gray-800">
             <span className="text-gray-500">Proof Size</span>
             <span className="font-mono text-white text-white">

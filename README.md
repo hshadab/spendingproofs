@@ -98,6 +98,10 @@ And produces 3 outputs:
 | `confidence` | Decision confidence (0-100%) |
 | `riskScore` | Risk assessment (0-100) |
 
+## Disclaimer
+
+This project demonstrates an Arc-native design pattern for zkML spending proofs. It is not affiliated with Circle Internet Financial or the official Arc blockchain team. The package namespace `@icme-labs/spending-proofs` is used for this demonstration.
+
 ## License
 
 MIT

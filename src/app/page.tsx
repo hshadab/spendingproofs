@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Shield, Zap, Code, Terminal, Copy, Check, ArrowRight, Box, Lock, Cpu, Bot, DollarSign, Globe, Clock, TrendingUp, ShoppingCart, AlertTriangle, CheckCircle, XCircle, Rocket, Layers, GitBranch, Gauge } from 'lucide-react';
+import { Shield, Zap, Code, Terminal, Copy, Check, ArrowRight, Box, Lock, Cpu, Bot, DollarSign, Globe, Clock, TrendingUp, ShoppingCart, AlertTriangle, CheckCircle, XCircle, Rocket, Layers, GitBranch, Gauge, Eye } from 'lucide-react';
+import { PerformanceMetrics } from '@/components/PerformanceMetrics';
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -192,10 +193,10 @@ function ModelExplorer() {
   );
 }
 
-const sdkExample = `import { PolicyProofs } from '@arc/policy-proofs';
+const sdkExample = `import { PolicyProofs } from '@icme-labs/spending-proofs';
 
 const client = new PolicyProofs({
-  proverUrl: 'https://prover.arc.network'
+  proverUrl: 'https://prover.spendingproofs.dev'
 });
 
 // Agent generates proof before every purchase
@@ -243,7 +244,7 @@ if (!verification.valid) {
 }
 
 // Check attestation on Arc chain
-import { isProofAttested } from '@arc/policy-proofs';
+import { isProofAttested } from '@icme-labs/spending-proofs';
 const attested = await isProofAttested(proof.proofHash);`;
 
 export default function Home() {
@@ -327,7 +328,7 @@ export default function Home() {
               </div>
               {/* Install command */}
               <div className="max-w-md">
-                <InstallCommand pkg="@arc/policy-proofs" />
+                <InstallCommand pkg="@icme-labs/spending-proofs" />
               </div>
             </div>
 
@@ -481,6 +482,108 @@ export default function Home() {
                         Proof reveals nothing about model weights or decision thresholds.
                       </p>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Proof Semantics */}
+      <section id="semantics" className="py-16 px-6 border-t border-gray-800">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">What Is Actually Proven</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Understanding exactly what the cryptographic proof guarantees—and what remains private.
+            </p>
+          </div>
+
+          {/* Verified Statement */}
+          <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/30 rounded-xl p-6 mb-8 text-center">
+            <h3 className="text-lg font-semibold mb-3 text-purple-400">The Verified Statement</h3>
+            <p className="text-lg font-mono text-white">
+              &quot;Model <span className="text-cyan-400">M</span> evaluated inputs <span className="text-cyan-400">X</span> bound to txIntentHash <span className="text-cyan-400">T</span> and produced decision <span className="text-green-400">D</span>.&quot;
+            </p>
+            <p className="text-sm text-gray-400 mt-3">
+              This is a mathematical fact, verifiable by anyone, without revealing the private inputs.
+            </p>
+          </div>
+
+          {/* Public vs Private Table */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Public Fields */}
+            <div className="bg-[#0a0a0a] border border-green-500/30 rounded-xl p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Eye className="w-5 h-5 text-green-400" />
+                Public (Verifier Sees)
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 bg-[#0d1117] rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm font-medium">policyId</div>
+                    <div className="text-xs text-gray-500">Identifier for the spending policy (e.g., &quot;default-spending-policy&quot;)</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-[#0d1117] rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm font-medium">modelHash / vkHash</div>
+                    <div className="text-xs text-gray-500">Cryptographic commitments to the model and verification key</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-[#0d1117] rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm font-medium">txIntentHash</div>
+                    <div className="text-xs text-gray-500">Binds proof to specific transaction (amount, recipient, nonce, expiry)</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-[#0d1117] rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm font-medium">decision</div>
+                    <div className="text-xs text-gray-500">shouldBuy (boolean), confidence (0-100%), riskScore (0-100)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Private Fields */}
+            <div className="bg-[#0a0a0a] border border-red-500/30 rounded-xl p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Lock className="w-5 h-5 text-red-400" />
+                Private (Hidden from Verifier)
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 bg-[#0d1117] rounded-lg">
+                  <XCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm font-medium">Policy Thresholds</div>
+                    <div className="text-xs text-gray-500">Daily limit, max single purchase, min success rate, etc.</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-[#0d1117] rounded-lg">
+                  <XCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm font-medium">Model Weights</div>
+                    <div className="text-xs text-gray-500">Neural network parameters and decision logic</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-[#0d1117] rounded-lg">
+                  <XCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm font-medium">Private Context Inputs</div>
+                    <div className="text-xs text-gray-500">Budget remaining, spending history, behavioral patterns</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-[#0d1117] rounded-lg">
+                  <XCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm font-medium">Service Relationships</div>
+                    <div className="text-xs text-gray-500">Which services the agent trusts and their reputation data</div>
                   </div>
                 </div>
               </div>
@@ -976,7 +1079,7 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-4 text-sm">
               <div className="bg-[#0a0a0a]/50 rounded-lg p-4">
                 <div className="text-purple-400 font-mono text-xs mb-2">1. IMPORT</div>
-                <code className="text-gray-400 text-xs">import &#123; PolicyProofs &#125; from &apos;@arc/policy-proofs&apos;</code>
+                <code className="text-gray-400 text-xs">import &#123; PolicyProofs &#125; from &apos;@icme-labs/spending-proofs&apos;</code>
               </div>
               <div className="bg-[#0a0a0a]/50 rounded-lg p-4">
                 <div className="text-cyan-400 font-mono text-xs mb-2">2. PROVE</div>
@@ -1095,10 +1198,10 @@ export default function Home() {
               <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-4">
                 <Zap className="w-5 h-5 text-cyan-400" />
               </div>
-              <h3 className="font-semibold mb-2">3-7x Faster</h3>
+              <h3 className="font-semibold mb-2">Fast Proving</h3>
               <p className="text-sm text-gray-400">
-                Benchmarks show ~0.7s proving time vs 2-5+ seconds for competing zkML frameworks.
-                Sub-second proofs for real-time agent decisions.
+                Prover compute p50: 2.1s, p90: 3.8s. End-to-end latency includes network
+                and queue overhead. Cold starts ~8s.
               </p>
             </div>
 
@@ -1141,8 +1244,8 @@ export default function Home() {
               </div>
               <h3 className="font-semibold mb-2">HyperKZG + BN254</h3>
               <p className="text-sm text-gray-400">
-                Production-ready polynomial commitment scheme. 143ms verification time
-                with compact proof sizes suitable for on-chain attestation.
+                Production-ready polynomial commitment scheme. 45ms offchain verification.
+                Compact ~48KB proofs suitable for on-chain attestation.
               </p>
             </div>
 
@@ -1158,37 +1261,9 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="bg-[#0d1117] border border-gray-800 rounded-xl p-6 max-w-2xl mx-auto">
-            <h4 className="font-semibold mb-4 text-center">Spending Model Performance</h4>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Proof Generation</span>
-                <span className="font-mono text-cyan-400">~0.7s</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Verification</span>
-                <span className="font-mono text-cyan-400">143ms</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Model Inputs</span>
-                <span className="font-mono text-white">8 features</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Model Outputs</span>
-                <span className="font-mono text-white">3 values</span>
-              </div>
-            </div>
-            <div className="mt-4 pt-4 border-t border-gray-700 text-center">
-              <a
-                href="https://github.com/ICME-Lab/jolt-atlas"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300"
-              >
-                View JOLT Atlas on GitHub
-                <ArrowRight className="w-3 h-3" />
-              </a>
-            </div>
+          {/* Unified Performance Metrics */}
+          <div className="max-w-2xl mx-auto">
+            <PerformanceMetrics variant="detailed" showBenchmarkLink={true} />
           </div>
         </div>
       </section>
@@ -1378,7 +1453,7 @@ export default function Home() {
               <div className="space-y-3">
                 <div className="bg-[#0d1117] border border-gray-800 rounded-lg px-4 py-2 font-mono text-sm">
                   <span className="text-gray-500">$ </span>
-                  <span className="text-gray-300">npm install @arc/policy-proofs</span>
+                  <span className="text-gray-300">npm install @icme-labs/spending-proofs</span>
                 </div>
                 <a
                   href="https://github.com"
@@ -1403,7 +1478,7 @@ export default function Home() {
               <div className="space-y-3">
                 <div className="bg-[#0d1117] border border-gray-800 rounded-lg px-4 py-2 font-mono text-sm">
                   <span className="text-gray-500">$ </span>
-                  <span className="text-gray-300">npm install -g @arc/policy-proofs-cli</span>
+                  <span className="text-gray-300">npm install -g @icme-labs/spending-proofs-cli</span>
                 </div>
                 <a
                   href="https://github.com"
@@ -1443,6 +1518,41 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-800 py-8 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-700 rounded flex items-center justify-center">
+                <Shield className="w-4 h-4" />
+              </div>
+              <span className="text-sm text-gray-400">ICME Labs - Spending Proofs</span>
+            </div>
+            <p className="text-xs text-gray-500 text-center">
+              Demonstration of Arc-native design. Not affiliated with Circle Internet Financial.
+            </p>
+            <div className="flex items-center gap-4 text-sm text-gray-400">
+              <a
+                href="https://github.com/ICME-Lab/jolt-atlas"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+              >
+                Jolt-Atlas
+              </a>
+              <a
+                href="https://github.com/hshadab/spendingproofs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+              >
+                GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
 
     </div>
   );

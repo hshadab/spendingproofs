@@ -1,16 +1,39 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import type { ProofGenerationState, ProveResponse, ProofStep } from '@/lib/types';
+import type { ProofGenerationState, ProveResponse, ProofStep, TxIntent } from '@/lib/types';
 import { spendingInputToNumeric, runSpendingModel, DEFAULT_SPENDING_POLICY, type SpendingModelInput } from '@/lib/spendingModel';
 
+// Generate txIntentHash for proof binding
+function generateTxIntentHash(input: SpendingModelInput, txIntent?: Partial<TxIntent>): string {
+  const intentData = {
+    chainId: txIntent?.chainId || 5042002,
+    amount: Math.floor(input.priceUsdc * 1e6), // USDC has 6 decimals
+    recipient: txIntent?.recipient || '0x8ba1f109551bD432803012645Ac136ddd64DBA72',
+    nonce: txIntent?.nonce || BigInt(Date.now()),
+    expiry: txIntent?.expiry || Math.floor(Date.now() / 1000) + 3600,
+    policyId: txIntent?.policyId || 'default-spending-policy',
+  };
+
+  // Simple deterministic hash (in real implementation, use keccak256)
+  const packed = JSON.stringify(intentData);
+  let hash = 0;
+  for (let i = 0; i < packed.length; i++) {
+    const char = packed.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return '0x' + Math.abs(hash).toString(16).padStart(64, '0');
+}
+
 // Generate mock proof data for static demo
-function generateMockProof(input: SpendingModelInput): ProveResponse {
+function generateMockProof(input: SpendingModelInput, txIntent?: Partial<TxIntent>): ProveResponse {
   const decision = runSpendingModel(input, DEFAULT_SPENDING_POLICY);
   const mockHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
   const inputHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
   const outputHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
   const modelHash = '0x7a8b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890';
+  const txIntentHash = generateTxIntentHash(input, txIntent);
   const generationTime = 2000 + Math.random() * 4000;
 
   return {
@@ -25,6 +48,7 @@ function generateMockProof(input: SpendingModelInput): ProveResponse {
         proofSize: Math.floor(45000 + Math.random() * 10000),
         generationTime,
         proverVersion: 'jolt-atlas-0.1.0-mock',
+        txIntentHash, // Added: binds proof to specific transaction intent
       },
       tag: 'spending',
       timestamp: Date.now(),
@@ -61,6 +85,7 @@ export function useProofGeneration() {
       elapsedMs: 0,
       steps: [
         { name: 'Running ONNX inference', status: 'pending' },
+        { name: 'Computing txIntentHash', status: 'pending' },
         { name: 'Preparing witness data', status: 'pending' },
         { name: 'Generating JOLT SNARK proof', status: 'pending' },
         { name: 'Computing commitments', status: 'pending' },
@@ -77,13 +102,14 @@ export function useProofGeneration() {
       const progress = Math.min(95, (elapsed / estimatedTotal) * 100);
 
       // Update steps based on progress
-      const stepProgress = Math.floor((progress / 100) * 5);
+      const stepProgress = Math.floor((progress / 100) * 6);
       const steps: ProofStep[] = [
         { name: 'Running ONNX inference', status: stepProgress > 0 ? 'done' : stepProgress === 0 ? 'running' : 'pending', durationMs: stepProgress > 0 ? 50 : undefined },
-        { name: 'Preparing witness data', status: stepProgress > 1 ? 'done' : stepProgress === 1 ? 'running' : 'pending', durationMs: stepProgress > 1 ? 200 : undefined },
-        { name: 'Generating JOLT SNARK proof', status: stepProgress > 2 ? 'done' : stepProgress === 2 ? 'running' : 'pending', durationMs: stepProgress > 2 ? 5000 : undefined },
-        { name: 'Computing commitments', status: stepProgress > 3 ? 'done' : stepProgress === 3 ? 'running' : 'pending', durationMs: stepProgress > 3 ? 1500 : undefined },
-        { name: 'Finalizing proof', status: stepProgress > 4 ? 'done' : stepProgress === 4 ? 'running' : 'pending' },
+        { name: 'Computing txIntentHash', status: stepProgress > 1 ? 'done' : stepProgress === 1 ? 'running' : 'pending', durationMs: stepProgress > 1 ? 25 : undefined },
+        { name: 'Preparing witness data', status: stepProgress > 2 ? 'done' : stepProgress === 2 ? 'running' : 'pending', durationMs: stepProgress > 2 ? 200 : undefined },
+        { name: 'Generating JOLT SNARK proof', status: stepProgress > 3 ? 'done' : stepProgress === 3 ? 'running' : 'pending', durationMs: stepProgress > 3 ? 5000 : undefined },
+        { name: 'Computing commitments', status: stepProgress > 4 ? 'done' : stepProgress === 4 ? 'running' : 'pending', durationMs: stepProgress > 4 ? 1500 : undefined },
+        { name: 'Finalizing proof', status: stepProgress > 5 ? 'done' : stepProgress === 5 ? 'running' : 'pending' },
       ];
 
       const currentStepIdx = steps.findIndex((s) => s.status === 'running');
@@ -140,8 +166,9 @@ export function useProofGeneration() {
           elapsedMs: finalElapsed,
           steps: [
             { name: 'Running ONNX inference', status: 'done', durationMs: 50 },
+            { name: 'Computing txIntentHash', status: 'done', durationMs: 25 },
             { name: 'Preparing witness data', status: 'done', durationMs: 200 },
-            { name: 'Generating JOLT SNARK proof', status: 'done', durationMs: result.generationTimeMs - 1750 },
+            { name: 'Generating JOLT SNARK proof', status: 'done', durationMs: result.generationTimeMs - 1775 },
             { name: 'Computing commitments', status: 'done', durationMs: 1000 },
             { name: 'Finalizing proof', status: 'done', durationMs: 500 },
           ],
@@ -155,6 +182,7 @@ export function useProofGeneration() {
           elapsedMs: finalElapsed,
           steps: [
             { name: 'Running ONNX inference', status: 'error' },
+            { name: 'Computing txIntentHash', status: 'pending' },
             { name: 'Preparing witness data', status: 'pending' },
             { name: 'Generating JOLT SNARK proof', status: 'pending' },
             { name: 'Computing commitments', status: 'pending' },
