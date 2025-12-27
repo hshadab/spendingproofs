@@ -2,7 +2,7 @@
  * Contract Addresses and ABIs for Arc Testnet
  */
 
-import { type Address } from 'viem';
+type Address = `0x${string}`;
 
 /**
  * Deployed contract addresses on Arc Testnet (Chain ID: 5042002)
