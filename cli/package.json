@@ -1,0 +1,35 @@
+{
+  "name": "@arc/policy-proofs-cli",
+  "version": "0.1.0",
+  "description": "CLI for Arc Policy Proofs - generate and verify zkML spending proofs",
+  "bin": {
+    "arc-prove": "./dist/cli.js"
+  },
+  "main": "dist/cli.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/cli.ts --format cjs --dts",
+    "dev": "tsup src/cli.ts --format cjs --dts --watch",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [
+    "arc",
+    "zkml",
+    "cli",
+    "proof",
+    "spending"
+  ],
+  "author": "Arc Builders",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}
