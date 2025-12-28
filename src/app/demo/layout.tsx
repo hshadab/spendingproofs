@@ -22,6 +22,12 @@ export default function DemoLayout({
               <Link href="/demo/playground" className="text-gray-400 hover:text-white transition-colors">
                 Playground
               </Link>
+              <Link href="/demo/splitview" className="text-gray-400 hover:text-white transition-colors">
+                Split View
+              </Link>
+              <Link href="/demo/enforcement" className="text-gray-400 hover:text-white transition-colors">
+                Enforcement
+              </Link>
               <Link href="/demo/payment" className="text-gray-400 hover:text-white transition-colors">
                 Payment
               </Link>
