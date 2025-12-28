@@ -264,28 +264,17 @@ export default function Home() {
               <span className="font-semibold text-lg">Arc Spending Policy Proofs</span>
             </Link>
             <div className="hidden md:flex items-center gap-6 text-sm text-gray-400">
-              <Link href="#problem" className="hover:text-white transition-colors">Problem</Link>
-              <Link href="#why-arc" className="hover:text-white transition-colors">Why Arc</Link>
-              <Link href="#use-cases" className="hover:text-white transition-colors">Use Cases</Link>
-              <Link href="#composable" className="hover:text-white transition-colors">Build On</Link>
-              <Link href="#enterprise" className="hover:text-white transition-colors">Enterprise</Link>
-              <Link href="#roadmap" className="hover:text-white transition-colors">Roadmap</Link>
               <Link href="/demo" className="hover:text-white transition-colors">Demo</Link>
+              <a href="https://github.com/hshadab/spendingproofs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <Link
               href="/demo"
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
               Try Demo
             </Link>
-            <a
-              href="#quickstart"
-              className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            >
-              Get Started
-            </a>
           </div>
         </div>
       </nav>
@@ -312,13 +301,13 @@ export default function Home() {
                 Transactions revert without valid proofs. Built on Jolt-Atlas for Arc.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <a
-                  href="#quickstart"
+                <button
+                  onClick={() => setActiveSection('integrate')}
                   className="inline-flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors"
                 >
                   Get Started
                   <ArrowRight className="w-4 h-4" />
-                </a>
+                </button>
                 <Link
                   href="/demo"
                   className="inline-flex items-center justify-center gap-2 border border-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-white/5 transition-colors"
