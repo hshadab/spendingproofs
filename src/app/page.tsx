@@ -325,6 +325,9 @@ export default function Home() {
         </div>
       </nav>
 
+      {/* === ARC + AGENTS TAB === */}
+      {activeSection === 'arc' && (
+      <>
       {/* Hero - Agentic Commerce Focus */}
       <section className="pt-24 pb-16 px-6">
         <div className="max-w-6xl mx-auto">
@@ -375,9 +378,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* === ARC + AGENTS TAB === */}
-      {activeSection === 'arc' && (
-      <>
       {/* Problem Statement */}
       <section id="problem" className="py-16 px-6 border-t border-gray-800">
         <div className="max-w-6xl mx-auto">
