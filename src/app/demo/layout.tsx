@@ -16,7 +16,7 @@ export default function DemoLayout({
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back to SDK</span>
+              <span className="hidden sm:inline">Back to Main</span>
             </Link>
             <div className="hidden md:flex items-center gap-4 text-sm">
               <Link href="/demo/playground" className="text-gray-400 hover:text-white transition-colors">
@@ -40,7 +40,7 @@ export default function DemoLayout({
             <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center">
               <Shield className="w-5 h-5" />
             </div>
-            <span className="font-semibold hidden sm:inline">Arc Policy Proofs</span>
+            <span className="font-semibold hidden sm:inline">Spending Proofs</span>
           </Link>
         </div>
       </nav>
