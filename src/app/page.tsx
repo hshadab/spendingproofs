@@ -249,6 +249,7 @@ const attested = await isProofAttested(proof.proofHash);`;
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'sdk' | 'cli'>('sdk');
+  const [activeSection, setActiveSection] = useState<'arc' | 'proof' | 'security' | 'integrate'>('arc');
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
@@ -339,6 +340,61 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Section Tabs */}
+      <div className="sticky top-16 z-40 bg-[#0a0a0a]/95 backdrop-blur-sm border-y border-gray-800">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
+            <button
+              onClick={() => setActiveSection('arc')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                activeSection === 'arc'
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Cpu className="w-4 h-4" />
+              Arc + Agents
+            </button>
+            <button
+              onClick={() => setActiveSection('proof')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                activeSection === 'proof'
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Shield className="w-4 h-4" />
+              Proof System
+            </button>
+            <button
+              onClick={() => setActiveSection('security')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                activeSection === 'security'
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Lock className="w-4 h-4" />
+              Security
+            </button>
+            <button
+              onClick={() => setActiveSection('integrate')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                activeSection === 'integrate'
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Code className="w-4 h-4" />
+              Integrate
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* === ARC + AGENTS TAB === */}
+      {activeSection === 'arc' && (
+      <>
       {/* Problem Statement */}
       <section id="problem" className="py-16 px-6 border-t border-gray-800">
         <div className="max-w-6xl mx-auto">
@@ -488,7 +544,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </>
+      )}
 
+      {/* === SECURITY TAB === */}
+      {activeSection === 'security' && (
+      <>
       {/* Proof Semantics */}
       <section id="semantics" className="py-16 px-6 border-t border-gray-800">
         <div className="max-w-6xl mx-auto">
@@ -590,7 +651,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </>
+      )}
 
+      {/* === PROOF SYSTEM TAB === */}
+      {activeSection === 'proof' && (
+      <>
       {/* Spending Policy Model */}
       <section id="model" className="py-16 px-6 border-t border-gray-800 bg-[#0d1117]/50">
         <div className="max-w-6xl mx-auto">
@@ -818,7 +884,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </>
+      )}
 
+      {/* === ARC TAB (continued) === */}
+      {activeSection === 'arc' && (
+      <>
       {/* Why Agents Require Arc */}
       <section id="why-arc" className="py-16 px-6 border-t border-gray-800 bg-[#0d1117]/50">
         <div className="max-w-6xl mx-auto">
@@ -1026,7 +1097,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </>
+      )}
 
+      {/* === INTEGRATE TAB === */}
+      {activeSection === 'integrate' && (
+      <>
       {/* Build On Spending Proofs - Composable Primitive */}
       <section id="composable" className="py-16 px-6 border-t border-gray-800 bg-[#0d1117]/50">
         <div className="max-w-6xl mx-auto">
@@ -1180,7 +1256,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </>
+      )}
 
+      {/* === PROOF SYSTEM TAB (continued) === */}
+      {activeSection === 'proof' && (
+      <>
       {/* Why Jolt-Atlas zkML */}
       <section id="why-jolt" className="py-16 px-6 border-t border-gray-800 bg-[#0d1117]/50">
         <div className="max-w-6xl mx-auto">
@@ -1266,7 +1347,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </>
+      )}
 
+      {/* === INTEGRATE TAB (continued) === */}
+      {activeSection === 'integrate' && (
+      <>
       {/* Roadmap */}
       <section id="roadmap" className="py-16 px-6 border-t border-gray-800 bg-[#0d1117]/50">
         <div className="max-w-6xl mx-auto">
@@ -1517,8 +1603,10 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </>
+      )}
 
-      {/* Footer */}
+      {/* Footer - Always visible */}
       <footer className="border-t border-gray-800 py-8 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
