@@ -297,19 +297,18 @@ export default function Home() {
             <div>
               <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-3 py-1 text-sm text-purple-400 mb-6">
                 <Shield className="w-4 h-4" />
-                Trust Primitive for Agentic Commerce on Arc
+                Proof-Gated USDC Execution for Autonomous Agents
               </div>
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-                zkML Spending Proofs for
+                No Valid Proof?
                 <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-purple-600">
-                  USDC Agents on Arc
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-600">
+                  No Transfer.
                 </span>
               </h1>
               <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-                Cryptographic proof of policy compliance for autonomous USDC agents.
-                Prove your agent followed its spending rules—without revealing them.
-                Built on Jolt-Atlas. Designed for Arc.
+                zkML spending proofs that <strong className="text-white">enforce</strong> policy compliance—not just attest it.
+                Transactions revert without valid proofs. Built on Jolt-Atlas for Arc.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <a
