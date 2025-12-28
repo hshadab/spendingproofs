@@ -255,20 +255,66 @@ export default function Home() {
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Navigation */}
       <nav className="border-b border-gray-800 bg-[#0a0a0a]/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-8">
+        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center">
                 <Shield className="w-5 h-5" />
               </div>
-              <span className="font-semibold text-lg">Arc Spending Policy Proofs</span>
+              <span className="font-semibold text-lg hidden sm:inline">Spending Proofs</span>
             </Link>
-            <div className="hidden md:flex items-center gap-6 text-sm text-gray-400">
-              <Link href="/demo" className="hover:text-white transition-colors">Demo</Link>
-              <a href="https://github.com/hshadab/spendingproofs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
+            {/* Section Tabs */}
+            <div className="hidden md:flex items-center gap-1">
+              <button
+                onClick={() => setActiveSection('arc')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  activeSection === 'arc'
+                    ? 'bg-purple-500/20 text-purple-400'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Cpu className="w-3.5 h-3.5" />
+                Arc + Agents
+              </button>
+              <button
+                onClick={() => setActiveSection('proof')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  activeSection === 'proof'
+                    ? 'bg-purple-500/20 text-purple-400'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Shield className="w-3.5 h-3.5" />
+                Proof System
+              </button>
+              <button
+                onClick={() => setActiveSection('security')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  activeSection === 'security'
+                    ? 'bg-purple-500/20 text-purple-400'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Lock className="w-3.5 h-3.5" />
+                Security
+              </button>
+              <button
+                onClick={() => setActiveSection('integrate')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  activeSection === 'integrate'
+                    ? 'bg-purple-500/20 text-purple-400'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Code className="w-3.5 h-3.5" />
+                Integrate
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <a href="https://github.com/hshadab/spendingproofs" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 hover:text-white transition-colors hidden sm:inline">
+              GitHub
+            </a>
             <Link
               href="/demo"
               className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -328,58 +374,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Section Tabs */}
-      <div className="sticky top-16 z-40 bg-[#0a0a0a]/95 backdrop-blur-sm border-y border-gray-800">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
-            <button
-              onClick={() => setActiveSection('arc')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                activeSection === 'arc'
-                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Cpu className="w-4 h-4" />
-              Arc + Agents
-            </button>
-            <button
-              onClick={() => setActiveSection('proof')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                activeSection === 'proof'
-                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Shield className="w-4 h-4" />
-              Proof System
-            </button>
-            <button
-              onClick={() => setActiveSection('security')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                activeSection === 'security'
-                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Lock className="w-4 h-4" />
-              Security
-            </button>
-            <button
-              onClick={() => setActiveSection('integrate')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                activeSection === 'integrate'
-                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Code className="w-4 h-4" />
-              Integrate
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* === ARC + AGENTS TAB === */}
       {activeSection === 'arc' && (
