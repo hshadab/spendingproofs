@@ -336,13 +336,13 @@ export default function Home() {
             <div>
               <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-3 py-1 text-sm text-purple-400 mb-6">
                 <Shield className="w-4 h-4" />
-                Proof-Gated USDC Execution for Autonomous Agents
+                Proof-Gated USDC Execution for Agentic Commerce on Arc
               </div>
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-                No Valid Proof?
+                No Spending Proof?
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-600">
-                  No Transfer.
+                  No USDC Transfer.
                 </span>
               </h1>
               <p className="text-xl text-gray-400 mb-8 leading-relaxed">
