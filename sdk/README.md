@@ -2,6 +2,8 @@
 
 zkML spending policy proofs for Arc chain. Generate and verify SNARK proofs for autonomous agent spending decisions.
 
+**Production infrastructure for agent commerce. Deploy today.**
+
 ## Installation
 
 ```bash
@@ -14,7 +16,7 @@ npm install @arc/policy-proofs
 import { PolicyProofs } from '@arc/policy-proofs';
 
 const client = new PolicyProofs({
-  proverUrl: 'http://localhost:3001'
+  proverUrl: 'https://prover.spendingproofs.dev' // Hosted prover
 });
 
 // Generate a proof
@@ -38,7 +40,108 @@ console.log(result.proofHash); // 0x...
 - **SNARK Proofs**: Generate real zkML proofs using JOLT-Atlas (HyperKZG/BN254)
 - **On-Chain Verification**: Verify proofs on Arc Testnet
 - **Local Decisions**: Fast local policy evaluation without proof overhead
+- **Wallet Integration**: High-level wallet SDK for proof-gated transfers
+- **React Hooks**: Ready-to-use hooks for React applications
+- **Wagmi Support**: Native integration with wagmi for web3 apps
 - **TypeScript Native**: Full type safety and IntelliSense
+
+## Wallet SDK
+
+High-level wallet class for proof-gated spending:
+
+```typescript
+import { SpendingProofsWallet } from '@arc/policy-proofs/wallet';
+
+const wallet = new SpendingProofsWallet({
+  proverUrl: 'https://prover.spendingproofs.dev',
+  agentAddress: '0x...',
+  chainId: 5042002, // Arc Testnet
+});
+
+// Prepare a gated transfer
+const result = await wallet.prepareGatedTransfer({
+  recipient: '0x...',
+  amountUsdc: 50,
+  input: {
+    priceUsdc: 50,
+    budgetUsdc: 100,
+    spentTodayUsdc: 20,
+    dailyLimitUsdc: 200,
+    serviceSuccessRate: 0.95,
+    serviceTotalCalls: 100,
+    purchasesInCategory: 3,
+    timeSinceLastPurchase: 1.5,
+  },
+});
+
+if (result.approved) {
+  console.log('Proof hash:', result.proof.proofHash);
+  console.log('TX intent hash:', result.txIntentHash);
+  // Execute the transfer with your wallet...
+}
+```
+
+## React Integration
+
+```tsx
+import { useState, useCallback, useMemo } from 'react';
+import { PolicyProofs, SpendingInput, ProofResult } from '@arc/policy-proofs';
+
+function useSpendingProofs(proverUrl: string) {
+  const client = useMemo(() => new PolicyProofs({ proverUrl }), [proverUrl]);
+  const [proof, setProof] = useState<ProofResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const generateProof = useCallback(async (input: SpendingInput) => {
+    setIsLoading(true);
+    try {
+      const result = await client.prove(input);
+      setProof(result);
+      return result;
+    } catch (e) {
+      setError(e instanceof Error ? e : new Error('Failed'));
+      throw e;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [client]);
+
+  return { proof, isLoading, error, generateProof };
+}
+```
+
+## Wagmi Integration
+
+```typescript
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import {
+  getGatedTransferArgs,
+  getExplorerTxUrl,
+  parseUSDC
+} from '@arc/policy-proofs/wagmi';
+import { SpendingProofsWallet } from '@arc/policy-proofs/wallet';
+
+// Prepare proof and execute gated transfer
+const wallet = new SpendingProofsWallet({ proverUrl, agentAddress });
+const { writeContract, data: hash } = useWriteContract();
+
+async function executeGatedTransfer() {
+  const result = await wallet.prepareGatedTransfer({ ... });
+
+  if (result.approved) {
+    writeContract(getGatedTransferArgs({
+      spendingGateAddress: '0x...',
+      recipient: '0x...',
+      amountWei: parseUSDC(50),
+      proofHash: result.proof.proofHash as `0x${string}`,
+      txIntentHash: result.txIntentHash as `0x${string}`,
+      nonce: result.txIntent.nonce,
+      expiry: BigInt(result.txIntent.expiry),
+    }));
+  }
+}
+```
 
 ## API Reference
 
@@ -106,41 +209,13 @@ const decision = client.decide(input);
 // { shouldBuy: boolean, confidence: number, riskScore: number }
 ```
 
-#### health()
-
-Check prover service health.
-
-```typescript
-const status = await client.health();
-// { healthy: boolean, models: string[] }
-```
-
 ### On-Chain Verification
 
 ```typescript
-import { isProofValidOnChain, ARC_TESTNET } from '@arc/policy-proofs';
+import { isProofAttested, ARC_TESTNET } from '@arc/policy-proofs';
 
-// Check if proof is valid on Arc Testnet
-const isValid = await isProofValidOnChain(proofHash);
-
-// With custom options
-const isValid = await isProofValidOnChain(proofHash, {
-  contractAddress: '0x...',
-  rpcUrl: 'https://rpc.testnet.arc.network',
-});
-```
-
-### Utilities
-
-```typescript
-import {
-  spendingInputToArray,    // Convert input object to array
-  arrayToSpendingInput,    // Convert array to input object
-  validateSpendingInput,   // Validate input values
-  formatProofHash,         // Format hash for display
-  getExplorerTxUrl,        // Get Arc explorer URL for tx
-  defaultPolicy,           // Get default spending policy
-} from '@arc/policy-proofs';
+// Check if proof is attested on Arc Testnet
+const isValid = await isProofAttested(proofHash);
 ```
 
 ## Spending Model Inputs
@@ -172,25 +247,28 @@ import { ARC_TESTNET } from '@arc/policy-proofs';
 // }
 ```
 
-## With Viem/Wagmi
+## Why Arc?
 
-```typescript
-import { getProofAttestationContract } from '@arc/policy-proofs';
-import { createPublicClient, http } from 'viem';
+Spending proofs require Arc's unique infrastructure:
 
-const client = createPublicClient({
-  chain: arcTestnet,
-  transport: http(),
-});
+| Feature | Arc | Other L2s |
+|---------|-----|-----------|
+| Gas Token | USDC (stable) | ETH (volatile) |
+| Finality | <1s deterministic | ~7 days soft |
+| Reorg Risk | None | Sequencer-dependent |
+| Privacy | Opt-in available | None |
 
-const contract = getProofAttestationContract();
+Learn more: [Arc Documentation](https://arc.builders)
 
-const isValid = await client.readContract({
-  ...contract,
-  functionName: 'isProofValid',
-  args: [proofHash as `0x${string}`],
-});
-```
+## Security
+
+- **inputsHash**: Prevents input tampering after proof generation
+- **txIntentHash**: Binds proof to specific transaction intent
+- **Nonce**: Prevents proof replay attacks
+- **Expiry**: Limits proof validity window
+- **PolicyRegistry**: On-chain model hash verification
+
+See our [Security Model](/security) for comprehensive threat analysis.
 
 ## License
 

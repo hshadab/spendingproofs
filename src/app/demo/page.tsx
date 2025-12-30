@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Play, CreditCard, AlertTriangle, Shield, Lock, Users } from 'lucide-react';
+import { Play, CreditCard, AlertTriangle, Lock, Eye } from 'lucide-react';
 
 export default function DemoHub() {
   return (
@@ -9,8 +9,8 @@ export default function DemoHub() {
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Interactive Demos</h1>
         <p className="text-gray-400 text-lg">
-          Experience zkML spending proofs in action. Try the playground,
-          run an end-to-end payment, or test tamper detection.
+          Experience zkML spending proofs in action. Generate real proofs,
+          see the privacy model, and explore enforcement scenarios.
         </p>
       </div>
 
@@ -27,76 +27,25 @@ export default function DemoHub() {
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xl font-semibold">Interactive Playground</h2>
-                <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">Recommended</span>
+                <span className="text-xs text-purple-400 bg-purple-500/10 px-2 py-1 rounded">Start Here</span>
               </div>
               <p className="text-gray-400 mb-4">
-                Configure spending policies with sliders, simulate purchase scenarios,
-                and watch real SNARK proofs generate in 4-12 seconds.
+                Configure spending policies, simulate purchases, and generate cryptographic proofs.
+                Toggle between Agent and Verifier views to see what stays private vs public.
               </p>
               <div className="flex flex-wrap gap-2">
                 <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Policy Config</span>
                 <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Real Proofs</span>
-                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Decision Visualization</span>
+                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded flex items-center gap-1">
+                  <Eye className="w-3 h-3" />
+                  Split View
+                </span>
               </div>
             </div>
           </div>
         </Link>
 
-        {/* Split View */}
-        <Link
-          href="/demo/splitview"
-          className="group p-6 bg-[#0d1117] border border-gray-800 rounded-xl hover:border-cyan-500/50 transition-colors"
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-cyan-500/10 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-              <Users className="w-6 h-6 text-cyan-400" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-semibold">Agent vs Verifier View</h2>
-                <span className="text-xs text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded">NEW</span>
-              </div>
-              <p className="text-gray-400 mb-4">
-                Side-by-side comparison of what the agent sees vs what the verifier sees.
-                Demonstrates the privacy-preserving nature of spending proofs.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Privacy Demo</span>
-                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Two-Party Protocol</span>
-                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Public Signals</span>
-              </div>
-            </div>
-          </div>
-        </Link>
-
-        {/* Enforcement */}
-        <Link
-          href="/demo/enforcement"
-          className="group p-6 bg-[#0d1117] border border-gray-800 rounded-xl hover:border-red-500/50 transition-colors"
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
-              <Lock className="w-6 h-6 text-red-400" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-semibold">SpendingGate Enforcement</h2>
-                <span className="text-xs text-red-400 bg-red-500/10 px-2 py-1 rounded">NEW</span>
-              </div>
-              <p className="text-gray-400 mb-4">
-                See how transactions REVERT without valid proofs. Hard enforcement vs advisory attestation.
-                Test no-proof, valid-proof, modified-amount, and replay scenarios.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Hard Enforcement</span>
-                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Revert Demo</span>
-                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Replay Protection</span>
-              </div>
-            </div>
-          </div>
-        </Link>
-
-        {/* Payment */}
+        {/* Payment + Enforcement */}
         <Link
           href="/demo/payment"
           className="group p-6 bg-[#0d1117] border border-gray-800 rounded-xl hover:border-green-500/50 transition-colors"
@@ -107,23 +56,26 @@ export default function DemoHub() {
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-semibold">End-to-End Payment</h2>
-                <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">Requires Wallet</span>
+                <h2 className="text-xl font-semibold">Payment Flow</h2>
+                <span className="text-xs text-green-400 bg-green-500/10 px-2 py-1 rounded flex items-center gap-1">
+                  <Lock className="w-3 h-3" />
+                  No Proof, No Payment
+                </span>
               </div>
               <p className="text-gray-400 mb-4">
-                Connect your wallet and run the full flow: policy check, proof generation,
-                on-chain attestation, and USDC payment on Arc Testnet.
+                End-to-end flow: connect wallet, generate proof, submit attestation to Arc, execute USDC payment.
+                Explore SpendingGate enforcement—transactions REVERT without valid proofs.
               </p>
               <div className="flex flex-wrap gap-2">
                 <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Wallet Connect</span>
                 <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">On-Chain Attestation</span>
-                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">USDC Transfer</span>
+                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Enforcement Demo</span>
               </div>
             </div>
           </div>
         </Link>
 
-        {/* Tamper */}
+        {/* Tamper Detection */}
         <Link
           href="/demo/tamper"
           className="group p-6 bg-[#0d1117] border border-gray-800 rounded-xl hover:border-amber-500/50 transition-colors"
@@ -135,11 +87,11 @@ export default function DemoHub() {
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xl font-semibold">Tamper Detection</h2>
-                <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">Security Demo</span>
+                <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-1 rounded">Security</span>
               </div>
               <p className="text-gray-400 mb-4">
-                See how modifying inputs after proof generation causes verification to fail.
-                Side-by-side comparison of original vs tampered inputs.
+                See why proofs matter: modify inputs after proof generation and watch verification fail.
+                The inputsHash binding prevents any tampering with transaction data.
               </p>
               <div className="flex flex-wrap gap-2">
                 <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Hash Comparison</span>
@@ -176,7 +128,7 @@ export default function DemoHub() {
           <div>
             <h4 className="text-gray-400 mb-2">Security Features</h4>
             <ul className="space-y-1 text-gray-500">
-              <li>PolicyRegistry verification</li>
+              <li>inputsHash tamper protection</li>
               <li>txIntentHash binding</li>
               <li>Replay protection</li>
               <li>Model substitution defense</li>

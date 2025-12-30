@@ -130,22 +130,32 @@ export function useProofGeneration() {
 
       let result: ProveResponse;
 
+      // Use direct prover URL if configured, otherwise use API proxy
+      const proverUrl = process.env.NEXT_PUBLIC_PROVER_URL;
+      const apiEndpoint = proverUrl ? `${proverUrl}/prove` : '/api/prove';
+
       try {
-        // Try to call the prove API (works when prover is running)
-        const response = await fetch('/api/prove', {
+        // Try to call the prover (direct or via API proxy)
+        const response = await fetch(apiEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ inputs: numericInputs, tag: 'spending' }),
         });
 
         if (!response.ok) {
-          throw new Error('API not available');
+          throw new Error('Prover not available');
         }
 
         result = await response.json();
+
+        // Check if prover returned an error code
+        if (!result.success && result.error?.includes('PROVER_UNAVAILABLE')) {
+          throw new Error('Prover unavailable');
+        }
       } catch {
-        // API not available (e.g., static GitHub Pages) - use mock proof
-        // Simulate realistic proof generation time
+        // Prover not available (e.g., static GitHub Pages deployment)
+        // Fall back to mock proof with realistic timing
+        console.warn('Prover unavailable, using mock proof generation');
         await new Promise((resolve) => setTimeout(resolve, 3000 + Math.random() * 2000));
         result = generateMockProof(input);
       }

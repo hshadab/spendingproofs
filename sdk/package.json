@@ -1,6 +1,6 @@
 {
   "name": "@arc/policy-proofs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "zkML spending policy proofs for Arc chain - generate and verify SNARK proofs for autonomous agent spending decisions",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -10,6 +10,21 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./wallet": {
+      "types": "./dist/wallet.d.ts",
+      "import": "./dist/wallet.mjs",
+      "require": "./dist/wallet.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.mjs",
+      "require": "./dist/react.js"
+    },
+    "./wagmi": {
+      "types": "./dist/wagmi.d.ts",
+      "import": "./dist/wagmi.mjs",
+      "require": "./dist/wagmi.js"
     }
   },
   "files": [
@@ -17,8 +32,8 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "build": "tsup src/index.ts src/wallet.ts src/react.ts src/wagmi.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts src/wallet.ts src/react.ts src/wagmi.ts --format cjs,esm --dts --watch",
     "test": "vitest",
     "lint": "eslint src/",
     "prepublishOnly": "npm run build"
