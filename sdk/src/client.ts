@@ -42,7 +42,7 @@ interface HealthApiResponse {
  *
  * @example
  * ```typescript
- * import { PolicyProofs } from '@arc/policy-proofs';
+ * import { PolicyProofs } from '@icme-labs/spending-proofs';
  *
  * const client = new PolicyProofs({
  *   proverUrl: 'http://localhost:3001'

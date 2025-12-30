@@ -356,14 +356,13 @@ export default function ComputeAgentCaseStudy() {
               <span className="text-xs text-gray-400">compute-purchase.ts</span>
             </div>
             <pre className="p-4 text-sm text-gray-400 overflow-x-auto">
-              <code>{`import { SpendingProofsSDK } from '@arc/spending-proofs';
+              <code>{`import { PolicyProofs } from '@icme-labs/spending-proofs';
+import { SpendingProofsWallet } from '@icme-labs/spending-proofs/wallet';
 import { createWalletClient, http } from 'viem';
-import { arcTestnet } from '@arc/chains';
 
 // Initialize SDK
-const sdk = new SpendingProofsSDK({
-  proverUrl: process.env.PROVER_URL,
-  chain: arcTestnet,
+const client = new PolicyProofs({
+  proverUrl: process.env.PROVER_URL || 'http://localhost:3001',
 });
 
 // Agent's spending policy

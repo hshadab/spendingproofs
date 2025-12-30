@@ -1,25 +1,31 @@
-# @arc/policy-proofs-cli
+# @icme-labs/spending-proofs-cli
 
-CLI for Arc Policy Proofs - generate and verify zkML spending proofs from the command line.
+CLI for generating and verifying zkML spending proofs.
 
 ## Installation
 
 ```bash
-npm install -g @arc/policy-proofs-cli
+npm install -g @icme-labs/spending-proofs-cli
+```
+
+Or use directly with npx:
+
+```bash
+npx @icme-labs/spending-proofs-cli prove --help
 ```
 
 ## Commands
 
-### Generate a Proof
+### prove
+
+Generate a SNARK proof for a spending decision.
 
 ```bash
 arc-prove prove \
   --price 0.05 \
   --budget 1.0 \
   --spent 0.2 \
-  --limit 0.5 \
-  --success-rate 0.95 \
-  --total-calls 100
+  --limit 0.5
 
 # Output:
 # 🔐 Generating zkML proof...
@@ -33,49 +39,7 @@ arc-prove prove \
 # Proof size: 48.5 KB
 ```
 
-### Quick Decision (No Proof)
-
-```bash
-arc-prove decide \
-  --price 0.05 \
-  --budget 1.0 \
-  --spent 0.2 \
-  --limit 0.5
-
-# Output:
-# Decision: ✅ APPROVE
-# Confidence: 100%
-```
-
-### Check Prover Health
-
-```bash
-arc-prove health
-
-# Output:
-# ✅ Prover is healthy
-#    Models: spending-model
-```
-
-### Verify On-Chain
-
-```bash
-arc-prove verify-onchain 0x7a8b...3c4d
-
-# Output:
-# ✅ Proof is valid on-chain
-```
-
-## Options
-
-### Global Options
-
-| Option | Description |
-|--------|-------------|
-| `--prover <url>` | Prover service URL (default: http://localhost:3001) |
-| `--json` | Output as JSON |
-
-### Prove Options
+**Options:**
 
 | Option | Description | Required |
 |--------|-------------|----------|
@@ -87,6 +51,55 @@ arc-prove verify-onchain 0x7a8b...3c4d
 | `--total-calls <n>` | Total service calls | No (default: 100) |
 | `--category-purchases <n>` | Purchases in category | No (default: 5) |
 | `--hours-since-last <h>` | Hours since last purchase | No (default: 2) |
+| `--prover <url>` | Prover service URL | No (default: http://localhost:3001) |
+| `--json` | Output as JSON | No |
+
+### decide
+
+Run spending decision locally without generating a proof. Useful for quick policy evaluation.
+
+```bash
+arc-prove decide \
+  --price 0.05 \
+  --budget 1.0 \
+  --spent 0.2 \
+  --limit 0.5
+
+# Output:
+# Decision: ✅ APPROVE
+# Confidence: 100%
+# Risk Score: 0%
+```
+
+### health
+
+Check if the prover service is running and healthy.
+
+```bash
+arc-prove health
+
+# Output:
+# ✅ Prover is healthy
+#    Models: spending-model
+```
+
+### check-attestation
+
+Check if a proof hash is attested on Arc chain.
+
+```bash
+arc-prove check-attestation 0x7a8b...3c4d
+
+# Output:
+# ✅ Proof is attested on-chain
+```
+
+**Options:**
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--rpc <url>` | Arc RPC URL | https://rpc.testnet.arc.network |
+| `--contract <address>` | ProofAttestation contract | 0xBE9a5DF7C551324CB872584C6E5bF56799787952 |
 
 ## JSON Output
 
@@ -118,7 +131,7 @@ arc-prove prove --price 0.05 --budget 1.0 --spent 0.2 --limit 0.5 --json
 # GitHub Actions example
 - name: Generate spending proof
   run: |
-    npx @arc/policy-proofs-cli prove \
+    npx @icme-labs/spending-proofs-cli prove \
       --price ${{ inputs.price }} \
       --budget ${{ inputs.budget }} \
       --spent ${{ inputs.spent }} \
@@ -126,6 +139,11 @@ arc-prove prove --price 0.05 --budget 1.0 --spent 0.2 --limit 0.5 --json
       --prover ${{ secrets.PROVER_URL }} \
       --json > proof.json
 ```
+
+## Requirements
+
+- Node.js 18+
+- Prover service running (for `prove` command)
 
 ## License
 

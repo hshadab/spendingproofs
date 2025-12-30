@@ -11,10 +11,10 @@ npm install @icme-labs/spending-proofs
 ## Quick Start
 
 ```typescript
-import { SpendingProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@icme-labs/spending-proofs';
 
 // Initialize client
-const client = new SpendingProofs({
+const client = new PolicyProofs({
   rpcUrl: 'https://rpc.arc.network',
   privateKey: process.env.PRIVATE_KEY,
 });
@@ -38,14 +38,14 @@ console.log('Risk Score:', proof.decision.riskScore);
 
 ## API Reference
 
-### SpendingProofs
+### PolicyProofs
 
 Main client class for interacting with the spending proofs system.
 
 #### Constructor
 
 ```typescript
-new SpendingProofs(config: SpendingProofsConfig)
+new PolicyProofs(config: PolicyProofsConfig)
 ```
 
 **Config Options:**
@@ -198,9 +198,9 @@ interface SpendingProof {
 ### Basic Proof Generation
 
 ```typescript
-import { SpendingProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@icme-labs/spending-proofs';
 
-const client = new SpendingProofs({
+const client = new PolicyProofs({
   rpcUrl: 'https://rpc.arc.network',
 });
 
@@ -225,9 +225,9 @@ if (proof.decision.shouldBuy) {
 ### End-to-End Payment Flow
 
 ```typescript
-import { SpendingProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@icme-labs/spending-proofs';
 
-const client = new SpendingProofs({
+const client = new PolicyProofs({
   rpcUrl: 'https://rpc.arc.network',
   privateKey: process.env.AGENT_PRIVATE_KEY,
 });
@@ -255,9 +255,9 @@ console.log('Verification method:', result.verificationMethod);
 ### Merchant Verification
 
 ```typescript
-import { SpendingProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@icme-labs/spending-proofs';
 
-const client = new SpendingProofs({
+const client = new PolicyProofs({
   rpcUrl: 'https://rpc.arc.network',
 });
 
@@ -285,7 +285,7 @@ if (isValid) {
 ### Custom Policy Configuration
 
 ```typescript
-import { SpendingProofs, PolicyConfig } from '@icme-labs/spending-proofs';
+import { PolicyProofs, PolicyConfig } from '@icme-labs/spending-proofs';
 
 // Define custom policy thresholds
 const policy: PolicyConfig = {
@@ -296,7 +296,7 @@ const policy: PolicyConfig = {
   requiredConfidence: 70,
 };
 
-const client = new SpendingProofs({
+const client = new PolicyProofs({
   rpcUrl: 'https://rpc.arc.network',
   policy,
 });
@@ -310,9 +310,9 @@ const proof = await client.prove({
 ### Batch Proof Generation
 
 ```typescript
-import { SpendingProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@icme-labs/spending-proofs';
 
-const client = new SpendingProofs({
+const client = new PolicyProofs({
   rpcUrl: 'https://rpc.arc.network',
 });
 
@@ -335,7 +335,7 @@ console.log(`${approved.length}/${proofs.length} purchases approved`);
 ## Error Handling
 
 ```typescript
-import { SpendingProofs, SpendingProofError } from '@icme-labs/spending-proofs';
+import { PolicyProofs, SpendingProofError } from '@icme-labs/spending-proofs';
 
 try {
   const proof = await client.prove(inputs);

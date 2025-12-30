@@ -18,10 +18,10 @@ Today, Spending Proofs works by:
 4. Merchants can verify the attestation before accepting payment
 
 ```typescript
-import { SpendingProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@icme-labs/spending-proofs';
 
 // Generate proof
-const proof = await SpendingProofs.prove({
+const proof = await PolicyProofs.prove({
   priceUsdc: 0.05,
   budgetUsdc: 1.00,
   spentTodayUsdc: 0.20,
@@ -33,7 +33,7 @@ const proof = await SpendingProofs.prove({
 });
 
 // Commit attestation to Arc
-const txHash = await SpendingProofs.attest(proof);
+const txHash = await PolicyProofs.attest(proof);
 ```
 
 **Gas Cost**: ~21,000 (simple storage write)
@@ -256,11 +256,11 @@ contract AgentWallet {
 ### TypeScript SDK
 
 ```typescript
-import { SpendingProofs, ArcProvider } from '@icme-labs/spending-proofs';
+import { PolicyProofs, ArcProvider } from '@icme-labs/spending-proofs';
 
 // Initialize with Arc provider
 const provider = new ArcProvider('https://rpc.arc.network');
-const client = new SpendingProofs({ provider });
+const client = new PolicyProofs({ provider });
 
 // Generate and submit in one call
 const result = await client.proveAndExecute({

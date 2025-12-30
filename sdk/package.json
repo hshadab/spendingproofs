@@ -1,5 +1,5 @@
 {
-  "name": "@arc/policy-proofs",
+  "name": "@icme-labs/spending-proofs",
   "version": "0.2.0",
   "description": "zkML spending policy proofs for Arc chain - generate and verify SNARK proofs for autonomous agent spending decisions",
   "main": "dist/index.js",
@@ -48,11 +48,11 @@
     "agent",
     "web3"
   ],
-  "author": "Arc Builders",
+  "author": "ICME Labs",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arc-builders/policy-proofs"
+    "url": "https://github.com/icme-labs/spending-proofs"
   },
   "peerDependencies": {
     "viem": "^2.0.0"

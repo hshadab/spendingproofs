@@ -39,7 +39,7 @@ export function IntegrateSection() {
                     <div className="bg-[#0d1117] rounded-lg p-3 font-mono text-xs">
                       <span className="text-gray-500">npm install</span>
                       <br />
-                      <span className="text-purple-400">@arc/policy-proofs</span>
+                      <span className="text-purple-400">@icme-labs/spending-proofs</span>
                     </div>
                     <div className="bg-[#0d1117] rounded-lg p-3 font-mono text-xs text-gray-400">
                       client.prove(inputs)
@@ -75,7 +75,7 @@ export function IntegrateSection() {
                     </div>
                     <div className="flex items-center gap-2 text-gray-400">
                       <Check className="w-4 h-4 text-cyan-400" />
-                      <span>~2s proving time</span>
+                      <span>4-12s proving time</span>
                     </div>
                   </div>
                 </div>
@@ -196,7 +196,7 @@ export function IntegrateSection() {
                 </div>
                 <div className="bg-[#0d1117] border border-gray-800 rounded-lg px-4 py-3 font-mono text-sm mb-4">
                   <span className="text-gray-500">$ </span>
-                  <span className="text-gray-300">npm install @arc/policy-proofs</span>
+                  <span className="text-gray-300">npm install @icme-labs/spending-proofs</span>
                 </div>
                 <div className="flex gap-3">
                   <a
@@ -232,7 +232,7 @@ export function IntegrateSection() {
                 </div>
                 <div className="bg-[#0d1117] border border-gray-800 rounded-lg px-4 py-3 font-mono text-sm mb-4">
                   <span className="text-gray-500">$ </span>
-                  <span className="text-gray-300">npx @arc/policy-proofs prove --help</span>
+                  <span className="text-gray-300">npx @icme-labs/spending-proofs-cli prove --help</span>
                 </div>
               </div>
             </div>
@@ -241,7 +241,7 @@ export function IntegrateSection() {
             <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6">
               <h3 className="font-semibold mb-4">Quick Example</h3>
               <pre className="text-sm font-mono text-gray-300 overflow-x-auto bg-[#0d1117] rounded-lg p-4">
-{`import { PolicyProofs } from '@arc/policy-proofs';
+{`import { PolicyProofs } from '@icme-labs/spending-proofs';
 
 const client = new PolicyProofs({
   proverUrl: 'https://prover.spendingproofs.dev'
@@ -393,7 +393,7 @@ if (result.decision.shouldBuy) {
               </div>
               <div>
                 <div className="text-gray-500 mb-1">Cold Start</div>
-                <div className="text-white font-medium">~8s first proof</div>
+                <div className="text-white font-medium">~30s first proof</div>
               </div>
             </div>
           </div>
@@ -530,9 +530,14 @@ if (result.decision.shouldBuy) {
                 <CheckCircle className="w-5 h-5 text-green-400" />
               </div>
               <h4 className="font-semibold mb-2">Proof Attestation</h4>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-400 mb-2">
                 Off-chain proof + on-chain hash attestation
               </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>• SDK + CLI published</li>
+                <li>• Arc testnet contracts live</li>
+                <li>• Circle wallet integration</li>
+              </ul>
             </div>
 
             {/* Next */}
@@ -544,9 +549,14 @@ if (result.decision.shouldBuy) {
                 <Shield className="w-5 h-5 text-purple-400" />
               </div>
               <h4 className="font-semibold mb-2">Solidity Verifier</h4>
-              <p className="text-sm text-gray-400">
-                Full on-chain verification (~500k gas)
+              <p className="text-sm text-gray-400 mb-2">
+                Full on-chain SNARK verification
               </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>• HyperKZG verifier contract</li>
+                <li>• ~500k gas per verification</li>
+                <li>• SpendingGate enforcement</li>
+              </ul>
             </div>
 
             {/* Future */}
@@ -558,9 +568,14 @@ if (result.decision.shouldBuy) {
                 <Layers className="w-5 h-5 text-cyan-400" />
               </div>
               <h4 className="font-semibold mb-2">Native Precompile</h4>
-              <p className="text-sm text-gray-400">
-                Protocol-level primitive (~50k gas)
+              <p className="text-sm text-gray-400 mb-2">
+                Arc-native Jolt verifier
               </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>• ~50k gas (10x cheaper)</li>
+                <li>• Consensus-level security</li>
+                <li>• Arc governance proposal</li>
+              </ul>
             </div>
 
             {/* Vision */}
@@ -571,10 +586,15 @@ if (result.decision.shouldBuy) {
               <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mt-2">
                 <Rocket className="w-5 h-5 text-amber-400" />
               </div>
-              <h4 className="font-semibold mb-2">Universal zkML</h4>
-              <p className="text-sm text-gray-400">
-                Cross-chain verification layer
+              <h4 className="font-semibold mb-2">Agent Ecosystem</h4>
+              <p className="text-sm text-gray-400 mb-2">
+                Full agent commerce stack
               </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>• Multi-chain via CCTP</li>
+                <li>• Agent framework SDKs</li>
+                <li>• Enterprise policy templates</li>
+              </ul>
             </div>
           </div>
         </div>

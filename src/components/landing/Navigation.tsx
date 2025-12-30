@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { Shield, Cpu, Lock, Code, ChevronDown, BookOpen } from 'lucide-react';
 
-type Section = 'arc' | 'proof' | 'integrate';
+type Section = 'arc' | 'proof' | 'integrate' | 'deep-dive';
 
 interface NavigationProps {
   activeSection: Section;
@@ -220,11 +220,26 @@ export function Navigation({ activeSection, setActiveSection }: NavigationProps)
                 description="USDC gas, sub-second finality"
                 onClick={() => navigateTo('arc', 'why-arc')}
               />
+            </TabDropdown>
+
+            {/* Deeper Dive */}
+            <TabDropdown
+              label="Deeper Dive"
+              icon={<BookOpen className="w-3.5 h-3.5" />}
+              isActive={activeSection === 'deep-dive'}
+              onClick={() => navigateTo('deep-dive', 'use-cases')}
+            >
               <DropdownItem
-                icon={<Code className="w-4 h-4" />}
+                icon={<Cpu className="w-4 h-4" />}
                 label="Use Cases"
                 description="Real agent applications"
-                onClick={() => navigateTo('arc', 'use-cases')}
+                onClick={() => navigateTo('deep-dive', 'use-cases')}
+              />
+              <DropdownItem
+                icon={<Shield className="w-4 h-4" />}
+                label="Chain Comparison"
+                description="Arc vs other L2s"
+                onClick={() => navigateTo('deep-dive', 'chain-comparison')}
               />
             </TabDropdown>
 

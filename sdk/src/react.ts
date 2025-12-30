@@ -15,7 +15,7 @@
  * ```tsx
  * // In your React app:
  * import { useState, useCallback, useMemo } from 'react';
- * import { PolicyProofs, SpendingInput, ProofResult } from '@arc/policy-proofs';
+ * import { PolicyProofs, SpendingInput, ProofResult } from '@icme-labs/spending-proofs';
  *
  * export function useSpendingProofs(proverUrl: string) {
  *   const client = useMemo(() => new PolicyProofs({ proverUrl }), [proverUrl]);
@@ -100,7 +100,7 @@ export interface UseSpendingProofsReturn extends UseSpendingProofsState, UseSpen
  *
  * @example
  * ```tsx
- * import { createUseSpendingProofs } from '@arc/policy-proofs/react';
+ * import { createUseSpendingProofs } from '@icme-labs/spending-proofs/react';
  * import { useState, useCallback, useMemo } from 'react';
  *
  * const useSpendingProofs = createUseSpendingProofs({

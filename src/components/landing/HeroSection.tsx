@@ -31,16 +31,16 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
             </div>
 
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-              Prove Your Agent
+              Unlock the
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-                Followed Its Policy.
+                Agent Economy.
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              <strong className="text-white">zkML spending proofs</strong> for autonomous agents on Arc.
-              Cryptographically prove your agent evaluated its spending policy—without revealing the policy itself.
-              Production infrastructure for agent commerce. Deploy today.
+              <strong className="text-white">Cryptographic spending proofs</strong> for autonomous agents.
+              Enable AI agents to spend USDC on Arc with verifiable policy compliance—no trust required.
+              The infrastructure layer for machine-to-machine commerce.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <button
@@ -58,19 +58,19 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
               </Link>
             </div>
 
-            {/* Value Props for Arc Builders Fund */}
+            {/* Value Props - Broader Appeal */}
             <div className="grid grid-cols-3 gap-4 mb-6 text-center">
               <div className="bg-[#0d1117] border border-gray-800 rounded-lg p-3">
-                <div className="text-lg font-bold text-green-400">USDC</div>
-                <div className="text-xs text-gray-500">Native Gas</div>
+                <div className="text-lg font-bold text-green-400">Trustless</div>
+                <div className="text-xs text-gray-500">No custody risk</div>
               </div>
               <div className="bg-[#0d1117] border border-gray-800 rounded-lg p-3">
-                <div className="text-lg font-bold text-cyan-400">&lt;1s</div>
-                <div className="text-xs text-gray-500">Finality</div>
+                <div className="text-lg font-bold text-cyan-400">Private</div>
+                <div className="text-xs text-gray-500">Policy stays hidden</div>
               </div>
               <div className="bg-[#0d1117] border border-gray-800 rounded-lg p-3">
-                <div className="text-lg font-bold text-purple-400">zkML</div>
-                <div className="text-xs text-gray-500">Enforcement</div>
+                <div className="text-lg font-bold text-purple-400">Instant</div>
+                <div className="text-xs text-gray-500">&lt;1s finality</div>
               </div>
             </div>
 

@@ -1,7 +1,7 @@
 {
-  "name": "@arc/policy-proofs-cli",
+  "name": "@icme-labs/spending-proofs-cli",
   "version": "0.1.0",
-  "description": "CLI for Arc Policy Proofs - generate and verify zkML spending proofs",
+  "description": "CLI for spending proofs - generate and verify zkML spending proofs",
   "bin": {
     "arc-prove": "./dist/cli.js"
   },
@@ -22,7 +22,7 @@
     "proof",
     "spending"
   ],
-  "author": "Arc Builders",
+  "author": "ICME Labs",
   "license": "MIT",
   "dependencies": {
     "commander": "^12.0.0"

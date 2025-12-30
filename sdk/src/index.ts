@@ -5,7 +5,7 @@
  *
  * @example
  * ```typescript
- * import { PolicyProofs, ARC_TESTNET } from '@arc/policy-proofs';
+ * import { PolicyProofs, ARC_TESTNET } from '@icme-labs/spending-proofs';
  *
  * const client = new PolicyProofs({
  *   proverUrl: 'http://localhost:3001'
