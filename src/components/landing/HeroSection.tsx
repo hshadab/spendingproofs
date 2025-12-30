@@ -16,18 +16,24 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Left: Title and CTA */}
           <div>
-            {/* Built for Arc Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/30 rounded-full text-sm text-purple-400 mb-6">
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
-              Built for Arc
-              <a
-                href="https://arc.builders"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-purple-300 transition-colors"
-              >
-                <ExternalLink className="w-3 h-3" />
-              </a>
+            {/* Badges */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/30 rounded-full text-sm text-purple-400">
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+                Built for Arc
+                <a
+                  href="https://arc.builders"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-purple-300 transition-colors"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-sm text-cyan-400">
+                <Shield className="w-3 h-3" />
+                Testnet Alpha
+              </div>
             </div>
 
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">

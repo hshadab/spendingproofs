@@ -1,8 +1,12 @@
 # Spending Proofs
 
+![Status](https://img.shields.io/badge/status-testnet%20alpha-cyan) ![Arc](https://img.shields.io/badge/built%20for-Arc-purple) ![License](https://img.shields.io/badge/license-MIT-green)
+
 **zkML Spending Proofs for Autonomous Agents on Arc**
 
 Cryptographically prove your agent evaluated its spending policy—without revealing the policy itself. Built on Jolt-Atlas. Designed for Arc.
+
+> **Testnet Alpha** — Core infrastructure is live on Arc testnet. Real zkML proofs, real contracts. Ready for developer preview and feedback.
 
 ## Quick Start
 

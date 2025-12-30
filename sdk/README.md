@@ -1,8 +1,10 @@
 # @icme-labs/spending-proofs
 
+![Status](https://img.shields.io/badge/status-testnet%20alpha-cyan) ![Arc](https://img.shields.io/badge/built%20for-Arc-purple)
+
 zkML spending policy proofs for Arc chain. Generate and verify SNARK proofs for autonomous agent spending decisions.
 
-**Production infrastructure for agent commerce. Deploy today.**
+> **Testnet Alpha** — Real zkML proofs on Arc testnet. Ready for developer preview.
 
 ## Installation
 
