@@ -143,6 +143,6 @@ export const ARC_TESTNET = {
   contracts: {
     proofAttestation: '0xBE9a5DF7C551324CB872584C6E5bF56799787952' as `0x${string}`,
     spendingGateWallet: '0x6A47D13593c00359a1c5Fc6f9716926aF184d138' as `0x${string}`,
-    mockUsdc: '0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213' as `0x${string}`,
+    testnetUsdc: '0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213' as `0x${string}`,
   },
 } as const;

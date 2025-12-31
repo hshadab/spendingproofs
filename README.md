@@ -56,7 +56,7 @@ if (result.decision.shouldBuy) {
 |-----------|--------|-------|
 | Jolt-Atlas SNARK Prover | **Live** | Rust, ~48KB proofs, hosted on Render |
 | SDK (`@hshadab/spending-proofs`) | **Live** | TypeScript, React hooks, wagmi |
-| Arc Testnet Contracts | **Deployed** | ProofAttestation, SpendingGateWallet, MockUSDC |
+| Arc Testnet Contracts | **Deployed** | ProofAttestation, SpendingGateWallet, TestnetUSDC |
 | SpendingGate (Enforcement) | **Live** | Real on-chain enforcement - no proof, no payment |
 | Interactive Demo | **Live** | https://spendingproofs.onrender.com/demo |
 
@@ -98,7 +98,7 @@ npm run build
 |----------|---------|
 | ProofAttestation | `0xBE9a5DF7C551324CB872584C6E5bF56799787952` |
 | SpendingGateWallet | `0x6A47D13593c00359a1c5Fc6f9716926aF184d138` |
-| MockUSDC | `0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213` |
+| TestnetUSDC | `0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213` |
 | ArcAgent (Demo) | `0x982Cd9663EBce3eB8Ab7eF511a6249621C79E384` |
 
 - **Chain ID:** `5042002`
