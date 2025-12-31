@@ -16,41 +16,33 @@ const COMPARISON_DATA: ComparisonRow[] = [
     dimension: 'Gas Token',
     description: 'Native token used to pay transaction fees',
     arc: { value: 'USDC', status: 'good' },
-    base: { value: 'ETH', status: 'bad' },
-    avalanche: { value: 'AVAX', status: 'bad' },
-    solana: { value: 'SOL', status: 'bad' },
+    base: { value: 'ETH', status: 'partial' },
+    avalanche: { value: 'AVAX', status: 'partial' },
+    solana: { value: 'SOL', status: 'partial' },
   },
   {
     dimension: 'Gas Volatility',
     description: 'Price stability of gas payments',
     arc: { value: 'None (stable)', status: 'good' },
-    base: { value: 'High (ETH)', status: 'bad' },
-    avalanche: { value: 'High (AVAX)', status: 'bad' },
-    solana: { value: 'High (SOL)', status: 'bad' },
+    base: { value: 'ETH-linked', status: 'partial' },
+    avalanche: { value: 'AVAX-linked', status: 'partial' },
+    solana: { value: 'SOL-linked', status: 'partial' },
   },
   {
     dimension: 'Finality Time',
     description: 'Time until transaction is irreversible',
     arc: { value: '<1 second', status: 'good' },
-    base: { value: '~7 days (soft)', status: 'partial' },
-    avalanche: { value: '~1 second', status: 'good' },
-    solana: { value: '~13 seconds', status: 'partial' },
-  },
-  {
-    dimension: 'Finality Type',
-    description: 'Guarantee model for finality',
-    arc: { value: 'Deterministic', status: 'good' },
-    base: { value: 'Probabilistic', status: 'partial' },
-    avalanche: { value: 'Probabilistic', status: 'partial' },
-    solana: { value: 'Probabilistic', status: 'partial' },
+    base: { value: '~13 minutes', status: 'partial' },
+    avalanche: { value: '~1-2 seconds', status: 'good' },
+    solana: { value: '~12.8 seconds', status: 'partial' },
   },
   {
     dimension: 'Reorg Risk',
-    description: 'Risk of transaction reversal',
+    description: 'Risk of transaction reversal after confirmation',
     arc: { value: 'None', status: 'good' },
-    base: { value: 'Sequencer-dependent', status: 'partial' },
-    avalanche: { value: 'Low', status: 'partial' },
-    solana: { value: 'Possible', status: 'partial' },
+    base: { value: 'Until L1 finality', status: 'partial' },
+    avalanche: { value: 'None once final', status: 'good' },
+    solana: { value: 'Rare in practice', status: 'partial' },
   },
   {
     dimension: 'Native USDC',
@@ -62,19 +54,19 @@ const COMPARISON_DATA: ComparisonRow[] = [
   },
   {
     dimension: 'Opt-in Privacy',
-    description: 'Transaction privacy options',
+    description: 'Built-in transaction privacy options',
     arc: { value: 'Supported', status: 'good' },
-    base: { value: 'None', status: 'bad' },
-    avalanche: { value: 'None', status: 'bad' },
-    solana: { value: 'None', status: 'bad' },
+    base: { value: 'None', status: 'partial' },
+    avalanche: { value: 'None', status: 'partial' },
+    solana: { value: 'None', status: 'partial' },
   },
   {
     dimension: 'zkML Precompile',
     description: 'Native support for zkML verification',
     arc: { value: 'Roadmap', status: 'partial' },
-    base: { value: 'None', status: 'bad' },
-    avalanche: { value: 'None', status: 'bad' },
-    solana: { value: 'None', status: 'bad' },
+    base: { value: 'None', status: 'partial' },
+    avalanche: { value: 'None', status: 'partial' },
+    solana: { value: 'None', status: 'partial' },
   },
 ];
 
@@ -240,11 +232,11 @@ export function ComparisonTable({ variant = 'full', showScenarios = true }: Comp
         <div className="flex items-start gap-3">
           <CheckCircle className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
           <div>
-            <div className="font-semibold text-purple-300">Why Arc for Agent Commerce</div>
+            <div className="font-semibold text-purple-300">Arc&apos;s Agent-First Design</div>
             <p className="text-sm text-gray-400 mt-1">
-              Autonomous agents require predictable costs (USDC gas), instant finality, and
-              privacy options. These aren&apos;t optimizations—they&apos;re requirements for
-              agents to operate reliably without human intervention.
+              Arc is purpose-built for agent commerce with USDC-denominated gas (predictable costs),
+              sub-second deterministic finality, and opt-in privacy. Other chains excel in their domains—Arc
+              is optimized specifically for autonomous economic agents.
             </p>
           </div>
         </div>
