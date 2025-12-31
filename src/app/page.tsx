@@ -4,8 +4,7 @@ import { useState, useMemo } from 'react';
 import {
   Navigation,
   HeroSection,
-  ProblemSection,
-  SolutionSection,
+  ProblemSolutionSection,
   WhyArcSection,
   UseCasesSection,
   ProofSystemSection,
@@ -19,7 +18,7 @@ type TabType = 'arc' | 'proof' | 'integrate' | 'deep-dive';
 
 // Section IDs for each tab
 const tabSections: Record<TabType, string[]> = {
-  arc: ['problem', 'solution', 'why-arc'],
+  arc: ['problem', 'why-arc'],
   proof: ['whats-proven', 'model', 'jolt-atlas'],
   integrate: ['architecture', 'install-sdk', 'deploy', 'roadmap'],
   'deep-dive': ['agent-flow', 'use-cases', 'chain-comparison'],
@@ -47,8 +46,7 @@ export default function Home() {
       {activeSection === 'arc' && (
         <>
           <HeroSection onGetStarted={() => setActiveSection('integrate')} />
-          <ProblemSection />
-          <SolutionSection />
+          <ProblemSolutionSection />
           <WhyArcSection />
         </>
       )}

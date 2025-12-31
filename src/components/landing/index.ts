@@ -2,6 +2,7 @@ export { Navigation } from './Navigation';
 export { HeroSection } from './HeroSection';
 export { ProblemSection } from './ProblemSection';
 export { SolutionSection } from './SolutionSection';
+export { ProblemSolutionSection } from './ProblemSolutionSection';
 export { WhyArcSection } from './WhyArcSection';
 export { UseCasesSection } from './UseCasesSection';
 export { ProofSystemSection } from './ProofSystemSection';
