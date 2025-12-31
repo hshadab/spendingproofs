@@ -207,9 +207,11 @@ export function Navigation({ activeSection, setActiveSection, activeScrollSectio
               }
             }}
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center">
-              <Shield className="w-5 h-5" />
-            </div>
+            <img
+              src="https://cdn.prod.website-files.com/65d52b07d5bc41614daa723f/665df12739c532f45b665fe7_logo-novanet.svg"
+              alt="NovaNet"
+              className="h-8 w-auto"
+            />
             <span className="font-semibold text-lg hidden sm:block">Spending Proofs</span>
           </Link>
 

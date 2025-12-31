@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, ArrowRight, Check, X, Bot, Lock } from 'lucide-react';
+import { Shield, ArrowDown, Check, X, Bot, Lock } from 'lucide-react';
 
 export function HeroFlowDiagram() {
   return (
@@ -11,7 +11,7 @@ export function HeroFlowDiagram() {
       <div className="relative bg-[#0d1117] border border-purple-500/30 rounded-xl p-6 w-full max-w-md shadow-[0_0_30px_rgba(168,85,247,0.15)]">
         {/* Header */}
         <div className="text-center mb-6">
-          <h4 className="text-sm font-semibold text-gray-300 mb-1">How It Works</h4>
+          <h4 className="text-lg font-semibold text-gray-300 mb-1">How It Works</h4>
           <p className="text-xs text-gray-500">Proof-gated USDC payments on Arc</p>
         </div>
 
@@ -30,7 +30,7 @@ export function HeroFlowDiagram() {
 
           {/* Arrow */}
           <div className="flex items-center justify-center">
-            <ArrowRight className="w-4 h-4 text-gray-600" />
+            <ArrowDown className="w-4 h-4 text-gray-600" />
           </div>
 
           {/* Step 2: Proof Generation */}
@@ -49,7 +49,7 @@ export function HeroFlowDiagram() {
 
           {/* Arrow */}
           <div className="flex items-center justify-center">
-            <ArrowRight className="w-4 h-4 text-gray-600" />
+            <ArrowDown className="w-4 h-4 text-gray-600" />
           </div>
 
           {/* Step 3: Verification Gate */}
