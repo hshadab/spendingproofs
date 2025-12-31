@@ -313,14 +313,14 @@ export function Navigation({ activeSection, setActiveSection }: NavigationProps)
                 icon={<Code className="w-4 h-4" />}
                 label="SDK Reference"
                 description="Full API documentation"
-                href="https://github.com/anthropics/spendingproofs/blob/main/docs/sdk-reference.md"
+                href="https://github.com/hshadab/spendingproofs/blob/main/docs/sdk-reference.md"
                 external
               />
               <DropdownLink
                 icon={<Shield className="w-4 h-4" />}
                 label="GitHub"
                 description="Source code & examples"
-                href="https://github.com/anthropics/spendingproofs"
+                href="https://github.com/hshadab/spendingproofs"
                 external
               />
             </TabDropdown>

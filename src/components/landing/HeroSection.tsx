@@ -36,9 +36,9 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              <strong className="text-white">Cryptographic spending proofs</strong> for autonomous agents.
-              Enable AI agents to spend USDC on Arc with verifiable policy compliance—no trust required.
-              The infrastructure layer for machine-to-machine commerce.
+              <strong className="text-white">A verification primitive for Arc.</strong>{' '}
+              Enable AI agents to spend USDC with cryptographic proof of policy compliance.
+              No trust required—just math. The infrastructure for machine-to-machine commerce.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <button

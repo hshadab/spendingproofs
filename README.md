@@ -1,12 +1,12 @@
 # Spending Proofs
 
-![Status](https://img.shields.io/badge/status-testnet%20alpha-cyan) ![Arc](https://img.shields.io/badge/built%20for-Arc-purple) ![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-testnet%20alpha-cyan) ![Arc](https://img.shields.io/badge/Arc%20primitive-purple) ![License](https://img.shields.io/badge/license-MIT-green)
 
-**zkML Spending Proofs for Autonomous Agents on Arc**
+**A verification primitive for Arc's agent economy**
 
-Cryptographically prove your agent evaluated its spending policy—without revealing the policy itself. Built on Jolt-Atlas. Designed for Arc.
+Spending Proofs is infrastructure for agentic commerce on Arc. Agents generate cryptographic proofs that they followed their spending policies—enabling trustless machine-to-machine payments.
 
-> **Testnet Alpha** — Core infrastructure is live on Arc testnet. Real zkML proofs, real contracts. Ready for developer preview and feedback.
+> **Testnet Alpha** — Core infrastructure is live on Arc testnet. Real zkML proofs, real contracts. Ready for developer preview.
 
 ## Quick Start
 
@@ -44,7 +44,7 @@ if (result.decision.shouldBuy) {
 │      YOUR APP       │     │       PROVER        │     │     ARC CHAIN       │
 │   (SDK installed)   │────▶│   (Jolt-Atlas)      │────▶│   (Settlement)      │
 │                     │     │                     │     │                     │
-│ @icme-labs/         │     │ • Runs neural net   │     │ • Proof attestation │
+│ @hshadab/           │     │ • Runs neural net   │     │ • Proof attestation │
 │ spending-proofs     │     │ • Generates SNARK   │     │ • USDC transfer     │
 │                     │     │ • 4-12s proving     │     │ • Sub-sec finality  │
 └─────────────────────┘     └─────────────────────┘     └─────────────────────┘

@@ -69,24 +69,6 @@ const result = await client.prove({
 console.log(result.decision.shouldBuy); // true
 console.log(result.proofHash);          // 0x7a8b...`;
 
-// CLI example
-export const cliExample = `# Generate a proof for agent spending decision
-$ arc-prove prove \\
-    --price 0.05 \\
-    --budget 1.0 \\
-    --spent 0.2 \\
-    --limit 0.5
-
-Decision: APPROVE
-Confidence: 92%
-Proof hash: 0x7a8b3c4d...
-Proof size: 48.5 KB
-Generated in 6.2s
-
-# Verify proof attestation on Arc
-$ arc-prove check-attestation 0x7a8b3c4d...
-✓ Proof is attested on-chain`;
-
 // Verify example
 export const verifyExample = `// Merchant/protocol verifies agent followed policy
 const verification = await client.verify(proof, claimedInputs);

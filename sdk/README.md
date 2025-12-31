@@ -1,8 +1,8 @@
 # @hshadab/spending-proofs
 
-![Status](https://img.shields.io/badge/status-testnet%20alpha-cyan) ![Arc](https://img.shields.io/badge/built%20for-Arc-purple)
+![Status](https://img.shields.io/badge/status-testnet%20alpha-cyan) ![Arc](https://img.shields.io/badge/Arc%20primitive-purple)
 
-zkML spending policy proofs for Arc chain. Generate and verify SNARK proofs for autonomous agent spending decisions.
+**A verification primitive for Arc's agent economy.** Generate zkML proofs that your agent followed its spending policy—enabling trustless machine-to-machine payments.
 
 > **Testnet Alpha** — Real zkML proofs on Arc testnet. Ready for developer preview.
 

@@ -1,12 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { Code, Terminal, Check, Lock } from 'lucide-react';
-import { CodeBlock, sdkExample, cliExample } from './utils';
+import { Check, Lock } from 'lucide-react';
+import { CodeBlock, sdkExample } from './utils';
 
 export function SolutionSection() {
-  const [activeTab, setActiveTab] = useState<'sdk' | 'cli'>('sdk');
-
   return (
     <section id="solution" className="py-16 px-6 border-t border-gray-800">
       <div className="max-w-6xl mx-auto">
@@ -19,33 +16,7 @@ export function SolutionSection() {
               revealing the policy logic itself.
             </p>
 
-            {/* Tabs */}
-            <div className="flex gap-2 mb-4">
-              <button
-                onClick={() => setActiveTab('sdk')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === 'sdk'
-                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <Code className="w-4 h-4" />
-                SDK
-              </button>
-              <button
-                onClick={() => setActiveTab('cli')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === 'cli'
-                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <Terminal className="w-4 h-4" />
-                CLI
-              </button>
-            </div>
-
-            <CodeBlock code={activeTab === 'sdk' ? sdkExample : cliExample} />
+            <CodeBlock code={sdkExample} />
           </div>
 
           <div>

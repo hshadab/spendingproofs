@@ -358,35 +358,6 @@ try {
 }
 ```
 
-## CLI Tool
-
-The SDK also provides a CLI for testing and CI/CD:
-
-```bash
-# Install globally
-npm install -g @hshadab/spending-proofs-cli
-
-# Generate a proof
-spending-proofs prove \
-  --price 0.05 \
-  --budget 1.00 \
-  --spent-today 0.20 \
-  --daily-limit 0.50 \
-  --success-rate 0.95 \
-  --total-calls 100 \
-  --category-purchases 5 \
-  --time-since-last 2
-
-# Verify a proof
-spending-proofs verify --proof ./proof.json
-
-# Submit attestation
-spending-proofs attest \
-  --proof ./proof.json \
-  --rpc https://rpc.arc.network \
-  --private-key $PRIVATE_KEY
-```
-
 ## Environment Variables
 
 | Variable | Description |
@@ -403,7 +374,7 @@ spending-proofs attest \
 - Initial release
 - Basic proof generation and verification
 - Arc attestation support
-- TypeScript SDK and CLI
+- TypeScript SDK
 
 ### v0.2.0 (Planned)
 

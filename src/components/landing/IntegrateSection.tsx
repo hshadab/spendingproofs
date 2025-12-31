@@ -1,6 +1,6 @@
 'use client';
 
-import { Layers, Shield, Bot, Rocket, Gauge, Globe, Check, ArrowRight, CheckCircle, Code, Terminal, Cpu, Server, Cloud, Box, ExternalLink } from 'lucide-react';
+import { Layers, Shield, Bot, Rocket, Gauge, Globe, Check, ArrowRight, CheckCircle, Code, Cpu, Server, Cloud, Box, ExternalLink } from 'lucide-react';
 import { CodeBlock, verifyExample } from './utils';
 
 export function IntegrateSection() {
@@ -200,7 +200,7 @@ export function IntegrateSection() {
                 </div>
                 <div className="flex gap-3">
                   <a
-                    href="https://github.com/anthropics/spendingproofs/blob/main/docs/sdk-reference.md"
+                    href="https://github.com/hshadab/spendingproofs/blob/main/docs/sdk-reference.md"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300"
@@ -209,7 +209,7 @@ export function IntegrateSection() {
                     <ExternalLink className="w-3 h-3" />
                   </a>
                   <a
-                    href="https://github.com/anthropics/spendingproofs/tree/main/sdk"
+                    href="https://github.com/hshadab/spendingproofs/tree/main/sdk"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-300"
@@ -217,22 +217,6 @@ export function IntegrateSection() {
                     View source
                     <ExternalLink className="w-3 h-3" />
                   </a>
-                </div>
-              </div>
-
-              <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center">
-                    <Terminal className="w-5 h-5 text-cyan-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">CLI Tool</h3>
-                    <p className="text-sm text-gray-400">For testing and CI/CD</p>
-                  </div>
-                </div>
-                <div className="bg-[#0d1117] border border-gray-800 rounded-lg px-4 py-3 font-mono text-sm mb-4">
-                  <span className="text-gray-500">$ </span>
-                  <span className="text-gray-300">npx @hshadab/spending-proofs-cli prove --help</span>
                 </div>
               </div>
             </div>
@@ -534,7 +518,7 @@ if (result.decision.shouldBuy) {
                 Off-chain proof + on-chain hash attestation
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>• SDK + CLI published</li>
+                <li>• SDK published to npm</li>
                 <li>• Arc testnet contracts live</li>
                 <li>• Circle wallet integration</li>
               </ul>

@@ -1,10 +1,10 @@
 # Arc Integration Guide
 
-This guide explains how Spending Proofs integrates with Arc as a first-class primitive through a native Jolt-Atlas verifier precompile.
+This guide explains how Spending Proofs integrates with Arc as a first-class verification primitive through a native Jolt-Atlas verifier precompile.
 
 ## Overview
 
-Spending Proofs is designed to be more than an application on Arc—it's infrastructure that makes Arc the definitive chain for agentic commerce. The integration path moves from simple attestation to full protocol-level verification.
+Spending Proofs is infrastructure for Arc's agent economy. It's not an application—it's a primitive that enables trustless machine-to-machine payments. The integration path moves from simple attestation to full protocol-level verification, making Arc the definitive chain for agentic commerce.
 
 ## Integration Phases
 
