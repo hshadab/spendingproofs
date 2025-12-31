@@ -30,14 +30,14 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
 
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-                zkML Spending Proofs
+                Spending Guardrails
               </span>
               <br />
               for Agentic Commerce
             </h1>
             <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              <strong className="text-white">A spending guardrail primitive for Arc.</strong>{' '}
-              Enable AI agents to spend USDC with cryptographic proof of policy compliance.
+              <strong className="text-white">A cryptographic proof primitive for Arc.</strong>{' '}
+              Enable AI agents to spend USDC with proof of policy compliance.
               No trust required—just math. The infrastructure for machine-to-machine commerce.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
