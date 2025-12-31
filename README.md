@@ -18,7 +18,7 @@ npm install @icme-labs/spending-proofs
 import { PolicyProofs } from '@icme-labs/spending-proofs';
 
 const client = new PolicyProofs({
-  proverUrl: 'https://prover.spendingproofs.dev'
+  proverUrl: 'https://spendingproofs-prover.onrender.com'
 });
 
 const result = await client.prove({
@@ -54,9 +54,8 @@ if (result.decision.shouldBuy) {
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| Jolt-Atlas SNARK Prover | **Live** | Rust implementation, ~48KB proofs |
+| Jolt-Atlas SNARK Prover | **Live** | Rust, ~48KB proofs, hosted on Render |
 | SDK (`@icme-labs/spending-proofs`) | **Live** | TypeScript, React hooks, wagmi |
-| CLI (`@icme-labs/spending-proofs-cli`) | **Live** | `arc-prove` command |
 | Arc Testnet Contracts | **Deployed** | ProofAttestation at `0xBE9a...7952` |
 | Circle Programmable Wallets | **Integrated** | API routes ready |
 | SpendingGate (Enforcement) | Mock | TypeScript simulation for demo |

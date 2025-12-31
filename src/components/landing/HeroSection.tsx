@@ -20,15 +20,7 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
             <div className="flex items-center gap-3 mb-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/30 rounded-full text-sm text-purple-400">
                 <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
-                Built for Arc
-                <a
-                  href="https://arc.builders"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-purple-300 transition-colors"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                Built for Arc Agentic Commerce
               </div>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-sm text-cyan-400">
                 <Shield className="w-3 h-3" />

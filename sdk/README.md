@@ -18,7 +18,7 @@ npm install @icme-labs/spending-proofs
 import { PolicyProofs } from '@icme-labs/spending-proofs';
 
 const client = new PolicyProofs({
-  proverUrl: 'https://prover.spendingproofs.dev' // Hosted prover
+  proverUrl: 'https://spendingproofs-prover.onrender.com'
 });
 
 // Generate a proof

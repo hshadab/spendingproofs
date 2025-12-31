@@ -325,26 +325,6 @@ export function Navigation({ activeSection, setActiveSection }: NavigationProps)
               />
             </TabDropdown>
 
-            {/* Case Studies */}
-            <LinkDropdown
-              label="Case Studies"
-              icon={<BookOpen className="w-3.5 h-3.5" />}
-              href="/case-studies"
-            >
-              <DropdownLink
-                icon={<BookOpen className="w-4 h-4" />}
-                label="All Case Studies"
-                description="Browse all examples"
-                href="/case-studies"
-              />
-              <div className="border-t border-gray-800 my-2" />
-              <DropdownLink
-                icon={<Cpu className="w-4 h-4" />}
-                label="Agent X: GPU Compute"
-                description="Autonomous compute purchasing"
-                href="/case-studies/compute-agent"
-              />
-            </LinkDropdown>
           </div>
         </div>
 
