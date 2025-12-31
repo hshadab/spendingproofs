@@ -437,20 +437,8 @@ export default function PaymentPage() {
       {showEnforcement && (
         <div className="mt-8 border-t border-gray-800 pt-8">
           <EnforcementDemo
-            proof={state.result?.proof && state.result.inference ? {
-              proofHash: state.result.proof.proofHash || proofHash || '',
-              inputHash: state.result.proof.metadata?.inputHash || '',
-              modelHash: state.result.proof.metadata?.modelHash || '',
-              decision: {
-                shouldBuy: state.result.inference.decision === 'approve',
-                confidence: state.result.inference.confidence,
-                riskScore: Math.round((1 - state.result.inference.confidence) * 100),
-              },
-              timestamp: Date.now(),
-              proofSizeBytes: state.result.proof.metadata?.proofSize || 48000,
-              generationTimeMs: state.elapsedMs || 0,
-              verified: true,
-            } : null}
+            proofHash={proofHash}
+            attestationTxHash={attestationUrl?.split('/tx/')[1] || null}
             onReset={() => setShowEnforcement(false)}
           />
           <div className="mt-6 flex justify-center">

@@ -9,6 +9,10 @@ interface DemoWalletStatus {
   usdcBalance: string;
   usdcFormatted: string;
   usdcConfigured: boolean;
+  spendingGateBalance: string;
+  spendingGateFormatted: string;
+  spendingGateConfigured: boolean;
+  spendingGateAddress?: string;
   funded: boolean;
 }
 
@@ -115,6 +119,46 @@ export function useDemoWallet() {
     }
   }, [fetchStatus]);
 
+  // Execute gated transfer (real on-chain enforcement)
+  const executeGatedTransfer = useCallback(async (params: {
+    to: string;
+    amount: number;
+    proofHash: string;
+    expiry?: number;
+  }): Promise<TransactionResult & { reverted?: boolean; revertReason?: string }> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/demo/transaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'gatedTransfer', params }),
+      });
+
+      const data = await response.json();
+      setIsLoading(false);
+
+      if (data.success) {
+        fetchStatus(); // Refresh balance
+        return data;
+      } else {
+        // Return revert info for enforcement demo
+        return {
+          success: false,
+          reverted: data.reverted,
+          revertReason: data.revertReason,
+          error: data.error,
+        };
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Gated transfer failed';
+      setError(errorMsg);
+      setIsLoading(false);
+      return { success: false, error: errorMsg };
+    }
+  }, [fetchStatus]);
+
   return {
     status,
     isLoading,
@@ -122,12 +166,18 @@ export function useDemoWallet() {
     fetchStatus,
     submitAttestation,
     executePayment,
+    executeGatedTransfer,
     isConnected: !!status?.address,
     address: status?.address,
     balance: status ? {
       native: status.nativeFormatted,
       usdc: status.usdcFormatted,
       display: `${status.usdcFormatted} USDC`,
+    } : null,
+    spendingGate: status?.spendingGateConfigured ? {
+      balance: status.spendingGateFormatted,
+      address: status.spendingGateAddress,
+      configured: true,
     } : null,
   };
 }

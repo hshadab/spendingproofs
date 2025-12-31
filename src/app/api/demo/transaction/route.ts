@@ -49,6 +49,45 @@ const ERC20_ABI = [
     inputs: [{ name: 'account', type: 'address' }],
     outputs: [{ type: 'uint256' }],
   },
+  {
+    name: 'approve',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    outputs: [{ type: 'bool' }],
+  },
+] as const;
+
+const SPENDING_GATE_ABI = [
+  {
+    name: 'gatedTransfer',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+      { name: 'proofHash', type: 'bytes32' },
+      { name: 'expiry', type: 'uint256' },
+    ],
+    outputs: [],
+  },
+  {
+    name: 'getBalance',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'uint256' }],
+  },
+  {
+    name: 'deposit',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'amount', type: 'uint256' }],
+    outputs: [],
+  },
 ] as const;
 
 // Get demo wallet
@@ -176,6 +215,71 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    if (action === 'gatedTransfer') {
+      // Execute gated transfer through SpendingGateWallet (real enforcement)
+      const { to, amount, proofHash, expiry } = params;
+
+      const spendingGateAddress = process.env.NEXT_PUBLIC_SPENDING_GATE_ADDRESS as `0x${string}`;
+
+      if (!spendingGateAddress || spendingGateAddress === '0x0000000000000000000000000000000000000000') {
+        return NextResponse.json({
+          success: false,
+          error: 'SpendingGate not configured',
+          simulated: true,
+        });
+      }
+
+      const amountWei = parseUnits(amount.toString(), 6); // USDC has 6 decimals
+      const expiryTimestamp = BigInt(expiry || Math.floor(Date.now() / 1000) + 3600);
+
+      try {
+        const hash = await walletClient.writeContract({
+          address: spendingGateAddress,
+          abi: SPENDING_GATE_ABI,
+          functionName: 'gatedTransfer',
+          args: [to, amountWei, proofHash, expiryTimestamp],
+        });
+
+        // Wait for confirmation
+        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+
+        return NextResponse.json({
+          success: receipt.status === 'success',
+          hash,
+          receipt: {
+            blockNumber: receipt.blockNumber.toString(),
+            status: receipt.status,
+          },
+          explorerUrl: `https://testnet.arcscan.app/tx/${hash}`,
+        });
+      } catch (err) {
+        // Parse revert reason from error
+        const errorMsg = err instanceof Error ? err.message : 'Transaction failed';
+        let revertReason = 'Unknown error';
+
+        if (errorMsg.includes('ProofNotAttested')) {
+          revertReason = 'SpendingGate: PROOF_NOT_ATTESTED - Proof hash not found in attestation contract';
+        } else if (errorMsg.includes('ProofAlreadyUsed')) {
+          revertReason = 'SpendingGate: PROOF_ALREADY_USED - This proof has already been consumed';
+        } else if (errorMsg.includes('ProofExpired')) {
+          revertReason = 'SpendingGate: PROOF_EXPIRED - Transaction intent has expired';
+        } else if (errorMsg.includes('InsufficientBalance')) {
+          revertReason = 'SpendingGate: INSUFFICIENT_BALANCE - Not enough USDC in wallet';
+        } else if (errorMsg.includes('InvalidProof')) {
+          revertReason = 'SpendingGate: INVALID_PROOF - Proof verification failed';
+        } else {
+          revertReason = errorMsg;
+        }
+
+        return NextResponse.json({
+          success: false,
+          reverted: true,
+          revertReason,
+          error: errorMsg,
+        });
+      }
+    }
+
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
   } catch (error) {
     console.error('Demo transaction error:', error);
@@ -198,8 +302,12 @@ export async function GET() {
     const nativeBalance = await publicClient.getBalance({ address: account.address });
 
     const usdcAddress = process.env.NEXT_PUBLIC_USDC_ADDRESS as `0x${string}`;
+    const spendingGateAddress = process.env.NEXT_PUBLIC_SPENDING_GATE_ADDRESS as `0x${string}`;
+
     let usdcBalance = BigInt(0);
     let usdcConfigured = false;
+    let spendingGateBalance = BigInt(0);
+    let spendingGateConfigured = false;
 
     if (usdcAddress && usdcAddress !== '0x0000000000000000000000000000000000000000') {
       usdcConfigured = true;
@@ -215,6 +323,20 @@ export async function GET() {
       }
     }
 
+    if (spendingGateAddress && spendingGateAddress !== '0x0000000000000000000000000000000000000000') {
+      spendingGateConfigured = true;
+      try {
+        spendingGateBalance = await publicClient.readContract({
+          address: spendingGateAddress,
+          abi: SPENDING_GATE_ABI,
+          functionName: 'getBalance',
+          args: [],
+        }) as bigint;
+      } catch {
+        // SpendingGate contract might not exist yet
+      }
+    }
+
     return NextResponse.json({
       address: account.address,
       nativeBalance: nativeBalance.toString(),
@@ -222,6 +344,10 @@ export async function GET() {
       usdcBalance: usdcBalance.toString(),
       usdcFormatted: (Number(usdcBalance) / 1e6).toFixed(2),
       usdcConfigured,
+      spendingGateBalance: spendingGateBalance.toString(),
+      spendingGateFormatted: (Number(spendingGateBalance) / 1e6).toFixed(2),
+      spendingGateConfigured,
+      spendingGateAddress,
       funded: nativeBalance > BigInt(0),
     });
   } catch (error) {
