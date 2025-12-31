@@ -56,22 +56,6 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
               </Link>
             </div>
 
-            {/* Value Props - Broader Appeal */}
-            <div className="grid grid-cols-3 gap-4 mb-6 text-center">
-              <div className="bg-[#0d1117] border border-gray-800 rounded-lg p-3">
-                <div className="text-lg font-bold text-green-400">Trustless</div>
-                <div className="text-xs text-gray-500">No custody risk</div>
-              </div>
-              <div className="bg-[#0d1117] border border-gray-800 rounded-lg p-3">
-                <div className="text-lg font-bold text-cyan-400">Private</div>
-                <div className="text-xs text-gray-500">Policy stays hidden</div>
-              </div>
-              <div className="bg-[#0d1117] border border-gray-800 rounded-lg p-3">
-                <div className="text-lg font-bold text-purple-400">Instant</div>
-                <div className="text-xs text-gray-500">&lt;1s finality</div>
-              </div>
-            </div>
-
             {/* Install command */}
             <div className="max-w-md">
               <InstallCommand pkg="@hshadab/spending-proofs" />
