@@ -40,7 +40,7 @@ export function HeroFlowDiagram() {
             </div>
             <div className="flex-1">
               <div className="text-sm font-medium text-white">Generates zkML proof</div>
-              <div className="text-xs text-gray-500">"I evaluated my spending policy"</div>
+              <div className="text-xs text-gray-500">"Proof: spending rules followed"</div>
             </div>
             <div className="text-xs font-mono text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded">
               48KB
