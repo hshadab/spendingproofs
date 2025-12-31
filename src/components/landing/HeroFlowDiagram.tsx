@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, ArrowRight, Check, X } from 'lucide-react';
+import { Shield, ArrowRight, Check, X, Bot, Lock } from 'lucide-react';
 
 export function HeroFlowDiagram() {
   return (
@@ -20,7 +20,7 @@ export function HeroFlowDiagram() {
           {/* Step 1: Agent */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-lg">🤖</span>
+              <Bot className="w-5 h-5 text-purple-400" />
             </div>
             <div className="flex-1">
               <div className="text-sm font-medium text-white">Agent requests $0.05</div>
@@ -56,7 +56,7 @@ export function HeroFlowDiagram() {
           <div className="bg-gradient-to-r from-amber-900/20 to-amber-900/10 border border-amber-500/30 rounded-lg p-3">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                <span className="text-sm">🔐</span>
+                <Lock className="w-4 h-4 text-amber-400" />
               </div>
               <div className="flex-1">
                 <div className="text-sm font-medium text-amber-400">Verification Gate</div>
