@@ -1,6 +1,6 @@
 'use client';
 
-import { Layers, Shield, Bot, Rocket, Gauge, Globe, Check, ArrowRight, CheckCircle, Code, ExternalLink } from 'lucide-react';
+import { Layers, Shield, Bot, Rocket, Gauge, Globe, Check, ArrowRight, CheckCircle, Code, ExternalLink, Server } from 'lucide-react';
 import { CodeBlock, verifyExample } from './utils';
 
 export function IntegrateSection() {
