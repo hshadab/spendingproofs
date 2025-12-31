@@ -37,7 +37,7 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
             </h1>
             <p className="text-xl text-gray-400 mb-8 leading-relaxed">
               <strong className="text-white">A cryptographic primitive for Arc.</strong>{' '}
-              Jolt-Atlas zkML for proof-gated USDC transfers. On-chain verification and audit trail via three smart contracts—ProofAttestation, SpendingGateWallet, and USDC.
+              Jolt-Atlas zkML for proof-gated USDC transfers. On-chain attestation and audit trail via three Arc smart contracts.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <button
