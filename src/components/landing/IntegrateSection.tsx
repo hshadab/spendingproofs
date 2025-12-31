@@ -99,17 +99,17 @@ export function IntegrateSection() {
                     </div>
                   </div>
                   <div className="space-y-2 text-sm">
+                    <a href="https://docs.arc.network/arc/key-features/deterministic-finality" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-400 hover:text-green-400 transition-colors">
+                      <Check className="w-4 h-4 text-green-400" />
+                      <span>Sub-second finality</span>
+                    </a>
+                    <a href="https://docs.arc.network/arc/key-features/stable-fee-design" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-400 hover:text-green-400 transition-colors">
+                      <Check className="w-4 h-4 text-green-400" />
+                      <span>USDC as gas token</span>
+                    </a>
                     <div className="flex items-center gap-2 text-gray-400">
                       <Check className="w-4 h-4 text-green-400" />
                       <span>Proof attestation</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-400">
-                      <Check className="w-4 h-4 text-green-400" />
-                      <span>USDC transfer</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-400">
-                      <Check className="w-4 h-4 text-green-400" />
-                      <span>Sub-second finality</span>
                     </div>
                   </div>
                 </div>
@@ -350,6 +350,24 @@ if (result.decision.shouldBuy) {
                   className="text-purple-400 hover:text-purple-300 flex items-center gap-1"
                 >
                   Explorer
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+                <a
+                  href="https://docs.arc.network/arc/references/connect-to-arc"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-gray-300 flex items-center gap-1"
+                >
+                  Arc Docs
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+                <a
+                  href="https://faucet.circle.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-gray-300 flex items-center gap-1"
+                >
+                  Faucet
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
