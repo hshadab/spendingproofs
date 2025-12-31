@@ -66,7 +66,7 @@ export interface GatedTransferResult {
  *
  * @example
  * ```typescript
- * import { SpendingProofsWallet } from '@icme-labs/spending-proofs/wallet';
+ * import { SpendingProofsWallet } from '@hshadab/spending-proofs/wallet';
  *
  * const wallet = new SpendingProofsWallet({
  *   proverUrl: 'http://localhost:3001',

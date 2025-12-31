@@ -1,17 +1,17 @@
 # SDK Reference
 
-The `@icme-labs/spending-proofs` SDK provides TypeScript bindings for generating and verifying spending proofs on Arc.
+The `@hshadab/spending-proofs` SDK provides TypeScript bindings for generating and verifying spending proofs on Arc.
 
 ## Installation
 
 ```bash
-npm install @icme-labs/spending-proofs
+npm install @hshadab/spending-proofs
 ```
 
 ## Quick Start
 
 ```typescript
-import { PolicyProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@hshadab/spending-proofs';
 
 // Initialize client
 const client = new PolicyProofs({
@@ -198,7 +198,7 @@ interface SpendingProof {
 ### Basic Proof Generation
 
 ```typescript
-import { PolicyProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@hshadab/spending-proofs';
 
 const client = new PolicyProofs({
   rpcUrl: 'https://rpc.arc.network',
@@ -225,7 +225,7 @@ if (proof.decision.shouldBuy) {
 ### End-to-End Payment Flow
 
 ```typescript
-import { PolicyProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@hshadab/spending-proofs';
 
 const client = new PolicyProofs({
   rpcUrl: 'https://rpc.arc.network',
@@ -255,7 +255,7 @@ console.log('Verification method:', result.verificationMethod);
 ### Merchant Verification
 
 ```typescript
-import { PolicyProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@hshadab/spending-proofs';
 
 const client = new PolicyProofs({
   rpcUrl: 'https://rpc.arc.network',
@@ -285,7 +285,7 @@ if (isValid) {
 ### Custom Policy Configuration
 
 ```typescript
-import { PolicyProofs, PolicyConfig } from '@icme-labs/spending-proofs';
+import { PolicyProofs, PolicyConfig } from '@hshadab/spending-proofs';
 
 // Define custom policy thresholds
 const policy: PolicyConfig = {
@@ -310,7 +310,7 @@ const proof = await client.prove({
 ### Batch Proof Generation
 
 ```typescript
-import { PolicyProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@hshadab/spending-proofs';
 
 const client = new PolicyProofs({
   rpcUrl: 'https://rpc.arc.network',
@@ -335,7 +335,7 @@ console.log(`${approved.length}/${proofs.length} purchases approved`);
 ## Error Handling
 
 ```typescript
-import { PolicyProofs, SpendingProofError } from '@icme-labs/spending-proofs';
+import { PolicyProofs, SpendingProofError } from '@hshadab/spending-proofs';
 
 try {
   const proof = await client.prove(inputs);
@@ -364,7 +364,7 @@ The SDK also provides a CLI for testing and CI/CD:
 
 ```bash
 # Install globally
-npm install -g @icme-labs/spending-proofs-cli
+npm install -g @hshadab/spending-proofs-cli
 
 # Generate a proof
 spending-proofs prove \

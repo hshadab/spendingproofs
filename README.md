@@ -11,11 +11,11 @@ Cryptographically prove your agent evaluated its spending policy—without revea
 ## Quick Start
 
 ```bash
-npm install @icme-labs/spending-proofs
+npm install @hshadab/spending-proofs
 ```
 
 ```typescript
-import { PolicyProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@hshadab/spending-proofs';
 
 const client = new PolicyProofs({
   proverUrl: 'https://spendingproofs-prover.onrender.com'
@@ -55,7 +55,7 @@ if (result.decision.shouldBuy) {
 | Component | Status | Notes |
 |-----------|--------|-------|
 | Jolt-Atlas SNARK Prover | **Live** | Rust, ~48KB proofs, hosted on Render |
-| SDK (`@icme-labs/spending-proofs`) | **Live** | TypeScript, React hooks, wagmi |
+| SDK (`@hshadab/spending-proofs`) | **Live** | TypeScript, React hooks, wagmi |
 | Arc Testnet Contracts | **Deployed** | ProofAttestation at `0xBE9a...7952` |
 | Circle Programmable Wallets | **Integrated** | API routes ready |
 | SpendingGate (Enforcement) | Mock | TypeScript simulation for demo |

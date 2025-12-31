@@ -39,7 +39,7 @@ export function IntegrateSection() {
                     <div className="bg-[#0d1117] rounded-lg p-3 font-mono text-xs">
                       <span className="text-gray-500">npm install</span>
                       <br />
-                      <span className="text-purple-400">@icme-labs/spending-proofs</span>
+                      <span className="text-purple-400">@hshadab/spending-proofs</span>
                     </div>
                     <div className="bg-[#0d1117] rounded-lg p-3 font-mono text-xs text-gray-400">
                       client.prove(inputs)
@@ -196,7 +196,7 @@ export function IntegrateSection() {
                 </div>
                 <div className="bg-[#0d1117] border border-gray-800 rounded-lg px-4 py-3 font-mono text-sm mb-4">
                   <span className="text-gray-500">$ </span>
-                  <span className="text-gray-300">npm install @icme-labs/spending-proofs</span>
+                  <span className="text-gray-300">npm install @hshadab/spending-proofs</span>
                 </div>
                 <div className="flex gap-3">
                   <a
@@ -232,7 +232,7 @@ export function IntegrateSection() {
                 </div>
                 <div className="bg-[#0d1117] border border-gray-800 rounded-lg px-4 py-3 font-mono text-sm mb-4">
                   <span className="text-gray-500">$ </span>
-                  <span className="text-gray-300">npx @icme-labs/spending-proofs-cli prove --help</span>
+                  <span className="text-gray-300">npx @hshadab/spending-proofs-cli prove --help</span>
                 </div>
               </div>
             </div>
@@ -241,7 +241,7 @@ export function IntegrateSection() {
             <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6">
               <h3 className="font-semibold mb-4">Quick Example</h3>
               <pre className="text-sm font-mono text-gray-300 overflow-x-auto bg-[#0d1117] rounded-lg p-4">
-{`import { PolicyProofs } from '@icme-labs/spending-proofs';
+{`import { PolicyProofs } from '@hshadab/spending-proofs';
 
 const client = new PolicyProofs({
   proverUrl: 'https://prover.spendingproofs.dev'

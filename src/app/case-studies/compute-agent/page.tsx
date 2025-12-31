@@ -356,8 +356,8 @@ export default function ComputeAgentCaseStudy() {
               <span className="text-xs text-gray-400">compute-purchase.ts</span>
             </div>
             <pre className="p-4 text-sm text-gray-400 overflow-x-auto">
-              <code>{`import { PolicyProofs } from '@icme-labs/spending-proofs';
-import { SpendingProofsWallet } from '@icme-labs/spending-proofs/wallet';
+              <code>{`import { PolicyProofs } from '@hshadab/spending-proofs';
+import { SpendingProofsWallet } from '@hshadab/spending-proofs/wallet';
 import { createWalletClient, http } from 'viem';
 
 // Initialize SDK

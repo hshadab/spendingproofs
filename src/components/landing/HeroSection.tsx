@@ -74,7 +74,7 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
 
             {/* Install command */}
             <div className="max-w-md">
-              <InstallCommand pkg="@icme-labs/spending-proofs" />
+              <InstallCommand pkg="@hshadab/spending-proofs" />
             </div>
           </div>
 

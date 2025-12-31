@@ -18,7 +18,7 @@ Today, Spending Proofs works by:
 4. Merchants can verify the attestation before accepting payment
 
 ```typescript
-import { PolicyProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@hshadab/spending-proofs';
 
 // Generate proof
 const proof = await PolicyProofs.prove({
@@ -256,7 +256,7 @@ contract AgentWallet {
 ### TypeScript SDK
 
 ```typescript
-import { PolicyProofs, ArcProvider } from '@icme-labs/spending-proofs';
+import { PolicyProofs, ArcProvider } from '@hshadab/spending-proofs';
 
 // Initialize with Arc provider
 const provider = new ArcProvider('https://rpc.arc.network');

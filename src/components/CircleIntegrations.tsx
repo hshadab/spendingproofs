@@ -190,7 +190,7 @@ export function CCTPIntegrationDemo() {
       <div className="mt-6 bg-[#0d1117] border border-gray-800 rounded-lg p-4">
         <div className="text-xs text-gray-500 mb-2">Integration Code</div>
         <pre className="text-xs font-mono text-gray-400 overflow-x-auto">
-{`import { PolicyProofs } from '@icme-labs/spending-proofs';
+{`import { PolicyProofs } from '@hshadab/spending-proofs';
 import { CCTP } from '@circle-fin/cctp-sdk';
 
 // 1. Generate spending proof for cross-chain transfer
@@ -390,7 +390,7 @@ export function ProgrammableWalletsDemo() {
         <div className="text-xs text-gray-500 mb-2">Integration Code</div>
         <pre className="text-xs font-mono text-gray-400 overflow-x-auto">
 {`import { CircleWallets } from '@circle-fin/w3s-sdk';
-import { PolicyProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@hshadab/spending-proofs';
 
 // 1. Create agent wallet with policy enforcement
 const wallet = await circleWallets.createWallet({

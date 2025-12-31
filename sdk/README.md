@@ -1,4 +1,4 @@
-# @icme-labs/spending-proofs
+# @hshadab/spending-proofs
 
 ![Status](https://img.shields.io/badge/status-testnet%20alpha-cyan) ![Arc](https://img.shields.io/badge/built%20for-Arc-purple)
 
@@ -9,13 +9,13 @@ zkML spending policy proofs for Arc chain. Generate and verify SNARK proofs for 
 ## Installation
 
 ```bash
-npm install @icme-labs/spending-proofs
+npm install @hshadab/spending-proofs
 ```
 
 ## Quick Start
 
 ```typescript
-import { PolicyProofs } from '@icme-labs/spending-proofs';
+import { PolicyProofs } from '@hshadab/spending-proofs';
 
 const client = new PolicyProofs({
   proverUrl: 'https://spendingproofs-prover.onrender.com'
@@ -52,7 +52,7 @@ console.log(result.proofHash); // 0x...
 High-level wallet class for proof-gated spending:
 
 ```typescript
-import { SpendingProofsWallet } from '@icme-labs/spending-proofs/wallet';
+import { SpendingProofsWallet } from '@hshadab/spending-proofs/wallet';
 
 const wallet = new SpendingProofsWallet({
   proverUrl: 'https://prover.spendingproofs.dev',
@@ -87,7 +87,7 @@ if (result.approved) {
 
 ```tsx
 import { useState, useCallback, useMemo } from 'react';
-import { PolicyProofs, SpendingInput, ProofResult } from '@icme-labs/spending-proofs';
+import { PolicyProofs, SpendingInput, ProofResult } from '@hshadab/spending-proofs';
 
 function useSpendingProofs(proverUrl: string) {
   const client = useMemo(() => new PolicyProofs({ proverUrl }), [proverUrl]);
@@ -121,8 +121,8 @@ import {
   getGatedTransferArgs,
   getExplorerTxUrl,
   parseUSDC
-} from '@icme-labs/spending-proofs/wagmi';
-import { SpendingProofsWallet } from '@icme-labs/spending-proofs/wallet';
+} from '@hshadab/spending-proofs/wagmi';
+import { SpendingProofsWallet } from '@hshadab/spending-proofs/wallet';
 
 // Prepare proof and execute gated transfer
 const wallet = new SpendingProofsWallet({ proverUrl, agentAddress });
@@ -214,7 +214,7 @@ const decision = client.decide(input);
 ### On-Chain Verification
 
 ```typescript
-import { isProofAttested, ARC_TESTNET } from '@icme-labs/spending-proofs';
+import { isProofAttested, ARC_TESTNET } from '@hshadab/spending-proofs';
 
 // Check if proof is attested on Arc Testnet
 const isValid = await isProofAttested(proofHash);
@@ -236,7 +236,7 @@ const isValid = await isProofAttested(proofHash);
 ## Arc Testnet
 
 ```typescript
-import { ARC_TESTNET } from '@icme-labs/spending-proofs';
+import { ARC_TESTNET } from '@hshadab/spending-proofs';
 
 // ARC_TESTNET = {
 //   chainId: 5042002,

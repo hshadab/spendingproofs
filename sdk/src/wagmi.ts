@@ -131,7 +131,7 @@ export interface WagmiGatedTransferParams {
  * @example
  * ```tsx
  * import { useWriteContract } from 'wagmi';
- * import { getGatedTransferArgs } from '@icme-labs/spending-proofs/wagmi';
+ * import { getGatedTransferArgs } from '@hshadab/spending-proofs/wagmi';
  *
  * function TransferButton({ params }: { params: WagmiGatedTransferParams }) {
  *   const { writeContract } = useWriteContract();
@@ -245,8 +245,8 @@ export function parseUSDC(amount: number | string): bigint {
  *   getGatedTransferArgs,
  *   WagmiGatedTransferParams,
  *   getExplorerTxUrl,
- * } from '@icme-labs/spending-proofs/wagmi';
- * import { SpendingProofsWallet } from '@icme-labs/spending-proofs/wallet';
+ * } from '@hshadab/spending-proofs/wagmi';
+ * import { SpendingProofsWallet } from '@hshadab/spending-proofs/wallet';
  *
  * export function useProofGatedTransfer(proverUrl: string, agentAddress: string) {
  *   const wallet = useMemo(

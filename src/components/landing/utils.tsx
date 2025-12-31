@@ -47,7 +47,7 @@ export function InstallCommand({ pkg }: { pkg: string }) {
 }
 
 // SDK code example
-export const sdkExample = `import { PolicyProofs } from '@icme-labs/spending-proofs';
+export const sdkExample = `import { PolicyProofs } from '@hshadab/spending-proofs';
 
 const client = new PolicyProofs({
   proverUrl: 'https://prover.spendingproofs.dev'
@@ -100,5 +100,5 @@ if (!verification.valid) {
 }
 
 // Check attestation on Arc chain
-import { isProofAttested } from '@icme-labs/spending-proofs';
+import { isProofAttested } from '@hshadab/spending-proofs';
 const attested = await isProofAttested(proof.proofHash);`;
