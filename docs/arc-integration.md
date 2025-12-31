@@ -1,6 +1,6 @@
 # Arc Integration Guide
 
-This guide explains how Spending Proofs integrates with Arc as a first-class verification primitive through a native Jolt-Atlas verifier precompile.
+This guide explains how Spending Proofs integrates with Arc as a first-class spending guardrail primitive through a native Jolt-Atlas verifier precompile.
 
 ## Overview
 

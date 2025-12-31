@@ -36,7 +36,7 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              <strong className="text-white">A verification primitive for Arc.</strong>{' '}
+              <strong className="text-white">A spending guardrail primitive for Arc.</strong>{' '}
               Enable AI agents to spend USDC with cryptographic proof of policy compliance.
               No trust required—just math. The infrastructure for machine-to-machine commerce.
             </p>

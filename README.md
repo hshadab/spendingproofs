@@ -2,7 +2,7 @@
 
 ![Status](https://img.shields.io/badge/status-testnet%20alpha-cyan) ![Arc](https://img.shields.io/badge/Arc%20primitive-purple) ![License](https://img.shields.io/badge/license-MIT-green)
 
-**A verification primitive for Arc's agent economy**
+**A spending guardrail primitive for Arc's agent economy**
 
 Spending Proofs is infrastructure for agentic commerce on Arc. Agents generate cryptographic proofs that they followed their spending policies—enabling trustless machine-to-machine payments.
 
