@@ -297,15 +297,9 @@ export function Navigation({ activeSection, setActiveSection }: NavigationProps)
                 onClick={() => navigateTo('integrate', 'install-sdk')}
               />
               <DropdownItem
-                icon={<Shield className="w-4 h-4" />}
-                label="Hosting Options"
-                description="Hosted vs self-host prover"
-                onClick={() => navigateTo('integrate', 'hosting')}
-              />
-              <DropdownItem
                 icon={<Lock className="w-4 h-4" />}
                 label="Deploy to Arc"
-                description="Testnet & mainnet deployment"
+                description="Testnet contracts & integration"
                 onClick={() => navigateTo('integrate', 'deploy')}
               />
               <div className="border-t border-gray-800 my-2" />
