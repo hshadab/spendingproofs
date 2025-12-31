@@ -210,7 +210,7 @@ export function Navigation({ activeSection, setActiveSection, activeScrollSectio
             <img
               src="https://cdn.prod.website-files.com/65d52b07d5bc41614daa723f/665df12739c532f45b665fe7_logo-novanet.svg"
               alt="NovaNet"
-              className="h-4 w-auto"
+              className="h-5 w-auto"
             />
             <span className="font-semibold text-lg hidden sm:block">Spending Proofs</span>
           </Link>
