@@ -1,7 +1,8 @@
 'use client';
 
-import { Layers, Shield, Bot, Rocket, Gauge, Globe, Check, ArrowRight, CheckCircle, Code, ExternalLink, Server } from 'lucide-react';
+import { Layers, Shield, Bot, Check, ArrowRight, CheckCircle, Code, ExternalLink, Server, Rocket } from 'lucide-react';
 import { CodeBlock, verifyExample } from './utils';
+import { TransactionHistory } from './TransactionHistory';
 
 export function IntegrateSection() {
   return (
@@ -117,18 +118,22 @@ export function IntegrateSection() {
 
             {/* Flow Description */}
             <div className="mt-6 pt-6 border-t border-gray-800">
-              <div className="grid md:grid-cols-3 gap-4 text-center text-sm">
+              <div className="grid md:grid-cols-4 gap-4 text-center text-sm">
                 <div>
                   <div className="text-purple-400 font-mono mb-1">1. PROVE</div>
                   <p className="text-gray-500">SDK calls prover with 8 spending inputs</p>
                 </div>
                 <div>
-                  <div className="text-cyan-400 font-mono mb-1">2. GENERATE</div>
-                  <p className="text-gray-500">Prover returns decision + 48KB SNARK proof</p>
+                  <div className="text-cyan-400 font-mono mb-1">2. VERIFY</div>
+                  <p className="text-gray-500">Cryptographic verification gates the transfer</p>
                 </div>
                 <div>
-                  <div className="text-green-400 font-mono mb-1">3. SETTLE</div>
-                  <p className="text-gray-500">Submit proof hash + execute USDC payment</p>
+                  <div className="text-amber-400 font-mono mb-1">3. ATTEST</div>
+                  <p className="text-gray-500">Submit proof hash for transparency</p>
+                </div>
+                <div>
+                  <div className="text-green-400 font-mono mb-1">4. TRANSFER</div>
+                  <p className="text-gray-500">Execute gated USDC payment</p>
                 </div>
               </div>
             </div>
@@ -265,20 +270,71 @@ if (result.decision.shouldBuy) {
           {/* Contract Addresses */}
           <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6 mb-8">
             <h3 className="font-semibold mb-4">Arc Testnet Contracts</h3>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
               <div className="bg-[#0d1117] rounded-lg p-4">
-                <div className="text-xs text-gray-500 mb-1">ProofAttestation</div>
-                <code className="text-sm text-purple-400 break-all">0xBE9a5DF7C551324CB872584C6E5bF56799787952</code>
-                <p className="text-xs text-gray-500 mt-2">Submit proof hashes for on-chain verification</p>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs text-gray-500">ProofAttestation</div>
+                  <a
+                    href="https://testnet.arcscan.app/address/0xBE9a5DF7C551324CB872584C6E5bF56799787952"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-purple-400 hover:text-purple-300"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                <code className="text-xs text-purple-400 break-all">0xBE9a...7952</code>
+                <p className="text-xs text-gray-500 mt-2">Transparency layer - logs proof submissions on-chain</p>
               </div>
               <div className="bg-[#0d1117] rounded-lg p-4">
-                <div className="text-xs text-gray-500 mb-1">ArcAgent (Demo)</div>
-                <code className="text-sm text-purple-400 break-all">0x982Cd9663EBce3eB8Ab7eF511a6249621C79E384</code>
-                <p className="text-xs text-gray-500 mt-2">Reference agent wallet implementation</p>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs text-gray-500">SpendingGateWallet</div>
+                  <a
+                    href="https://testnet.arcscan.app/address/0x6A47D13593c00359a1c5Fc6f9716926aF184d138"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-green-400 hover:text-green-300"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                <code className="text-xs text-green-400 break-all">0x6A47...d138</code>
+                <p className="text-xs text-gray-500 mt-2">Enforcement layer - gated USDC transfers</p>
+              </div>
+              <div className="bg-[#0d1117] rounded-lg p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs text-gray-500">MockUSDC</div>
+                  <a
+                    href="https://testnet.arcscan.app/address/0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-cyan-400 hover:text-cyan-300"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                <code className="text-xs text-cyan-400 break-all">0x1Fb6...9213</code>
+                <p className="text-xs text-gray-500 mt-2">Test USDC token (6 decimals)</p>
               </div>
             </div>
+
+            {/* Architecture Explanation */}
             <div className="mt-4 pt-4 border-t border-gray-800">
-              <div className="flex items-center gap-4 text-sm">
+              <h4 className="text-sm font-semibold mb-3 text-gray-300">Architecture: Verification vs Attestation</h4>
+              <div className="grid md:grid-cols-2 gap-4 text-xs">
+                <div className="bg-[#0d1117]/50 rounded-lg p-3 border border-cyan-500/20">
+                  <div className="text-cyan-400 font-semibold mb-1">Verification (Gates Transfer)</div>
+                  <p className="text-gray-400">Cryptographic proof verification via /verify endpoint. This is the trust boundary - if verification fails, transfer should not proceed.</p>
+                </div>
+                <div className="bg-[#0d1117]/50 rounded-lg p-3 border border-purple-500/20">
+                  <div className="text-purple-400 font-semibold mb-1">Attestation (Transparency)</div>
+                  <p className="text-gray-400">On-chain record of proof submission. Provides audit trail and public accountability, but relies on off-chain verification.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-gray-800">
+              <div className="flex flex-wrap items-center gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">Chain ID:</span>
                   <span className="text-white ml-2">5042002</span>
@@ -300,32 +356,9 @@ if (result.decision.shouldBuy) {
             </div>
           </div>
 
-          {/* Deployment Timeline */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-[#0a0a0a] border border-purple-500/30 rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Rocket className="w-6 h-6 text-purple-400" />
-              </div>
-              <div className="text-2xl font-bold text-purple-400 mb-1">1 Day</div>
-              <div className="text-sm text-gray-500 mb-2">SDK to First Proof</div>
-              <p className="text-xs text-gray-400">Install SDK, generate proofs in development</p>
-            </div>
-            <div className="bg-[#0a0a0a] border border-cyan-500/30 rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Gauge className="w-6 h-6 text-cyan-400" />
-              </div>
-              <div className="text-2xl font-bold text-cyan-400 mb-1">1 Week</div>
-              <div className="text-sm text-gray-500 mb-2">Testnet Integration</div>
-              <p className="text-xs text-gray-400">Submit attestations, test with real network</p>
-            </div>
-            <div className="bg-[#0a0a0a] border border-green-500/30 rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Globe className="w-6 h-6 text-green-400" />
-              </div>
-              <div className="text-2xl font-bold text-green-400 mb-1">Production</div>
-              <div className="text-sm text-gray-500 mb-2">Mainnet Ready</div>
-              <p className="text-xs text-gray-400">Deploy with Circle-backed USDC</p>
-            </div>
+          {/* Transaction History */}
+          <div className="mb-8">
+            <TransactionHistory />
           </div>
 
           {/* Verification Example */}

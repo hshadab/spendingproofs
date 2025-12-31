@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Navigation,
   HeroSection,
@@ -9,20 +9,40 @@ import {
   WhyArcSection,
   UseCasesSection,
   ProofSystemSection,
+  AgentFlowSection,
   IntegrateSection,
   FooterSection,
   ComparisonTable,
 } from '@/components/landing';
+import { useScrollSpy } from '@/hooks/useScrollSpy';
 
 type TabType = 'arc' | 'proof' | 'integrate' | 'deep-dive';
+
+// Section IDs for each tab
+const tabSections: Record<TabType, string[]> = {
+  arc: ['problem', 'solution', 'why-arc'],
+  proof: ['whats-proven', 'model', 'jolt-atlas'],
+  integrate: ['architecture', 'install-sdk', 'deploy', 'roadmap'],
+  'deep-dive': ['agent-flow', 'use-cases', 'chain-comparison'],
+};
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState<TabType>('arc');
 
+  // Get the section IDs for the current tab
+  const currentSections = useMemo(() => tabSections[activeSection], [activeSection]);
+
+  // Track which section is currently in view
+  const activeScrollSection = useScrollSpy(currentSections, 100);
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Navigation */}
-      <Navigation activeSection={activeSection} setActiveSection={setActiveSection} />
+      <Navigation
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+        activeScrollSection={activeScrollSection}
+      />
 
       {/* === ARC + AGENTS TAB === */}
       {activeSection === 'arc' && (
@@ -51,10 +71,11 @@ export default function Home() {
             <div className="max-w-6xl mx-auto text-center">
               <h1 className="text-4xl font-bold mb-4">Deeper Dive</h1>
               <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                Explore use cases, chain comparisons, and detailed analysis of why spending proofs matter for the agent economy.
+                Explore the agent transaction flow, use cases, and chain comparisons.
               </p>
             </div>
           </section>
+          <AgentFlowSection />
           <UseCasesSection />
           <section id="chain-comparison" className="py-16 px-6 border-t border-gray-800">
             <div className="max-w-6xl mx-auto">

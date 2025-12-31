@@ -5,6 +5,8 @@ export { SolutionSection } from './SolutionSection';
 export { WhyArcSection } from './WhyArcSection';
 export { UseCasesSection } from './UseCasesSection';
 export { ProofSystemSection } from './ProofSystemSection';
+export { AgentFlowSection } from './AgentFlowSection';
+export { TransactionHistory } from './TransactionHistory';
 export { IntegrateSection } from './IntegrateSection';
 export { FooterSection } from './FooterSection';
 export { ModelExplorer } from './ModelExplorer';

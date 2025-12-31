@@ -9,6 +9,7 @@ type Section = 'arc' | 'proof' | 'integrate' | 'deep-dive';
 interface NavigationProps {
   activeSection: Section;
   setActiveSection: (section: Section) => void;
+  activeScrollSection?: string | null;
 }
 
 interface TabDropdownProps {
@@ -65,21 +66,26 @@ function TabDropdown({ label, icon, isActive, onClick, children }: TabDropdownPr
   );
 }
 
-function DropdownItem({ icon, label, description, onClick }: {
+function DropdownItem({ icon, label, description, onClick, isActive }: {
   icon: React.ReactNode;
   label: string;
   description: string;
   onClick?: () => void;
+  isActive?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-start gap-3 px-4 py-2.5 text-left hover:bg-white/5 text-gray-300 transition-colors"
+      className={`w-full flex items-start gap-3 px-4 py-2.5 text-left transition-colors ${
+        isActive
+          ? 'bg-purple-500/10 text-purple-400'
+          : 'hover:bg-white/5 text-gray-300'
+      }`}
     >
-      <div className="mt-0.5 text-gray-500">{icon}</div>
+      <div className={`mt-0.5 ${isActive ? 'text-purple-400' : 'text-gray-500'}`}>{icon}</div>
       <div>
         <div className="text-sm font-medium">{label}</div>
-        <div className="text-xs text-gray-500">{description}</div>
+        <div className={`text-xs ${isActive ? 'text-purple-400/70' : 'text-gray-500'}`}>{description}</div>
       </div>
     </button>
   );
@@ -174,13 +180,16 @@ function scrollToSection(id: string) {
   }, 50);
 }
 
-export function Navigation({ activeSection, setActiveSection }: NavigationProps) {
+export function Navigation({ activeSection, setActiveSection, activeScrollSection }: NavigationProps) {
 
   // Switch tab and scroll to section
   const navigateTo = (tab: Section, sectionId: string) => {
     setActiveSection(tab);
     scrollToSection(sectionId);
   };
+
+  // Check if a section is the active scroll section
+  const isActiveScroll = (sectionId: string) => activeScrollSection === sectionId;
 
   return (
     <nav className="border-b border-gray-800 bg-[#0a0a0a]/80 backdrop-blur-sm sticky top-0 z-50">
@@ -218,18 +227,21 @@ export function Navigation({ activeSection, setActiveSection }: NavigationProps)
                 label="The Problem"
                 description="Why agents need verifiable spending"
                 onClick={() => navigateTo('arc', 'problem')}
+                isActive={isActiveScroll('problem')}
               />
               <DropdownItem
                 icon={<Shield className="w-4 h-4" />}
                 label="The Solution"
                 description="Cryptographic policy compliance"
                 onClick={() => navigateTo('arc', 'solution')}
+                isActive={isActiveScroll('solution')}
               />
               <DropdownItem
                 icon={<Lock className="w-4 h-4" />}
                 label="Why Arc"
                 description="USDC gas, sub-second finality"
                 onClick={() => navigateTo('arc', 'why-arc')}
+                isActive={isActiveScroll('why-arc')}
               />
             </TabDropdown>
 
@@ -238,19 +250,28 @@ export function Navigation({ activeSection, setActiveSection }: NavigationProps)
               label="Deeper Dive"
               icon={<BookOpen className="w-3.5 h-3.5" />}
               isActive={activeSection === 'deep-dive'}
-              onClick={() => navigateTo('deep-dive', 'use-cases')}
+              onClick={() => navigateTo('deep-dive', 'agent-flow')}
             >
+              <DropdownItem
+                icon={<Shield className="w-4 h-4" />}
+                label="Agent Flow"
+                description="Complete transaction lifecycle"
+                onClick={() => navigateTo('deep-dive', 'agent-flow')}
+                isActive={isActiveScroll('agent-flow')}
+              />
               <DropdownItem
                 icon={<Cpu className="w-4 h-4" />}
                 label="Use Cases"
                 description="Real agent applications"
                 onClick={() => navigateTo('deep-dive', 'use-cases')}
+                isActive={isActiveScroll('use-cases')}
               />
               <DropdownItem
-                icon={<Shield className="w-4 h-4" />}
+                icon={<Lock className="w-4 h-4" />}
                 label="Chain Comparison"
                 description="Arc vs other L2s"
                 onClick={() => navigateTo('deep-dive', 'chain-comparison')}
+                isActive={isActiveScroll('chain-comparison')}
               />
             </TabDropdown>
 
@@ -266,18 +287,21 @@ export function Navigation({ activeSection, setActiveSection }: NavigationProps)
                 label="What's Proven"
                 description="Public vs private signals"
                 onClick={() => navigateTo('proof', 'whats-proven')}
+                isActive={isActiveScroll('whats-proven')}
               />
               <DropdownItem
                 icon={<Cpu className="w-4 h-4" />}
                 label="The Model"
                 description="8 inputs, 3 outputs"
                 onClick={() => navigateTo('proof', 'model')}
+                isActive={isActiveScroll('model')}
               />
               <DropdownItem
                 icon={<Shield className="w-4 h-4" />}
                 label="Jolt Atlas zkML"
                 description="HyperKZG + BN254"
                 onClick={() => navigateTo('proof', 'jolt-atlas')}
+                isActive={isActiveScroll('jolt-atlas')}
               />
               <div className="border-t border-gray-800 my-2" />
               <DropdownLink
@@ -300,18 +324,21 @@ export function Navigation({ activeSection, setActiveSection }: NavigationProps)
                 label="Architecture"
                 description="How the pieces fit together"
                 onClick={() => navigateTo('integrate', 'architecture')}
+                isActive={isActiveScroll('architecture')}
               />
               <DropdownItem
                 icon={<Code className="w-4 h-4" />}
                 label="Install SDK"
                 description="npm install & quickstart"
                 onClick={() => navigateTo('integrate', 'install-sdk')}
+                isActive={isActiveScroll('install-sdk')}
               />
               <DropdownItem
                 icon={<Lock className="w-4 h-4" />}
                 label="Deploy to Arc"
                 description="Testnet contracts & integration"
                 onClick={() => navigateTo('integrate', 'deploy')}
+                isActive={isActiveScroll('deploy')}
               />
               <div className="border-t border-gray-800 my-2" />
               <DropdownLink
