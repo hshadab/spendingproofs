@@ -52,13 +52,11 @@ USER appuser
 
 # Environment variables
 ENV MODELS_DIR=/app/models
-ENV PORT=10000
 ENV RUST_LOG=info
+# PORT is set by Render at runtime
 
 EXPOSE 10000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:10000/health || exit 1
+# Render handles health checks via /health endpoint
 
 CMD ["/app/arc-prover"]
