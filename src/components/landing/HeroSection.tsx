@@ -30,14 +30,13 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
 
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-                Spending Guardrails
+                Spending Policy Proofs
               </span>
               <br />
               for Agentic Commerce
             </h1>
             <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              <strong className="text-white">A cryptographic primitive for Arc.</strong>{' '}
-              <a href="https://github.com/ICME-Lab/jolt-atlas" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 transition-colors">Jolt-Atlas zkML</a> for proof-gated USDC transfers. On-chain attestation and audit trail via three Arc smart contracts.
+              <a href="https://github.com/ICME-Lab/jolt-atlas" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 transition-colors">Jolt-Atlas zkML</a> for proof-gated USDC transfer guardrails on <strong className="text-white">Arc</strong>.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <button
