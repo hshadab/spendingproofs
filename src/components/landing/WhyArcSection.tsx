@@ -1,12 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { XCircle, DollarSign, Zap, Lock, Globe, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
-import { ComparisonTable } from './ComparisonTable';
+import { XCircle, DollarSign, Zap, Lock, Globe } from 'lucide-react';
 
 export function WhyArcSection() {
-  const [showComparison, setShowComparison] = useState(false);
-
   return (
     <section id="why-arc" className="py-16 px-6 border-t border-gray-800 bg-[#0d1117]/50">
       <div className="max-w-6xl mx-auto">
@@ -108,30 +104,6 @@ export function WhyArcSection() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Comparison Table Toggle */}
-        <div className="mb-8">
-          <button
-            onClick={() => setShowComparison(!showComparison)}
-            className="w-full flex items-center justify-center gap-2 py-4 px-6 bg-[#0a0a0a] border border-gray-800 hover:border-purple-500/30 rounded-xl transition-colors group"
-          >
-            <BarChart3 className="w-5 h-5 text-purple-400" />
-            <span className="font-medium text-gray-300 group-hover:text-white">
-              {showComparison ? 'Hide' : 'View'} Full Comparison: Arc vs Other L2s
-            </span>
-            {showComparison ? (
-              <ChevronUp className="w-5 h-5 text-gray-500" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-gray-500" />
-            )}
-          </button>
-
-          {showComparison && (
-            <div className="mt-4 p-6 bg-[#0a0a0a] border border-gray-800 rounded-xl">
-              <ComparisonTable variant="full" showScenarios={true} />
-            </div>
-          )}
         </div>
 
         {/* Enterprise Rails callout */}
