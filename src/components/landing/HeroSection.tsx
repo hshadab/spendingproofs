@@ -36,7 +36,7 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
               for Agentic Commerce
             </h1>
             <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              <a href="https://github.com/ICME-Lab/jolt-atlas" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 transition-colors">Jolt-Atlas zkML</a> for proof-gated USDC transfer guardrails on <strong className="text-white">Arc</strong>.
+              <a href="https://github.com/ICME-Lab/jolt-atlas" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 transition-colors">Jolt-Atlas zkML</a> for proof-gated USDC transfer guardrails.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <button
