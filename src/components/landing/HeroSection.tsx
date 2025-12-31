@@ -36,9 +36,8 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
               for Agentic Commerce
             </h1>
             <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              <strong className="text-white">A cryptographic proof primitive for Arc.</strong>{' '}
-              Enable AI agents to spend USDC with proof of policy compliance.
-              No trust required—just math. The infrastructure for machine-to-machine commerce.
+              <strong className="text-white">A cryptographic primitive for Arc.</strong>{' '}
+              Jolt-Atlas zkML for proof-gated USDC transfers. On-chain verification and audit trail via three smart contracts—ProofAttestation, SpendingGateWallet, and USDC.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <button
