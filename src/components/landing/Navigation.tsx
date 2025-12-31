@@ -217,36 +217,6 @@ export function Navigation({ activeSection, setActiveSection, activeScrollSectio
 
           {/* Section Tabs with Dropdowns */}
           <div className="hidden md:flex items-center gap-1">
-            {/* Arc + Agents */}
-            <TabDropdown
-              label="Arc + Agents"
-              icon={<Cpu className="w-3.5 h-3.5" />}
-              isActive={activeSection === 'arc'}
-              onClick={() => navigateTo('arc', 'problem')}
-            >
-              <DropdownItem
-                icon={<Cpu className="w-4 h-4" />}
-                label="The Problem"
-                description="Why agents need verifiable spending"
-                onClick={() => navigateTo('arc', 'problem')}
-                isActive={isActiveScroll('problem')}
-              />
-              <DropdownItem
-                icon={<Shield className="w-4 h-4" />}
-                label="The Solution"
-                description="Cryptographic policy compliance"
-                onClick={() => navigateTo('arc', 'solution')}
-                isActive={isActiveScroll('solution')}
-              />
-              <DropdownItem
-                icon={<Lock className="w-4 h-4" />}
-                label="Why Arc"
-                description="USDC gas, sub-second finality"
-                onClick={() => navigateTo('arc', 'why-arc')}
-                isActive={isActiveScroll('why-arc')}
-              />
-            </TabDropdown>
-
             {/* Deeper Dive */}
             <TabDropdown
               label="Deeper Dive"
