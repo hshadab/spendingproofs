@@ -106,9 +106,6 @@ export function AgentFlowSection() {
         {/* Flow Steps - Horizontal on large screens */}
         <div className="hidden lg:block">
           <div className="flex items-start justify-between relative">
-            {/* Connection line */}
-            <div className="absolute top-12 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-emerald-500 opacity-30"></div>
-
             {flowSteps.map((step, index) => {
               const colors = colorClasses[step.color as keyof typeof colorClasses];
               const Icon = step.icon;
