@@ -15,8 +15,7 @@ import { PolicyProofs } from '@hshadab/spending-proofs';
 
 // Initialize client
 const client = new PolicyProofs({
-  rpcUrl: 'https://rpc.arc.network',
-  privateKey: process.env.PRIVATE_KEY,
+  proverUrl: 'https://spendingproofs-prover.onrender.com'
 });
 
 // Generate a spending proof
@@ -369,14 +368,15 @@ try {
 
 ## Changelog
 
-### v0.1.0
+### v0.2.0 (Current)
 
-- Initial release
-- Basic proof generation and verification
-- Arc attestation support
+- Real SNARK proof generation via Jolt-Atlas
+- On-chain attestation support
+- SpendingGateWallet integration
+- React hooks and wagmi support
 - TypeScript SDK
 
-### v0.2.0 (Planned)
+### v0.3.0 (Planned)
 
 - Solidity verifier integration
 - Batch proof generation

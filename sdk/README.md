@@ -245,6 +245,8 @@ import { ARC_TESTNET } from '@hshadab/spending-proofs';
 //   explorerUrl: 'https://testnet.arcscan.app',
 //   contracts: {
 //     proofAttestation: '0xBE9a5DF7C551324CB872584C6E5bF56799787952',
+//     spendingGateWallet: '0x6A47D13593c00359a1c5Fc6f9716926aF184d138',
+//     mockUsdc: '0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213',
 //   },
 // }
 ```
