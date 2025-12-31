@@ -82,7 +82,7 @@ export function HeroFlowDiagram() {
 
         {/* What's proven */}
         <div className="mt-5 pt-4 border-t border-gray-800">
-          <div className="text-xs text-gray-500 mb-2">The spending proof guarantees:</div>
+          <div className="text-xs text-gray-500 mb-2">The spending policy proof guarantees:</div>
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 text-xs">
               <Check className="w-3 h-3 text-green-400 flex-shrink-0" />

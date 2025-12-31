@@ -212,7 +212,7 @@ export function Navigation({ activeSection, setActiveSection, activeScrollSectio
               alt="NovaNet"
               className="h-5 w-auto"
             />
-            <span className="font-semibold text-lg hidden sm:block">Spending Proofs</span>
+            <span className="font-semibold text-lg hidden sm:block">Spending Policy Proofs</span>
           </Link>
 
           {/* Section Tabs with Dropdowns */}

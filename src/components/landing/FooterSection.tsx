@@ -11,10 +11,10 @@ export function FooterSection() {
             <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-700 rounded flex items-center justify-center">
               <Shield className="w-4 h-4" />
             </div>
-            <span className="text-sm text-gray-400">Spending Proofs</span>
+            <span className="text-sm text-gray-400">Spending Policy Proofs</span>
           </div>
           <p className="text-xs text-gray-500 text-center">
-            zkML Policy Enforcement for Autonomous Agents
+            Cryptographic spending guardrails for autonomous agents
           </p>
           <div className="flex items-center gap-4 text-sm text-gray-400">
             <a
