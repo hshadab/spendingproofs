@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Shield, ArrowRight, ExternalLink } from 'lucide-react';
+import { Shield, ArrowRight } from 'lucide-react';
 import { InstallCommand } from './utils';
-import { ModelExplorer } from './ModelExplorer';
+import { HeroFlowDiagram } from './HeroFlowDiagram';
 
 interface HeroSectionProps {
   onGetStarted: () => void;
@@ -78,9 +78,9 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
             </div>
           </div>
 
-          {/* Right: Interactive Model Explorer */}
+          {/* Right: Flow Diagram */}
           <div className="flex justify-center lg:justify-center">
-            <ModelExplorer />
+            <HeroFlowDiagram />
           </div>
         </div>
       </div>
