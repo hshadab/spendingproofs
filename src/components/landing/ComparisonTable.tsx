@@ -6,9 +6,9 @@ interface ComparisonRow {
   dimension: string;
   description: string;
   arc: { value: string; status: 'good' | 'partial' | 'bad' };
-  arbitrum: { value: string; status: 'good' | 'partial' | 'bad' };
-  optimism: { value: string; status: 'good' | 'partial' | 'bad' };
   base: { value: string; status: 'good' | 'partial' | 'bad' };
+  avalanche: { value: string; status: 'good' | 'partial' | 'bad' };
+  solana: { value: string; status: 'good' | 'partial' | 'bad' };
 }
 
 const COMPARISON_DATA: ComparisonRow[] = [
@@ -16,77 +16,77 @@ const COMPARISON_DATA: ComparisonRow[] = [
     dimension: 'Gas Token',
     description: 'Native token used to pay transaction fees',
     arc: { value: 'USDC', status: 'good' },
-    arbitrum: { value: 'ETH', status: 'bad' },
-    optimism: { value: 'ETH', status: 'bad' },
     base: { value: 'ETH', status: 'bad' },
+    avalanche: { value: 'AVAX', status: 'bad' },
+    solana: { value: 'SOL', status: 'bad' },
   },
   {
     dimension: 'Gas Volatility',
     description: 'Price stability of gas payments',
     arc: { value: 'None (stable)', status: 'good' },
-    arbitrum: { value: 'High (ETH)', status: 'bad' },
-    optimism: { value: 'High (ETH)', status: 'bad' },
     base: { value: 'High (ETH)', status: 'bad' },
+    avalanche: { value: 'High (AVAX)', status: 'bad' },
+    solana: { value: 'High (SOL)', status: 'bad' },
   },
   {
     dimension: 'Finality Time',
     description: 'Time until transaction is irreversible',
     arc: { value: '<1 second', status: 'good' },
-    arbitrum: { value: '~7 days (soft)', status: 'partial' },
-    optimism: { value: '~7 days (soft)', status: 'partial' },
     base: { value: '~7 days (soft)', status: 'partial' },
+    avalanche: { value: '~1 second', status: 'good' },
+    solana: { value: '~13 seconds', status: 'partial' },
   },
   {
     dimension: 'Finality Type',
     description: 'Guarantee model for finality',
     arc: { value: 'Deterministic', status: 'good' },
-    arbitrum: { value: 'Probabilistic', status: 'partial' },
-    optimism: { value: 'Probabilistic', status: 'partial' },
     base: { value: 'Probabilistic', status: 'partial' },
+    avalanche: { value: 'Probabilistic', status: 'partial' },
+    solana: { value: 'Probabilistic', status: 'partial' },
   },
   {
     dimension: 'Reorg Risk',
     description: 'Risk of transaction reversal',
     arc: { value: 'None', status: 'good' },
-    arbitrum: { value: 'Sequencer-dependent', status: 'partial' },
-    optimism: { value: 'Sequencer-dependent', status: 'partial' },
     base: { value: 'Sequencer-dependent', status: 'partial' },
+    avalanche: { value: 'Low', status: 'partial' },
+    solana: { value: 'Possible', status: 'partial' },
   },
   {
     dimension: 'Native USDC',
     description: 'Circle-native USDC (not bridged)',
     arc: { value: 'Yes', status: 'good' },
-    arbitrum: { value: 'Bridged', status: 'partial' },
-    optimism: { value: 'Bridged', status: 'partial' },
     base: { value: 'Yes', status: 'good' },
+    avalanche: { value: 'Yes', status: 'good' },
+    solana: { value: 'Yes', status: 'good' },
   },
   {
     dimension: 'Opt-in Privacy',
     description: 'Transaction privacy options',
     arc: { value: 'Supported', status: 'good' },
-    arbitrum: { value: 'None', status: 'bad' },
-    optimism: { value: 'None', status: 'bad' },
     base: { value: 'None', status: 'bad' },
+    avalanche: { value: 'None', status: 'bad' },
+    solana: { value: 'None', status: 'bad' },
   },
   {
     dimension: 'zkML Precompile',
     description: 'Native support for zkML verification',
     arc: { value: 'Roadmap', status: 'partial' },
-    arbitrum: { value: 'None', status: 'bad' },
-    optimism: { value: 'None', status: 'bad' },
     base: { value: 'None', status: 'bad' },
+    avalanche: { value: 'None', status: 'bad' },
+    solana: { value: 'None', status: 'bad' },
   },
 ];
 
 const SCENARIO_DATA = [
   {
-    scenario: 'ETH price spikes 20%',
+    scenario: 'Gas token price spikes 20%',
     others: "Agent's $1 budget now costs $1.20 in gas value",
     arc: 'Budget unchanged: $1 = $1',
   },
   {
     scenario: 'Agent needs instant confirmation',
-    others: 'Wait or accept reorg risk',
+    others: 'Wait for finality or accept reorg risk',
     arc: 'Instant deterministic finality',
   },
   {
@@ -147,9 +147,9 @@ export function ComparisonTable({ variant = 'full', showScenarios = true }: Comp
               </th>
               {variant === 'full' && (
                 <>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-400">Arbitrum</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-400">Optimism</th>
                   <th className="text-center py-3 px-4 font-semibold text-gray-400">Base</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-400">Avalanche</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-400">Solana</th>
                 </>
               )}
             </tr>
@@ -178,24 +178,22 @@ export function ComparisonTable({ variant = 'full', showScenarios = true }: Comp
                   <>
                     <td className="text-center py-3 px-4">
                       <div className="flex items-center justify-center gap-2">
-                        <StatusIcon status={row.arbitrum.status} />
-                        <span className={getStatusColor(row.arbitrum.status)}>
-                          {row.arbitrum.value}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="text-center py-3 px-4">
-                      <div className="flex items-center justify-center gap-2">
-                        <StatusIcon status={row.optimism.status} />
-                        <span className={getStatusColor(row.optimism.status)}>
-                          {row.optimism.value}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="text-center py-3 px-4">
-                      <div className="flex items-center justify-center gap-2">
                         <StatusIcon status={row.base.status} />
                         <span className={getStatusColor(row.base.status)}>{row.base.value}</span>
+                      </div>
+                    </td>
+                    <td className="text-center py-3 px-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <StatusIcon status={row.avalanche.status} />
+                        <span className={getStatusColor(row.avalanche.status)}>
+                          {row.avalanche.value}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="text-center py-3 px-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <StatusIcon status={row.solana.status} />
+                        <span className={getStatusColor(row.solana.status)}>{row.solana.value}</span>
                       </div>
                     </td>
                   </>
@@ -224,7 +222,7 @@ export function ComparisonTable({ variant = 'full', showScenarios = true }: Comp
                   <div className="font-medium text-white">{scenario.scenario}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-red-400 mb-1">On Other L2s</div>
+                  <div className="text-xs text-red-400 mb-1">On Other Chains</div>
                   <div className="text-sm text-gray-400">{scenario.others}</div>
                 </div>
                 <div>
@@ -242,7 +240,7 @@ export function ComparisonTable({ variant = 'full', showScenarios = true }: Comp
         <div className="flex items-start gap-3">
           <CheckCircle className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
           <div>
-            <div className="font-semibold text-purple-300">Why Arc is Required</div>
+            <div className="font-semibold text-purple-300">Why Arc for Agent Commerce</div>
             <p className="text-sm text-gray-400 mt-1">
               Autonomous agents require predictable costs (USDC gas), instant finality, and
               privacy options. These aren&apos;t optimizations—they&apos;re requirements for
