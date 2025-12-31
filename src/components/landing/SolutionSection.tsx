@@ -1,22 +1,19 @@
 'use client';
 
 import { Check, Lock } from 'lucide-react';
-import { CodeBlock, sdkExample } from './utils';
 
 export function SolutionSection() {
   return (
     <section id="solution" className="py-16 px-6 border-t border-gray-800">
       <div className="max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          <div>
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-4">The Solution: Cryptographic Policy Compliance</h2>
-            <p className="text-gray-400 mb-6">
+            <p className="text-gray-400">
               Every agent spending decision generates a SNARK proof. This proof mathematically
               guarantees the agent&apos;s ML model evaluated the purchase against its policy—without
               revealing the policy logic itself.
             </p>
-
-            <CodeBlock code={sdkExample} />
           </div>
 
           <div>

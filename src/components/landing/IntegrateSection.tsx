@@ -303,7 +303,7 @@ if (result.decision.shouldBuy) {
               </div>
               <div className="bg-[#0d1117] rounded-lg p-4">
                 <div className="flex items-center justify-between mb-1">
-                  <div className="text-xs text-gray-500">MockUSDC</div>
+                  <div className="text-xs text-gray-500">TestnetUSDC</div>
                   <a
                     href="https://testnet.arcscan.app/address/0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213"
                     target="_blank"
