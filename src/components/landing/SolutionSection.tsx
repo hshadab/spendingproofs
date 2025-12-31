@@ -9,7 +9,7 @@ export function SolutionSection() {
       <div className="max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           <div>
-            <h2 className="text-3xl font-bold mb-4">Cryptographic Policy Compliance</h2>
+            <h2 className="text-3xl font-bold mb-4">The Solution: Cryptographic Policy Compliance</h2>
             <p className="text-gray-400 mb-6">
               Every agent spending decision generates a SNARK proof. This proof mathematically
               guarantees the agent&apos;s ML model evaluated the purchase against its policy—without
