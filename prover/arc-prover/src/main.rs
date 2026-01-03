@@ -542,7 +542,7 @@ async fn verify(
 
     // Get or create verifier preprocessing
     let cache = state.model_cache.read().await;
-    let has_cached_preprocessing = cache.get(&request.model_id)
+    let _has_cached_preprocessing = cache.get(&request.model_id)
         .map(|m| m.prover_preprocessing.is_some())
         .unwrap_or(false);
     drop(cache);
@@ -586,6 +586,14 @@ async fn verify(
             Json(VerifyResponse {
                 valid: true,
                 error: None,
+                verification_time_ms: start.elapsed().as_millis(),
+            })
+        }
+        Ok(Ok(false)) => {
+            warn!("[zkML] Proof verification returned false");
+            Json(VerifyResponse {
+                valid: false,
+                error: Some("Proof verification returned false".to_string()),
                 verification_time_ms: start.elapsed().as_millis(),
             })
         }
