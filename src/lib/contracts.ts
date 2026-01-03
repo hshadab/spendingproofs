@@ -138,6 +138,157 @@ export const RESPONSE_CODES = {
 } as const;
 
 /**
+ * SpendingGateWallet ABI - Real on-chain enforcement
+ */
+export const SPENDING_GATE_WALLET_ABI = [
+  // Read functions
+  {
+    name: 'getBalance',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  {
+    name: 'getCurrentNonce',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  {
+    name: 'getRemainingDailyAllowance',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  {
+    name: 'isProofUsed',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [{ name: 'proofHash', type: 'bytes32' }],
+    outputs: [{ name: '', type: 'bool' }],
+  },
+  {
+    name: 'computeTxIntentHash',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+      { name: '_nonce', type: 'uint256' },
+      { name: 'expiry', type: 'uint256' },
+    ],
+    outputs: [{ name: '', type: 'bytes32' }],
+  },
+  {
+    name: 'dailyLimit',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  {
+    name: 'maxSingleTransfer',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  {
+    name: 'agentId',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  // Write functions
+  {
+    name: 'deposit',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'amount', type: 'uint256' }],
+    outputs: [],
+  },
+  {
+    name: 'gatedTransfer',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+      { name: 'proofHash', type: 'bytes32' },
+      { name: 'expiry', type: 'uint256' },
+    ],
+    outputs: [],
+  },
+  {
+    name: 'updateLimits',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: '_dailyLimit', type: 'uint256' },
+      { name: '_maxSingleTransfer', type: 'uint256' },
+    ],
+    outputs: [],
+  },
+  {
+    name: 'emergencyWithdraw',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'to', type: 'address' }],
+    outputs: [],
+  },
+  // Events
+  {
+    name: 'Deposit',
+    type: 'event',
+    inputs: [
+      { name: 'from', type: 'address', indexed: true },
+      { name: 'amount', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    name: 'GatedTransfer',
+    type: 'event',
+    inputs: [
+      { name: 'to', type: 'address', indexed: true },
+      { name: 'amount', type: 'uint256', indexed: false },
+      { name: 'proofHash', type: 'bytes32', indexed: false },
+      { name: 'txIntentHash', type: 'bytes32', indexed: false },
+    ],
+  },
+  {
+    name: 'EmergencyWithdraw',
+    type: 'event',
+    inputs: [
+      { name: 'to', type: 'address', indexed: true },
+      { name: 'amount', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    name: 'LimitsUpdated',
+    type: 'event',
+    inputs: [
+      { name: 'dailyLimit', type: 'uint256', indexed: false },
+      { name: 'maxSingleTransfer', type: 'uint256', indexed: false },
+    ],
+  },
+  // Errors (for decoding)
+  { name: 'InvalidProof', type: 'error', inputs: [] },
+  { name: 'ProofAlreadyUsed', type: 'error', inputs: [] },
+  { name: 'ProofNotAttested', type: 'error', inputs: [] },
+  { name: 'TxIntentMismatch', type: 'error', inputs: [] },
+  { name: 'ProofExpired', type: 'error', inputs: [] },
+  { name: 'ExceedsDailyLimit', type: 'error', inputs: [] },
+  { name: 'ExceedsMaxSingleTransfer', type: 'error', inputs: [] },
+  { name: 'InsufficientBalance', type: 'error', inputs: [] },
+  { name: 'InvalidRecipient', type: 'error', inputs: [] },
+  { name: 'TransferFailed', type: 'error', inputs: [] },
+] as const;
+
+/**
  * Convert string to bytes32
  */
 export function stringToBytes32(str: string): `0x${string}` {

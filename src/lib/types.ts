@@ -15,6 +15,8 @@ export interface ProofMetadata {
 export interface ProofData {
   proof: string;
   proofHash: string;
+  /** Serialized program_io for SNARK verification */
+  programIo?: string;
   metadata: ProofMetadata;
   tag: string;
   timestamp: number;
@@ -46,6 +48,7 @@ export interface HealthResponse {
   version: string;
   proofType: string;
   modelsLoaded: number;
+  verificationEnabled?: boolean;
 }
 
 export interface ProofStep {
@@ -67,12 +70,16 @@ export interface ProofGenerationState {
 }
 
 /**
- * Unified spending proof representation for enforcement demos
+ * Unified spending proof representation for enforcement
  */
 export interface SpendingProof {
+  /** Raw proof bytes (hex encoded) - optional for lightweight references */
+  proof?: string;
   proofHash: string;
   inputHash: string;
   modelHash: string;
+  /** Serialized program_io for SNARK verification */
+  programIo?: string;
   decision: {
     shouldBuy: boolean;
     confidence: number;
@@ -99,3 +106,25 @@ export interface TxIntent {
   policyId: string;
   policyVersion: number;
 }
+
+/**
+ * Signed request for authenticated proof generation
+ */
+export interface SignedProveRequest {
+  inputs: number[];
+  tag: string;
+  address: `0x${string}`;
+  timestamp: number;
+  signature: `0x${string}`;
+}
+
+/**
+ * Error codes for proof API
+ */
+export type ProveErrorCode =
+  | 'INVALID_SIGNATURE'
+  | 'SIGNATURE_EXPIRED'
+  | 'ADDRESS_NOT_ALLOWED'
+  | 'RATE_LIMITED'
+  | 'PROVER_UNAVAILABLE'
+  | 'PROOF_GENERATION_FAILED';

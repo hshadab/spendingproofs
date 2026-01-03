@@ -1,9 +1,25 @@
 /**
  * Arc Policy Proofs SDK - Type Definitions
+ *
+ * This module contains all TypeScript type definitions for the SDK.
+ * Types are designed to be compatible with both browser and Node.js environments.
+ *
+ * @packageDocumentation
  */
 
 /**
- * Spending policy configuration
+ * Spending policy configuration that defines limits and thresholds
+ * for agent spending decisions.
+ *
+ * @example
+ * ```typescript
+ * const policy: SpendingPolicy = {
+ *   dailyLimitUsdc: 10.0,      // $10/day max
+ *   maxSinglePurchaseUsdc: 1.0, // $1 per transaction
+ *   minServiceSuccessRate: 0.9, // 90% reliability required
+ *   minBudgetBuffer: 0.5,       // Keep $0.50 reserve
+ * };
+ * ```
  */
 export interface SpendingPolicy {
   /** Maximum allowed spend per day in USDC */
@@ -17,7 +33,24 @@ export interface SpendingPolicy {
 }
 
 /**
- * Input for spending decision model
+ * Input for the spending decision model.
+ *
+ * This represents all the information needed to make a spending decision.
+ * These values are fed into the ONNX model and used to generate a SNARK proof.
+ *
+ * @example
+ * ```typescript
+ * const input: SpendingInput = {
+ *   priceUsdc: 0.05,           // Buying something for $0.05
+ *   budgetUsdc: 10.0,          // Have $10 in treasury
+ *   spentTodayUsdc: 0.50,      // Already spent $0.50 today
+ *   dailyLimitUsdc: 5.0,       // Daily limit is $5
+ *   serviceSuccessRate: 0.95,  // Service has 95% success rate
+ *   serviceTotalCalls: 100,    // Used service 100 times before
+ *   purchasesInCategory: 3,    // 3 purchases in this category today
+ *   timeSinceLastPurchase: 2.5 // 2.5 hours since last purchase
+ * };
+ * ```
  */
 export interface SpendingInput {
   /** Price of the item/service in USDC */
@@ -133,7 +166,7 @@ export interface OnChainVerifyOptions {
 }
 
 /**
- * Arc Testnet configuration
+ * Arc Testnet configuration constants
  */
 export const ARC_TESTNET = {
   chainId: 5042002,
@@ -146,3 +179,93 @@ export const ARC_TESTNET = {
     testnetUsdc: '0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213' as `0x${string}`,
   },
 } as const;
+
+/**
+ * Error codes for SDK operations
+ */
+export enum SDKErrorCode {
+  /** Prover service is not available */
+  PROVER_UNAVAILABLE = 'PROVER_UNAVAILABLE',
+  /** Proof generation timed out */
+  PROVER_TIMEOUT = 'PROVER_TIMEOUT',
+  /** Proof generation failed */
+  PROOF_GENERATION_FAILED = 'PROOF_GENERATION_FAILED',
+  /** Input validation failed */
+  INVALID_INPUT = 'INVALID_INPUT',
+  /** Proof verification failed */
+  VERIFICATION_FAILED = 'VERIFICATION_FAILED',
+  /** Network request failed */
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  /** Unknown error */
+  UNKNOWN = 'UNKNOWN',
+}
+
+/**
+ * SDK Error class with typed error codes
+ *
+ * @example
+ * ```typescript
+ * try {
+ *   await client.prove(input);
+ * } catch (error) {
+ *   if (error instanceof SDKError) {
+ *     console.log('Error code:', error.code);
+ *     console.log('Message:', error.message);
+ *   }
+ * }
+ * ```
+ */
+export class SDKError extends Error {
+  /** Error code for programmatic handling */
+  readonly code: SDKErrorCode;
+  /** Original error that caused this error */
+  readonly cause?: unknown;
+  /** Additional context about the error */
+  readonly context?: Record<string, unknown>;
+
+  constructor(
+    message: string,
+    code: SDKErrorCode = SDKErrorCode.UNKNOWN,
+    cause?: unknown,
+    context?: Record<string, unknown>
+  ) {
+    super(message);
+    this.name = 'SDKError';
+    this.code = code;
+    this.cause = cause;
+    this.context = context;
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+  }
+
+  /** Create a prover unavailable error */
+  static proverUnavailable(cause?: unknown): SDKError {
+    return new SDKError(
+      'Prover service is unavailable',
+      SDKErrorCode.PROVER_UNAVAILABLE,
+      cause
+    );
+  }
+
+  /** Create a timeout error */
+  static timeout(timeoutMs: number): SDKError {
+    return new SDKError(
+      `Request timed out after ${timeoutMs}ms`,
+      SDKErrorCode.PROVER_TIMEOUT,
+      undefined,
+      { timeoutMs }
+    );
+  }
+
+  /** Create an invalid input error */
+  static invalidInput(errors: string[]): SDKError {
+    return new SDKError(
+      `Invalid input: ${errors.join('; ')}`,
+      SDKErrorCode.INVALID_INPUT,
+      undefined,
+      { errors }
+    );
+  }
+}

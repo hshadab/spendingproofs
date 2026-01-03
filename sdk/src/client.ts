@@ -1,5 +1,36 @@
 /**
  * Arc Policy Proofs SDK - Client
+ *
+ * This module provides the main `PolicyProofs` client for generating
+ * and verifying zkML spending proofs.
+ *
+ * @example Basic usage
+ * ```typescript
+ * import { PolicyProofs } from '@hshadab/spending-proofs';
+ *
+ * // Initialize client
+ * const client = new PolicyProofs({
+ *   proverUrl: 'https://prover.example.com',
+ *   timeout: 60000, // 1 minute timeout
+ * });
+ *
+ * // Generate a proof
+ * const result = await client.prove({
+ *   priceUsdc: 0.05,
+ *   budgetUsdc: 1.00,
+ *   spentTodayUsdc: 0.20,
+ *   dailyLimitUsdc: 0.50,
+ *   serviceSuccessRate: 0.95,
+ *   serviceTotalCalls: 100,
+ *   purchasesInCategory: 5,
+ *   timeSinceLastPurchase: 2.5,
+ * });
+ *
+ * console.log('Should buy:', result.decision.shouldBuy);
+ * console.log('Proof hash:', result.proofHash);
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import {

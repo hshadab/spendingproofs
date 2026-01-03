@@ -9,6 +9,7 @@ import type {
   VerifyResponse,
   HealthResponse,
 } from './types';
+import { keccak256, encodePacked } from 'viem';
 
 const JOLT_ATLAS_URL = process.env.NEXT_PUBLIC_JOLT_ATLAS_URL || 'http://localhost:3001';
 
@@ -72,6 +73,7 @@ export async function generateProof(
     proof: {
       proof: data.proof.proof,
       proofHash: data.proof.proof_hash,
+      programIo: data.proof.program_io, // For SNARK verification
       metadata: {
         modelHash: data.proof.metadata.model_hash,
         inputHash: data.proof.metadata.input_hash,
@@ -94,12 +96,14 @@ export async function generateProof(
 }
 
 /**
- * Verify a proof against model hash
+ * Verify a SNARK proof cryptographically
+ * Requires program_io for real verification
  */
 export async function verifyProof(
   proof: string,
   modelId: string,
-  modelHash: string
+  modelHash: string,
+  programIo: string
 ): Promise<VerifyResponse> {
   const response = await fetch(`${JOLT_ATLAS_URL}/verify`, {
     method: 'POST',
@@ -110,6 +114,7 @@ export async function verifyProof(
       proof,
       model_id: modelId,
       model_hash: modelHash,
+      program_io: programIo,
     }),
   });
 
@@ -131,20 +136,23 @@ export async function verifyProof(
 
 /**
  * Compute keccak256 hash of input array (for local verification)
+ * Uses real keccak256 for cryptographic security
  */
 export function hashInputs(inputs: number[]): string {
-  // Convert to bytes and hash
-  const bytes = new Float64Array(inputs);
-  const buffer = new Uint8Array(bytes.buffer);
+  // Convert to fixed-point representation for deterministic hashing
+  // Scale by 1e8 to preserve 8 decimal places, then convert to hex
+  const scaledInputs = inputs.map(n => {
+    const scaled = BigInt(Math.round(n * 1e8));
+    return scaled;
+  });
 
-  // Simple hash for demo - in production use proper keccak256
-  let hash = 0;
-  for (let i = 0; i < buffer.length; i++) {
-    hash = ((hash << 5) - hash) + buffer[i];
-    hash = hash & hash;
-  }
+  // Pack as int256 values and hash
+  const encoded = encodePacked(
+    scaledInputs.map(() => 'int256' as const),
+    scaledInputs
+  );
 
-  return '0x' + Math.abs(hash).toString(16).padStart(64, '0');
+  return keccak256(encoded);
 }
 
 /**

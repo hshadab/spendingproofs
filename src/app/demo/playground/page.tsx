@@ -1,11 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Play, RotateCcw, Eye, Lock } from 'lucide-react';
-import { PolicySliders } from '@/components/PolicySliders';
-import { PurchaseSimulator } from '@/components/PurchaseSimulator';
-import { ProofProgress } from '@/components/ProofProgress';
-import { ProofViewer } from '@/components/ProofViewer';
 import {
   type SpendingPolicy,
   type SpendingModelInput,
@@ -14,6 +11,39 @@ import {
   runSpendingModel,
 } from '@/lib/spendingModel';
 import { useProofGeneration } from '@/hooks/useProofGeneration';
+
+// Code-split heavy components for better initial load performance
+const PolicySliders = dynamic(
+  () => import('@/components/PolicySliders').then(mod => ({ default: mod.PolicySliders })),
+  {
+    loading: () => <div className="h-48 bg-gray-800/50 rounded-xl animate-pulse" />,
+    ssr: false,
+  }
+);
+
+const PurchaseSimulator = dynamic(
+  () => import('@/components/PurchaseSimulator').then(mod => ({ default: mod.PurchaseSimulator })),
+  {
+    loading: () => <div className="h-64 bg-gray-800/50 rounded-xl animate-pulse" />,
+    ssr: false,
+  }
+);
+
+const ProofProgress = dynamic(
+  () => import('@/components/ProofProgress').then(mod => ({ default: mod.ProofProgress })),
+  {
+    loading: () => <div className="h-32 bg-gray-800/50 rounded-xl animate-pulse" />,
+    ssr: false,
+  }
+);
+
+const ProofViewer = dynamic(
+  () => import('@/components/ProofViewer').then(mod => ({ default: mod.ProofViewer })),
+  {
+    loading: () => <div className="h-48 bg-gray-800/50 rounded-xl animate-pulse" />,
+    ssr: false,
+  }
+);
 
 type ViewMode = 'full' | 'agent' | 'verifier';
 

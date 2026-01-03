@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyProveRequest, isSignatureAuthEnabled } from '@/lib/signatureAuth';
+import type { SignedProveRequest } from '@/lib/types';
 
 const PROVER_BACKEND_URL = process.env.PROVER_BACKEND_URL || 'http://localhost:3001';
 
@@ -6,13 +8,43 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Forward request to prover backend
+    // Verify signature if authentication is enabled
+    if (isSignatureAuthEnabled()) {
+      const { inputs, tag, address, timestamp, signature } = body as SignedProveRequest;
+
+      // Check required fields for signed request
+      if (!address || !timestamp || !signature) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Signature authentication required. Missing: address, timestamp, or signature',
+            code: 'INVALID_SIGNATURE',
+          },
+          { status: 401 }
+        );
+      }
+
+      const verification = await verifyProveRequest({ inputs, tag, address, timestamp, signature });
+
+      if (!verification.valid) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: verification.error,
+            code: verification.code,
+          },
+          { status: 401 }
+        );
+      }
+    }
+
+    // Forward request to prover backend (only send inputs and tag)
     const response = await fetch(`${PROVER_BACKEND_URL}/prove`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ inputs: body.inputs, tag: body.tag }),
     });
 
     if (!response.ok) {

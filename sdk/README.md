@@ -262,7 +262,64 @@ Spending proofs require Arc's unique infrastructure:
 | Reorg Risk | None | Sequencer-dependent |
 | Privacy | Opt-in available | None |
 
-Learn more: [Arc Documentation](https://arc.builders)
+Learn more: [Arc Documentation](https://docs.arc.network)
+
+## Error Handling
+
+The SDK provides typed errors for robust error handling:
+
+```typescript
+import { PolicyProofs, SDKError, SDKErrorCode } from '@hshadab/spending-proofs';
+
+const client = new PolicyProofs({ proverUrl: '...' });
+
+try {
+  const result = await client.prove(input);
+} catch (error) {
+  if (error instanceof SDKError) {
+    switch (error.code) {
+      case SDKErrorCode.PROVER_UNAVAILABLE:
+        console.log('Prover is down, try again later');
+        break;
+      case SDKErrorCode.PROVER_TIMEOUT:
+        console.log('Request timed out');
+        break;
+      case SDKErrorCode.INVALID_INPUT:
+        console.log('Invalid input:', error.context?.errors);
+        break;
+      default:
+        console.log('Error:', error.message);
+    }
+  }
+}
+```
+
+### Error Codes
+
+| Code | Description |
+|------|-------------|
+| `PROVER_UNAVAILABLE` | Prover service is not reachable |
+| `PROVER_TIMEOUT` | Proof generation timed out |
+| `PROOF_GENERATION_FAILED` | Prover returned an error |
+| `INVALID_INPUT` | Input validation failed |
+| `VERIFICATION_FAILED` | Proof verification failed |
+| `NETWORK_ERROR` | Network request failed |
+
+## Input Validation
+
+Validate inputs before generating proofs:
+
+```typescript
+import { validateSpendingInput } from '@hshadab/spending-proofs';
+
+const errors = validateSpendingInput(input);
+
+if (errors.length > 0) {
+  console.log('Validation errors:', errors);
+} else {
+  const result = await client.prove(input);
+}
+```
 
 ## Security
 

@@ -96,7 +96,7 @@ export interface GatedTransferParams {
 }
 
 export function useSpendingGate() {
-  const spendingGateAddress = CONTRACTS.spendingGate;
+  const spendingGateAddress = CONTRACTS.spendingGateWallet;
   const isConfigured = !!spendingGateAddress;
 
   // Write contract
@@ -179,7 +179,7 @@ export function useNonceUsed(
   sender: `0x${string}` | undefined,
   nonce: bigint | undefined
 ) {
-  const spendingGateAddress = CONTRACTS.spendingGate;
+  const spendingGateAddress = CONTRACTS.spendingGateWallet;
 
   const { data, isLoading, error, refetch } = useReadContract({
     address: spendingGateAddress,
@@ -201,7 +201,7 @@ export function useNonceUsed(
 
 // Hook to check if a proof has been used
 export function useProofUsed(proofHash: `0x${string}` | undefined) {
-  const spendingGateAddress = CONTRACTS.spendingGate;
+  const spendingGateAddress = CONTRACTS.spendingGateWallet;
 
   const { data, isLoading, error, refetch } = useReadContract({
     address: spendingGateAddress,

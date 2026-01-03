@@ -85,11 +85,116 @@ npm install
 # Run development server
 npm run dev
 
-# Run tests
+# Run TypeScript tests
 npm test
+
+# Run contract tests (requires Foundry)
+cd contracts && forge test
 
 # Build for production
 npm run build
+```
+
+## Features
+
+### Error Handling
+
+Typed error classes for robust error handling:
+
+```typescript
+import { ProverError, ValidationError, parseError, ErrorCode } from '@/lib/errors';
+
+try {
+  await generateProof(input);
+} catch (err) {
+  const error = parseError(err);
+  switch (error.code) {
+    case ErrorCode.PROVER_UNAVAILABLE:
+      // Handle prover down
+      break;
+    case ErrorCode.INVALID_INPUT:
+      // Handle validation error
+      break;
+  }
+}
+```
+
+### Retry with Exponential Backoff
+
+Automatic retry for transient failures:
+
+```typescript
+import { withRetry, proverRetryOptions } from '@/lib/retry';
+
+const result = await withRetry(
+  () => fetchProof(inputs),
+  {
+    ...proverRetryOptions,
+    maxAttempts: 5,
+    onRetry: (err, attempt) => console.log(`Retry ${attempt}...`),
+  }
+);
+```
+
+### Input Validation
+
+Comprehensive input validation:
+
+```typescript
+import { validateSpendingInput, assertValidSpendingInput } from '@/lib/spendingModel';
+
+// Get validation errors
+const { valid, errors } = validateSpendingInput(input);
+
+// Or throw on invalid input
+assertValidSpendingInput(input); // throws ValidationError if invalid
+```
+
+### Proof Caching
+
+LRU cache for proof results (same inputs = same proof):
+
+```typescript
+import { withProofCache, getProofCache } from '@/lib/proofCache';
+
+const result = await withProofCache(inputs, 'spending', async () => {
+  return await generateProof(inputs);
+});
+
+// Check cache stats
+const stats = getProofCache().getStats();
+console.log(`Hit rate: ${(stats.hitRate * 100).toFixed(1)}%`);
+```
+
+### Metrics & Observability
+
+Built-in metrics collection:
+
+```typescript
+import { getMetricsCollector } from '@/lib/metrics';
+
+const metrics = getMetricsCollector();
+metrics.recordRequest();
+metrics.recordSuccess(generationTimeMs);
+
+// Export for Prometheus
+console.log(metrics.toPrometheusFormat());
+```
+
+### Signature Authentication
+
+Optional wallet signature authentication for API requests:
+
+```typescript
+// Enable in .env
+REQUIRE_SIGNATURE_AUTH=true
+ALLOWED_PROVER_ADDRESSES=0x123...,0x456...
+
+// Use the signed proof generation hook
+import { useSignedProofGeneration } from '@/hooks/useSignedProofGeneration';
+
+const { generateSignedProof } = useSignedProofGeneration();
+await generateSignedProof(input); // Auto-signs with connected wallet
 ```
 
 ## Arc Testnet

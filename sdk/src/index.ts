@@ -52,6 +52,9 @@ export type {
 // Constants
 export { ARC_TESTNET } from './types';
 
+// Errors
+export { SDKError, SDKErrorCode } from './types';
+
 // Utilities
 export {
   spendingInputToArray,

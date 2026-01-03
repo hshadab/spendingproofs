@@ -1,8 +1,8 @@
 /**
- * Mock SpendingGate Contract Interface
+ * SpendingGate Contract Interface
  *
- * This simulates a smart contract that ENFORCES spending policy compliance
- * by requiring valid proofs before allowing USDC transfers.
+ * This interfaces with the SpendingGate smart contract that ENFORCES spending
+ * policy compliance by requiring valid proofs before allowing USDC transfers.
  *
  * Key difference from attestation:
  * - Attestation: "We logged that this proof was submitted" (advisory)
@@ -10,6 +10,7 @@
  */
 
 import { SpendingProof, TxIntent } from './types';
+import { keccak256, encodePacked } from 'viem';
 
 export type { TxIntent };
 
@@ -39,28 +40,26 @@ const contractState: SpendingGateState = {
 
 /**
  * Compute txIntentHash - binds proof to specific transaction intent
+ * Uses real keccak256 for cryptographic binding
  */
 export function computeTxIntentHash(intent: TxIntent): string {
-  const packed = [
-    intent.chainId.toString(16).padStart(8, '0'),
-    intent.usdcAddress.slice(2).toLowerCase(),
-    intent.sender.slice(2).toLowerCase(),
-    intent.recipient.slice(2).toLowerCase(),
-    intent.amount.toString(16).padStart(64, '0'),
-    intent.nonce.toString(16).padStart(16, '0'),
-    intent.expiry.toString(16).padStart(8, '0'),
-    intent.policyId,
-    intent.policyVersion.toString(16).padStart(4, '0'),
-  ].join('');
+  // Pack all intent fields using ABI encoding (matches Solidity)
+  const encoded = encodePacked(
+    ['uint256', 'address', 'address', 'address', 'uint256', 'uint256', 'uint256', 'string', 'uint256'],
+    [
+      BigInt(intent.chainId),
+      intent.usdcAddress as `0x${string}`,
+      intent.sender as `0x${string}`,
+      intent.recipient as `0x${string}`,
+      BigInt(intent.amount),
+      BigInt(intent.nonce),
+      BigInt(intent.expiry),
+      intent.policyId,
+      BigInt(intent.policyVersion),
+    ]
+  );
 
-  // Simple hash simulation (in real contract, use keccak256)
-  let hash = 0;
-  for (let i = 0; i < packed.length; i++) {
-    const char = packed.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return '0x' + Math.abs(hash).toString(16).padStart(64, '0');
+  return keccak256(encoded);
 }
 
 /**

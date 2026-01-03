@@ -69,18 +69,29 @@ const result = await client.prove({
 console.log(result.decision.shouldBuy); // true
 console.log(result.proofHash);          // 0x7a8b...`;
 
-// Verify example
-export const verifyExample = `// Merchant/protocol verifies agent followed policy
-const verification = await client.verify(proof, claimedInputs);
+// Verify example - verification GATES the transfer
+export const verifyExample = `// 1. VERIFY - This gates the transfer (trust boundary)
+const verification = await client.verify(
+  proof.proof,
+  proof.programIo,  // Required for cryptographic verification
+  'spending-model'
+);
 
 if (!verification.valid) {
-  // Agent tried to modify inputs after proof generation
-  console.error('Policy violation detected');
-  console.error('Expected:', verification.expectedInputHash);
-  console.error('Actual:', verification.actualInputHash);
-  rejectTransaction();
+  throw new Error('Proof verification failed - blocking transfer');
 }
 
-// Check attestation on Arc chain
-import { isProofAttested } from '@hshadab/spending-proofs';
-const attested = await isProofAttested(proof.proofHash);`;
+// 2. ATTEST - Record on-chain for transparency (audit trail)
+import { submitAttestation } from '@hshadab/spending-proofs';
+await submitAttestation(proof.proofHash);
+
+// 3. TRANSFER - Execute via SpendingGateWallet
+import { useSpendingGateWallet } from './hooks';
+const { gatedTransfer } = useSpendingGateWallet(walletAddress);
+
+await gatedTransfer({
+  to: merchantAddress,
+  amount: parseUSDC('0.05'),
+  proofHash: proof.proofHash,
+  expiry: BigInt(Date.now() / 1000 + 3600),
+});`;

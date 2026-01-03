@@ -3,6 +3,7 @@
  */
 
 import { SpendingInput, SpendingDecision } from './types';
+import { keccak256, encodePacked } from 'viem';
 
 /**
  * Convert spending input object to array of numbers for model
@@ -58,21 +59,23 @@ export function parseDecision(rawOutputs: number[]): SpendingDecision {
 
 /**
  * Hash inputs for verification
- * Simple deterministic hash for client-side verification
+ * Uses real keccak256 for cryptographic security
  */
 export function hashInputs(inputs: number[]): string {
-  // Create a deterministic string representation
-  const str = inputs.map((n) => n.toFixed(8)).join(',');
+  // Convert to fixed-point representation for deterministic hashing
+  // Scale by 1e8 to preserve 8 decimal places
+  const scaledInputs = inputs.map(n => {
+    const scaled = BigInt(Math.round(n * 1e8));
+    return scaled;
+  });
 
-  // Simple hash function (for demo - use keccak256 in production)
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
+  // Pack as int256 values and hash
+  const encoded = encodePacked(
+    scaledInputs.map(() => 'int256' as const),
+    scaledInputs
+  );
 
-  return '0x' + Math.abs(hash).toString(16).padStart(8, '0');
+  return keccak256(encoded);
 }
 
 /**

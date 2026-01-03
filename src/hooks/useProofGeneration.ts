@@ -1,32 +1,44 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
+import { keccak256, encodePacked, toBytes } from 'viem';
 import type { ProofGenerationState, ProveResponse, ProofStep, TxIntent } from '@/lib/types';
 import { spendingInputToNumeric, runSpendingModel, DEFAULT_SPENDING_POLICY, type SpendingModelInput } from '@/lib/spendingModel';
+import { withRetry, proverRetryOptions } from '@/lib/retry';
+import { ProverError, parseError } from '@/lib/errors';
 
-// Generate txIntentHash for proof binding
-function generateTxIntentHash(input: SpendingModelInput, txIntent?: Partial<TxIntent>): string {
-  const intentData = {
-    chainId: txIntent?.chainId || 5042002,
-    amount: Math.floor(input.priceUsdc * 1e6), // USDC has 6 decimals
-    recipient: txIntent?.recipient || '0x8ba1f109551bD432803012645Ac136ddd64DBA72',
-    nonce: txIntent?.nonce || BigInt(Date.now()),
-    expiry: txIntent?.expiry || Math.floor(Date.now() / 1000) + 3600,
-    policyId: txIntent?.policyId || 'default-spending-policy',
-  };
-
-  // Simple deterministic hash (in real implementation, use keccak256)
-  const packed = JSON.stringify(intentData);
-  let hash = 0;
-  for (let i = 0; i < packed.length; i++) {
-    const char = packed.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return '0x' + Math.abs(hash).toString(16).padStart(64, '0');
+/**
+ * Create the message to sign for authenticated proof requests
+ */
+export function createProveMessage(inputs: number[], tag: string, timestamp: number): string {
+  const inputHash = keccak256(toBytes(JSON.stringify(inputs)));
+  return `Spending Proofs Authentication\n\nAction: Generate proof\nTag: ${tag}\nInput Hash: ${inputHash}\nTimestamp: ${timestamp}`;
 }
 
-// Generate mock proof data for static demo
+/**
+ * Signature function type for signing proof requests
+ */
+export type SignProveRequest = (message: string) => Promise<`0x${string}`>;
+
+// Generate txIntentHash for proof binding using real keccak256
+function generateTxIntentHash(input: SpendingModelInput, txIntent?: Partial<TxIntent>): string {
+  const chainId = BigInt(txIntent?.chainId || 5042002);
+  const amount = BigInt(Math.floor(input.priceUsdc * 1e6)); // USDC has 6 decimals
+  const recipient = (txIntent?.recipient || '0x8ba1f109551bD432803012645Ac136ddd64DBA72') as `0x${string}`;
+  const nonce = BigInt(txIntent?.nonce || Date.now());
+  const expiry = BigInt(txIntent?.expiry || Math.floor(Date.now() / 1000) + 3600);
+  const policyId = txIntent?.policyId || 'default-spending-policy';
+
+  const encoded = encodePacked(
+    ['uint256', 'uint256', 'address', 'uint256', 'uint256', 'string'],
+    [chainId, amount, recipient, nonce, expiry, policyId]
+  );
+
+  return keccak256(encoded);
+}
+
+// Generate mock proof data for static demo (when prover is unavailable)
+// WARNING: Mock proofs are NOT cryptographically valid and cannot be verified
 function generateMockProof(input: SpendingModelInput, txIntent?: Partial<TxIntent>): ProveResponse {
   const decision = runSpendingModel(input, DEFAULT_SPENDING_POLICY);
   const mockHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -36,19 +48,27 @@ function generateMockProof(input: SpendingModelInput, txIntent?: Partial<TxInten
   const txIntentHash = generateTxIntentHash(input, txIntent);
   const generationTime = 2000 + Math.random() * 4000;
 
+  // Mock program_io - not valid for real verification
+  const mockProgramIo = '0x' + Buffer.from(JSON.stringify({
+    inputs: [],
+    outputs: [decision.shouldBuy ? 1 : 0],
+    _mock: true,
+  })).toString('hex');
+
   return {
     success: true,
     proof: {
       proof: 'mock_proof_' + mockHash.slice(2, 18),
       proofHash: mockHash,
+      programIo: mockProgramIo, // Mock - not valid for verification
       metadata: {
         modelHash,
         inputHash,
         outputHash,
         proofSize: Math.floor(45000 + Math.random() * 10000),
         generationTime,
-        proverVersion: 'jolt-atlas-0.1.0-mock',
-        txIntentHash, // Added: binds proof to specific transaction intent
+        proverVersion: 'jolt-atlas-MOCK-v0.0.0', // Clearly marked as mock
+        txIntentHash,
       },
       tag: 'spending',
       timestamp: Date.now(),
@@ -71,12 +91,22 @@ const INITIAL_STATE: ProofGenerationState = {
   steps: [],
 };
 
+export interface ProofGenerationOptions {
+  /** Wallet address for signed requests */
+  address?: `0x${string}`;
+  /** Function to sign the request message */
+  signMessage?: SignProveRequest;
+}
+
 export function useProofGeneration() {
   const [state, setState] = useState<ProofGenerationState>(INITIAL_STATE);
   const startTimeRef = useRef<number>(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const generateProof = useCallback(async (input: SpendingModelInput): Promise<ProveResponse> => {
+  const generateProof = useCallback(async (
+    input: SpendingModelInput,
+    options?: ProofGenerationOptions
+  ): Promise<ProveResponse> => {
     // Reset state
     setState({
       status: 'running',
@@ -135,29 +165,78 @@ export function useProofGeneration() {
       const apiEndpoint = proverUrl ? `${proverUrl}/prove` : '/api/prove';
 
       try {
-        // Try to call the prover (direct or via API proxy)
-        const response = await fetch(apiEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ inputs: numericInputs, tag: 'spending' }),
-        });
+        // Build request body
+        const tag = 'spending';
+        let requestBody: Record<string, unknown> = { inputs: numericInputs, tag };
 
-        if (!response.ok) {
-          throw new Error('Prover not available');
+        // Add signature if signing is available
+        if (options?.address && options?.signMessage) {
+          const timestamp = Date.now();
+          const message = createProveMessage(numericInputs, tag, timestamp);
+          const signature = await options.signMessage(message);
+          requestBody = {
+            ...requestBody,
+            address: options.address,
+            timestamp,
+            signature,
+          };
         }
 
-        result = await response.json();
+        // Try to call the prover with retry logic
+        const retryResult = await withRetry(
+          async () => {
+            const response = await fetch(apiEndpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(requestBody),
+            });
 
-        // Check if prover returned an error code
-        if (!result.success && result.error?.includes('PROVER_UNAVAILABLE')) {
-          throw new Error('Prover unavailable');
+            if (!response.ok) {
+              const errorText = await response.text().catch(() => 'Unknown error');
+              throw new Error(`Prover error (${response.status}): ${errorText}`);
+            }
+
+            const data = await response.json();
+
+            // Check if prover returned an error code
+            if (!data.success && data.error?.includes('PROVER_UNAVAILABLE')) {
+              throw ProverError.unavailable();
+            }
+
+            return data as ProveResponse;
+          },
+          {
+            ...proverRetryOptions,
+            onRetry: (error, attempt, delayMs) => {
+              console.warn(`Prover request failed, retrying (attempt ${attempt}) in ${delayMs}ms:`, error);
+              setState((prev) => ({
+                ...prev,
+                currentStep: `Retrying... (attempt ${attempt})`,
+              }));
+            },
+          }
+        );
+
+        if (retryResult.success && retryResult.data) {
+          result = retryResult.data;
+        } else {
+          // All retries failed, fall back to mock
+          throw retryResult.error || new Error('Prover unavailable after retries');
         }
-      } catch {
+      } catch (err) {
         // Prover not available (e.g., static GitHub Pages deployment)
         // Fall back to mock proof with realistic timing
-        console.warn('Prover unavailable, using mock proof generation');
+        const parsedError = parseError(err);
+        console.warn('Prover unavailable after retries, using mock proof generation:', parsedError.message);
         await new Promise((resolve) => setTimeout(resolve, 3000 + Math.random() * 2000));
         result = generateMockProof(input);
+        // Warn about mock proof in console
+        console.warn(
+          '%c⚠️ MOCK PROOF GENERATED',
+          'background: #ff6b6b; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+          '\nThis proof is NOT cryptographically valid and cannot be verified on-chain.',
+          '\nMock proofs are for demo purposes only. Connect to a real prover for valid proofs.'
+        );
       }
 
       // Clear interval

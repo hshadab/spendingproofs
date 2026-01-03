@@ -28,12 +28,16 @@ export const arcTestnet = defineChain({
   testnet: true,
 });
 
-// Contract addresses
+// Contract addresses on Arc Testnet
 export const CONTRACTS = {
+  // Transparency layer - logs proof submissions
   proofAttestation: (process.env.NEXT_PUBLIC_PROOF_ATTESTATION || '0xBE9a5DF7C551324CB872584C6E5bF56799787952') as `0x${string}`,
+  // Enforcement layer - gated USDC transfers
+  spendingGateWallet: (process.env.NEXT_PUBLIC_SPENDING_GATE_ADDRESS || '0x6A47D13593c00359a1c5Fc6f9716926aF184d138') as `0x${string}`,
+  // Test USDC token (6 decimals)
+  usdc: (process.env.NEXT_PUBLIC_USDC_ADDRESS || '0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213') as `0x${string}`,
+  // Demo agent contract (legacy)
   arcAgent: (process.env.NEXT_PUBLIC_ARC_AGENT || '0x982Cd9663EBce3eB8Ab7eF511a6249621C79E384') as `0x${string}`,
-  usdc: (process.env.NEXT_PUBLIC_USDC_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`,
-  spendingGate: process.env.NEXT_PUBLIC_SPENDING_GATE_ADDRESS as `0x${string}` | undefined,
   // Demo merchant address for receiving payments
   demoMerchant: (process.env.NEXT_PUBLIC_DEMO_MERCHANT || '0x8ba1f109551bD432803012645Ac136ddd64DBA72') as `0x${string}`,
 } as const;

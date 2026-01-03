@@ -8,6 +8,8 @@
  * Output: buy/don't_buy decision with confidence
  */
 
+import { ValidationError } from './errors';
+
 export type ServiceCategory =
   | 'ai'
   | 'data'
@@ -71,6 +73,113 @@ export const DEFAULT_SPENDING_POLICY: SpendingPolicy = {
 };
 
 /**
+ * Validation result for spending model input
+ */
+export interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+}
+
+/**
+ * Validate spending model input
+ * Returns errors array - empty if valid
+ */
+export function validateSpendingInput(input: SpendingModelInput): ValidationResult {
+  const errors: string[] = [];
+
+  // Price validation
+  if (typeof input.priceUsdc !== 'number' || isNaN(input.priceUsdc)) {
+    errors.push('priceUsdc must be a valid number');
+  } else if (input.priceUsdc < 0) {
+    errors.push('priceUsdc must be non-negative');
+  } else if (input.priceUsdc > 1000000) {
+    errors.push('priceUsdc exceeds maximum allowed value (1,000,000)');
+  }
+
+  // Budget validation
+  if (typeof input.budgetUsdc !== 'number' || isNaN(input.budgetUsdc)) {
+    errors.push('budgetUsdc must be a valid number');
+  } else if (input.budgetUsdc < 0) {
+    errors.push('budgetUsdc must be non-negative');
+  }
+
+  // Spent today validation
+  if (typeof input.spentTodayUsdc !== 'number' || isNaN(input.spentTodayUsdc)) {
+    errors.push('spentTodayUsdc must be a valid number');
+  } else if (input.spentTodayUsdc < 0) {
+    errors.push('spentTodayUsdc must be non-negative');
+  }
+
+  // Daily limit validation
+  if (typeof input.dailyLimitUsdc !== 'number' || isNaN(input.dailyLimitUsdc)) {
+    errors.push('dailyLimitUsdc must be a valid number');
+  } else if (input.dailyLimitUsdc <= 0) {
+    errors.push('dailyLimitUsdc must be positive');
+  }
+
+  // Service success rate validation (must be 0-1)
+  if (typeof input.serviceSuccessRate !== 'number' || isNaN(input.serviceSuccessRate)) {
+    errors.push('serviceSuccessRate must be a valid number');
+  } else if (input.serviceSuccessRate < 0 || input.serviceSuccessRate > 1) {
+    errors.push('serviceSuccessRate must be between 0 and 1');
+  }
+
+  // Service total calls validation
+  if (typeof input.serviceTotalCalls !== 'number' || isNaN(input.serviceTotalCalls)) {
+    errors.push('serviceTotalCalls must be a valid number');
+  } else if (input.serviceTotalCalls < 0) {
+    errors.push('serviceTotalCalls must be non-negative');
+  } else if (!Number.isInteger(input.serviceTotalCalls)) {
+    errors.push('serviceTotalCalls must be an integer');
+  }
+
+  // Purchases in category validation
+  if (typeof input.purchasesInCategory !== 'number' || isNaN(input.purchasesInCategory)) {
+    errors.push('purchasesInCategory must be a valid number');
+  } else if (input.purchasesInCategory < 0) {
+    errors.push('purchasesInCategory must be non-negative');
+  } else if (!Number.isInteger(input.purchasesInCategory)) {
+    errors.push('purchasesInCategory must be an integer');
+  }
+
+  // Time since last purchase validation
+  if (typeof input.timeSinceLastPurchase !== 'number' || isNaN(input.timeSinceLastPurchase)) {
+    errors.push('timeSinceLastPurchase must be a valid number');
+  } else if (input.timeSinceLastPurchase < 0) {
+    errors.push('timeSinceLastPurchase must be non-negative');
+  }
+
+  // String field validations
+  if (typeof input.serviceUrl !== 'string' || input.serviceUrl.trim() === '') {
+    errors.push('serviceUrl must be a non-empty string');
+  }
+
+  if (typeof input.serviceName !== 'string' || input.serviceName.trim() === '') {
+    errors.push('serviceName must be a non-empty string');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Validate spending model input and throw if invalid
+ */
+export function assertValidSpendingInput(input: SpendingModelInput): void {
+  const result = validateSpendingInput(input);
+  if (!result.valid) {
+    throw ValidationError.fromErrors(result.errors);
+  }
+}
+
+export interface RunSpendingModelOptions {
+  /** Validate input before running (default: true) */
+  validate?: boolean;
+}
+
+/**
  * Run the spending decision model
  *
  * This is a deterministic model that can be proven with zkML.
@@ -78,8 +187,16 @@ export const DEFAULT_SPENDING_POLICY: SpendingPolicy = {
  */
 export function runSpendingModel(
   input: SpendingModelInput,
-  policy: SpendingPolicy = DEFAULT_SPENDING_POLICY
+  policy: SpendingPolicy = DEFAULT_SPENDING_POLICY,
+  options: RunSpendingModelOptions = {}
 ): SpendingModelOutput {
+  const { validate = true } = options;
+
+  // Validate input if enabled
+  if (validate) {
+    assertValidSpendingInput(input);
+  }
+
   const reasons: string[] = [];
   let riskScore = 0;
 

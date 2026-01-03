@@ -1,9 +1,9 @@
 //! Arc Agent zkML SNARK Proof Generation Service using JOLT-Atlas
 //!
-//! Real zero-knowledge proofs for ONNX model inference.
+//! Real zero-knowledge proofs for ONNX model inference with full verification.
 
 use ark_bn254::Fr;
-use ark_serialize::CanonicalSerialize;
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use axum::{
     extract::State,
     http::StatusCode,
@@ -11,7 +11,7 @@ use axum::{
     Json, Router,
 };
 use jolt_core::{poly::commitment::dory::DoryCommitmentScheme, transcripts::KeccakTranscript};
-use onnx_tracer::{model, tensor::Tensor};
+use onnx_tracer::{model, tensor::Tensor, ProgramIO};
 use serde::{Deserialize, Serialize};
 use sha3::{Digest, Keccak256};
 use std::{
@@ -22,14 +22,14 @@ use std::{
 };
 use tokio::sync::RwLock;
 use tower_http::cors::{Any, CorsLayer};
-use tracing::{info, warn};
-use zkml_jolt_core::jolt::JoltSNARK;
+use tracing::{info, warn, error};
+use zkml_jolt_core::jolt::{JoltSNARK, JoltVerifierPreprocessing, JoltProverPreprocessing};
 
 #[allow(clippy::upper_case_acronyms)]
 type PCS = DoryCommitmentScheme;
 type Snark = JoltSNARK<Fr, PCS, KeccakTranscript>;
 
-const PROVER_VERSION: &str = "jolt-atlas-snark-v1.0.0";
+const PROVER_VERSION: &str = "jolt-atlas-snark-v1.1.0";
 
 // =============================================================================
 // Data Structures
@@ -38,13 +38,26 @@ const PROVER_VERSION: &str = "jolt-atlas-snark-v1.0.0";
 #[derive(Clone)]
 struct AppState {
     models_dir: PathBuf,
-    model_cache: Arc<RwLock<HashMap<String, ModelInfo>>>,
+    model_cache: Arc<RwLock<HashMap<String, CachedModel>>>,
 }
 
-#[derive(Clone)]
-struct ModelInfo {
+/// Cached model data including verification key for real verification
+struct CachedModel {
     model_hash: String,
     input_shape: Vec<usize>,
+    /// Cached prover preprocessing (includes verification key derivation)
+    prover_preprocessing: Option<JoltProverPreprocessing<Fr, PCS>>,
+}
+
+// Can't derive Clone for CachedModel due to preprocessing, so implement manually
+impl Clone for CachedModel {
+    fn clone(&self) -> Self {
+        Self {
+            model_hash: self.model_hash.clone(),
+            input_shape: self.input_shape.clone(),
+            prover_preprocessing: None, // Don't clone preprocessing, regenerate if needed
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -71,6 +84,8 @@ struct ProveResponse {
 struct ProofData {
     proof: String,
     proof_hash: String,
+    /// Serialized program_io for verification
+    program_io: String,
     metadata: ProofMetadata,
     tag: String,
     timestamp: u64,
@@ -99,8 +114,8 @@ struct VerifyRequest {
     proof: String,
     model_id: String,
     model_hash: String,
-    #[serde(default)]
-    program_io: Option<String>,
+    /// Serialized program_io (required for real verification)
+    program_io: String,
 }
 
 #[derive(Serialize)]
@@ -117,6 +132,7 @@ struct HealthResponse {
     version: String,
     proof_type: String,
     models_loaded: usize,
+    verification_enabled: bool,
 }
 
 #[derive(Serialize)]
@@ -131,6 +147,7 @@ struct ModelEntry {
     model_hash: String,
     input_shape: Vec<usize>,
     loaded: bool,
+    verification_key_cached: bool,
 }
 
 // =============================================================================
@@ -170,7 +187,7 @@ fn model_id_to_name(id: &str) -> String {
 
 fn get_input_shape(model_id: &str) -> Vec<usize> {
     match model_id {
-        "spending-model" => vec![1, 8],  // Universal spending decision model
+        "spending-model" => vec![1, 8],
         "trading-signal" | "risk-scorer" => vec![1, 64],
         "opportunity-detector" => vec![1, 8],
         "sentiment-classifier" => vec![1, 5],
@@ -179,6 +196,20 @@ fn get_input_shape(model_id: &str) -> Vec<usize> {
         "signal-transformer" => vec![1, 1, 16, 128],
         _ => vec![1, 64],
     }
+}
+
+/// Serialize ProgramIO to hex string for transmission
+fn serialize_program_io(program_io: &ProgramIO) -> String {
+    let json = serde_json::to_string(program_io).unwrap_or_default();
+    format!("0x{}", hex::encode(json.as_bytes()))
+}
+
+/// Deserialize ProgramIO from hex string
+fn deserialize_program_io(hex_str: &str) -> Result<ProgramIO, String> {
+    let hex_data = hex_str.strip_prefix("0x").unwrap_or(hex_str);
+    let bytes = hex::decode(hex_data).map_err(|e| format!("Invalid hex: {}", e))?;
+    let json_str = String::from_utf8(bytes).map_err(|e| format!("Invalid UTF-8: {}", e))?;
+    serde_json::from_str(&json_str).map_err(|e| format!("Invalid JSON: {}", e))
 }
 
 // =============================================================================
@@ -192,6 +223,7 @@ async fn health(State(state): State<AppState>) -> Json<HealthResponse> {
         version: PROVER_VERSION.to_string(),
         proof_type: "JOLT-Atlas SNARK (HyperKZG/BN254)".to_string(),
         models_loaded: cache.len(),
+        verification_enabled: true,
     })
 }
 
@@ -199,7 +231,7 @@ async fn list_models(State(state): State<AppState>) -> Json<ModelsResponse> {
     let cache = state.model_cache.read().await;
 
     let model_ids = vec![
-        "spending-model",  // Universal spending decision model (ALL agents)
+        "spending-model",
         "trading-signal",
         "opportunity-detector",
         "risk-scorer",
@@ -220,6 +252,7 @@ async fn list_models(State(state): State<AppState>) -> Json<ModelsResponse> {
                 model_hash: cached.map(|m| m.model_hash.clone()).unwrap_or_default(),
                 input_shape: get_input_shape(id),
                 loaded: cached.is_some(),
+                verification_key_cached: cached.map(|m| m.prover_preprocessing.is_some()).unwrap_or(false),
             }
         })
         .collect();
@@ -321,14 +354,16 @@ async fn prove(
     info!("[zkML] Generating SNARK proof...");
     let prove_start = Instant::now();
 
-    // Clone path for closures
     let model_path_for_preprocess = model_path.clone();
     let model_path_for_prove = model_path.clone();
+    let model_id_clone = request.model_id.clone();
+    let model_hash_clone = model_hash.clone();
+    let input_shape_clone = input_shape.clone();
 
     // Use tokio spawn_blocking for CPU-intensive proof generation
     let input_tensor_clone = input_tensor.clone();
     let proof_result = tokio::task::spawn_blocking(move || {
-        // Preprocessing
+        // Preprocessing (generates both prover and verifier keys)
         let preprocess_fn = || model(&model_path_for_preprocess);
         let preprocessing = Snark::prover_preprocess(preprocess_fn, 1 << 14);
 
@@ -339,20 +374,36 @@ async fn prove(
         // Serialize proof
         let mut proof_bytes = Vec::new();
         match snark.serialize_compressed(&mut proof_bytes) {
-            Ok(_) => {}
+            Ok(_) => {
+                info!("[zkML] Proof serialized successfully: {} bytes", proof_bytes.len());
+            }
             Err(e) => {
                 warn!("[zkML] Failed to serialize proof: {:?}", e);
-                // Fall back to program_io hash
-                proof_bytes = format!("{:?}", program_io).into_bytes();
+                return Err(format!("Failed to serialize proof: {:?}", e));
             }
         }
 
-        proof_bytes
+        // Serialize program_io for verification
+        let program_io_hex = serialize_program_io(&program_io);
+
+        Ok((proof_bytes, program_io_hex, preprocessing))
     })
     .await;
 
-    let proof_bytes = match proof_result {
-        Ok(bytes) => bytes,
+    let (proof_bytes, program_io_hex, preprocessing) = match proof_result {
+        Ok(Ok(result)) => result,
+        Ok(Err(e)) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ProveResponse {
+                    success: false,
+                    proof: None,
+                    inference: None,
+                    error: Some(e),
+                    generation_time_ms: start.elapsed().as_millis(),
+                }),
+            ));
+        }
         Err(e) => {
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
@@ -360,7 +411,7 @@ async fn prove(
                     success: false,
                     proof: None,
                     inference: None,
-                    error: Some(format!("Proof generation failed: {:?}", e)),
+                    error: Some(format!("Proof generation task failed: {:?}", e)),
                     generation_time_ms: start.elapsed().as_millis(),
                 }),
             ));
@@ -373,14 +424,15 @@ async fn prove(
     let proof_hash = hash_bytes(&proof_bytes);
     let proof_hex = format!("0x{}", hex::encode(&proof_bytes));
 
-    // Update cache
+    // Cache the preprocessing for future verification
     {
         let mut cache = state.model_cache.write().await;
         cache.insert(
-            request.model_id.clone(),
-            ModelInfo {
-                model_hash: model_hash.clone(),
-                input_shape,
+            model_id_clone,
+            CachedModel {
+                model_hash: model_hash_clone,
+                input_shape: input_shape_clone,
+                prover_preprocessing: Some(preprocessing),
             },
         );
     }
@@ -393,6 +445,7 @@ async fn prove(
         proof: Some(ProofData {
             proof: proof_hex,
             proof_hash,
+            program_io: program_io_hex,
             metadata: ProofMetadata {
                 model_hash,
                 input_hash,
@@ -424,6 +477,23 @@ async fn verify(
 ) -> Json<VerifyResponse> {
     let start = Instant::now();
 
+    // Validate inputs
+    if request.proof.is_empty() || !request.proof.starts_with("0x") {
+        return Json(VerifyResponse {
+            valid: false,
+            error: Some("Invalid proof format: must be hex string starting with 0x".to_string()),
+            verification_time_ms: start.elapsed().as_millis(),
+        });
+    }
+
+    if request.program_io.is_empty() {
+        return Json(VerifyResponse {
+            valid: false,
+            error: Some("program_io is required for verification".to_string()),
+            verification_time_ms: start.elapsed().as_millis(),
+        });
+    }
+
     let model_path = state.models_dir.join(format!("{}.onnx", request.model_id));
     if !model_path.exists() {
         return Json(VerifyResponse {
@@ -433,35 +503,109 @@ async fn verify(
         });
     }
 
+    // Verify model hash
     let computed_hash = compute_model_hash(&model_path);
-
-    // Basic validation
-    if request.proof.len() < 10 || !request.proof.starts_with("0x") {
-        return Json(VerifyResponse {
-            valid: false,
-            error: Some("Invalid proof format".to_string()),
-            verification_time_ms: start.elapsed().as_millis(),
-        });
-    }
-
-    // Verify model hash matches
     if !request.model_hash.is_empty() && request.model_hash != computed_hash {
         return Json(VerifyResponse {
             valid: false,
-            error: Some("Model hash mismatch".to_string()),
+            error: Some("Model hash mismatch - model may have been tampered with".to_string()),
             verification_time_ms: start.elapsed().as_millis(),
         });
     }
 
-    // TODO: Full SNARK verification requires deserializing proof and running verifier
-    // For now, we validate structure and hashes
-    info!("[zkML] Proof verified (structure check) in {}ms", start.elapsed().as_millis());
+    // Deserialize proof
+    let proof_hex = request.proof.strip_prefix("0x").unwrap_or(&request.proof);
+    let proof_bytes = match hex::decode(proof_hex) {
+        Ok(bytes) => bytes,
+        Err(e) => {
+            return Json(VerifyResponse {
+                valid: false,
+                error: Some(format!("Failed to decode proof hex: {}", e)),
+                verification_time_ms: start.elapsed().as_millis(),
+            });
+        }
+    };
 
-    Json(VerifyResponse {
-        valid: true,
-        error: None,
-        verification_time_ms: start.elapsed().as_millis(),
+    // Deserialize program_io
+    let program_io = match deserialize_program_io(&request.program_io) {
+        Ok(io) => io,
+        Err(e) => {
+            return Json(VerifyResponse {
+                valid: false,
+                error: Some(format!("Failed to deserialize program_io: {}", e)),
+                verification_time_ms: start.elapsed().as_millis(),
+            });
+        }
+    };
+
+    info!("[zkML] Starting SNARK verification for model: {}", request.model_id);
+
+    // Get or create verifier preprocessing
+    let cache = state.model_cache.read().await;
+    let has_cached_preprocessing = cache.get(&request.model_id)
+        .map(|m| m.prover_preprocessing.is_some())
+        .unwrap_or(false);
+    drop(cache);
+
+    let model_id = request.model_id.clone();
+    let models_dir = state.models_dir.clone();
+
+    // Run verification in blocking task
+    let verify_result = tokio::task::spawn_blocking(move || {
+        // Deserialize the SNARK proof
+        let snark: Snark = match Snark::deserialize_compressed(&proof_bytes[..]) {
+            Ok(s) => s,
+            Err(e) => {
+                return Err(format!("Failed to deserialize proof: {:?}", e));
+            }
+        };
+
+        // Get or generate verifier preprocessing
+        let model_path = models_dir.join(format!("{}.onnx", model_id));
+        let preprocess_fn = || model(&model_path);
+        let prover_preprocessing = Snark::prover_preprocess(preprocess_fn, 1 << 14);
+        let verifier_preprocessing: JoltVerifierPreprocessing<Fr, PCS> = (&prover_preprocessing).into();
+
+        // Run actual SNARK verification
+        match snark.verify(&verifier_preprocessing, program_io, None) {
+            Ok(_) => {
+                info!("[zkML] SNARK verification PASSED");
+                Ok(true)
+            }
+            Err(e) => {
+                warn!("[zkML] SNARK verification FAILED: {:?}", e);
+                Err(format!("Verification failed: {:?}", e))
+            }
+        }
     })
+    .await;
+
+    match verify_result {
+        Ok(Ok(true)) => {
+            info!("[zkML] Proof verified successfully in {}ms", start.elapsed().as_millis());
+            Json(VerifyResponse {
+                valid: true,
+                error: None,
+                verification_time_ms: start.elapsed().as_millis(),
+            })
+        }
+        Ok(Err(e)) => {
+            error!("[zkML] Verification error: {}", e);
+            Json(VerifyResponse {
+                valid: false,
+                error: Some(e),
+                verification_time_ms: start.elapsed().as_millis(),
+            })
+        }
+        Err(e) => {
+            error!("[zkML] Verification task failed: {:?}", e);
+            Json(VerifyResponse {
+                valid: false,
+                error: Some(format!("Verification task failed: {:?}", e)),
+                verification_time_ms: start.elapsed().as_millis(),
+            })
+        }
+    }
 }
 
 // =============================================================================
@@ -482,6 +626,7 @@ async fn main() -> anyhow::Result<()> {
     info!("Models directory: {}", models_dir);
     info!("Prover: JOLT-Atlas SNARK (HyperKZG/BN254)");
     info!("Version: {}", PROVER_VERSION);
+    info!("Verification: ENABLED (real SNARK verification)");
 
     let state = AppState {
         models_dir: PathBuf::from(&models_dir),
