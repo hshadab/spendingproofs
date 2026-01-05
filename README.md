@@ -4,7 +4,7 @@
 
 **Cryptographic spending guardrails for Arc's agent economy**
 
-Spending Policy Proofs is infrastructure for agentic commerce on Arc powered by [Jolt Atlas](https://github.com/ICME-Lab/jolt-atlas) zero-knowledge machine learning (zkML). Agents generate cryptographic proofs that they followed their spending policies—enabling trustless machine-to-machine payments.
+Spending Policy Proofs is infrastructure for agentic commerce on Arc powered by [Jolt Atlas](https://github.com/ICME-Lab/jolt-atlas) zero-knowledge machine learning (zkML) from ICME Labs. Agents generate cryptographic proofs that they followed their spending policies—enabling trustless machine-to-machine payments.
 
 > **Testnet Alpha** — Core infrastructure is live on Arc testnet. Real zkML proofs, real contracts. Ready for developer preview.
 
