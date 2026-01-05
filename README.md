@@ -4,7 +4,7 @@
 
 **Cryptographic spending guardrails for Arc's agent economy**
 
-Spending Policy Proofs is infrastructure for agentic commerce on Arc. Agents generate cryptographic proofs that they followed their spending policies—enabling trustless machine-to-machine payments.
+Spending Policy Proofs is infrastructure for agentic commerce on Arc powered by [Jolt Atlas](https://github.com/ICME-Lab/jolt-atlas) zero-knowledge machine learning (zkML).
 
 > **Testnet Alpha** — Core infrastructure is live on Arc testnet. Real zkML proofs, real contracts. Ready for developer preview.
 
@@ -58,7 +58,7 @@ if (result.decision.shouldBuy) {
 | SDK (`@hshadab/spending-proofs`) | **Live** | TypeScript, React hooks, wagmi |
 | Arc Testnet Contracts | **Deployed** | ProofAttestation, SpendingGateWallet, TestnetUSDC |
 | SpendingGate (Enforcement) | **Live** | Real on-chain enforcement - no proof, no payment |
-| Interactive Demo | **Live** | https://spendingproofs.onrender.com/demo |
+| Interactive Demo | **Live** | https://spendingproofs.com/demo |
 
 ## Performance
 
