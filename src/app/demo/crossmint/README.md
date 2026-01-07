@@ -1,6 +1,6 @@
 # Crossmint Integration Demo
 
-An interactive walkthrough showing how Crossmint enterprise wallets integrate with zkML spending proofs for trustless AI agent commerce.
+An interactive walkthrough showing how Crossmint enterprise wallets integrate with [Jolt-Atlas](https://github.com/ICME-Lab/jolt-atlas) zkML spending proofs for trustless AI agent commerce.
 
 ## How It Works
 
@@ -41,7 +41,7 @@ An interactive walkthrough showing how Crossmint enterprise wallets integrate wi
 | Component | Role | Product |
 |-----------|------|---------|
 | **Crossmint** | Wallet infrastructure | MPC Wallets, Agentic Commerce, Headless Checkout |
-| **Jolt-Atlas** | Proof generation | SNARK proofs via NovaNet zkML |
+| **[Jolt-Atlas](https://github.com/ICME-Lab/jolt-atlas)** | Proof generation | SNARK proofs (~48KB) |
 | **Arc Network** | On-chain attestation | ProofAttestation + SpendingGate contracts |
 
 ## Key Files
@@ -107,6 +107,6 @@ This demo shows a better approach:
 ## Links
 
 - [Crossmint](https://crossmint.com) - Enterprise wallet infrastructure
-- [NovaNet / Jolt-Atlas](https://novanet.xyz) - zkML proof generation
+- [Jolt-Atlas](https://github.com/ICME-Lab/jolt-atlas) - zkML proof generation
 - [Arc Network](https://arc.network) - On-chain attestation
 - [Arc Explorer](https://testnet.arcscan.app) - View transactions
