@@ -40,9 +40,9 @@ An interactive walkthrough showing how Crossmint enterprise wallets integrate wi
 
 | Component | Role | Product |
 |-----------|------|---------|
-| **Crossmint** | Wallet infrastructure | MPC Wallets, Agentic Commerce, Headless Checkout |
+| **[Crossmint](https://docs.crossmint.com)** | Wallet infrastructure | MPC Wallets, Agentic Commerce, Headless Checkout |
 | **[Jolt-Atlas](https://github.com/ICME-Lab/jolt-atlas)** | Proof generation | SNARK proofs (~48KB) |
-| **Arc Network** | On-chain attestation | ProofAttestation + SpendingGate contracts |
+| **[Arc Network](https://docs.arc.net)** | On-chain attestation | ProofAttestation + SpendingGate contracts |
 
 ## Key Files
 
