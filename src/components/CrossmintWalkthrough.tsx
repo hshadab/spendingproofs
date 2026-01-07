@@ -109,16 +109,16 @@ const WORKFLOW_STEPS: WalkthroughStep[] = [
   {
     id: 'wallet-1',
     phase: 'wallet',
-    title: 'zkML Proof Verification',
-    description: 'The Crossmint Wallet receives the payment request with the zkML proof. The proof is verified on-chain: valid proof? correct transaction? model approved? No valid proof = no payment.',
-    crossmintNote: 'Crossmint Wallets can enforce zkML proof verification before releasing funds.',
+    title: 'zkML Proof Attestation',
+    description: 'The Crossmint Wallet receives the payment request with the zkML proof. The proof is attested on Arc: valid proof? correct transaction? model approved? No valid attestation = no payment.',
+    crossmintNote: 'Crossmint Wallets can require zkML proof attestation before releasing funds.',
     duration: 5000,
   },
   {
     id: 'execution-1',
     phase: 'execution',
     title: 'Crossmint Executes Payment',
-    description: 'Proof verified! Crossmint executes the $0.05 USDC transfer. The proof hash is recorded on-chain, preventing replay attacks.',
+    description: 'Proof attested! Crossmint executes the $0.05 USDC transfer. The proof hash is recorded on Arc, preventing replay attacks.',
     duration: 5000,
   },
   {
@@ -615,7 +615,7 @@ export function CrossmintWalkthrough({
                   <Shield className="w-4 h-4 text-purple-400" />
                   <span className="text-purple-400 font-semibold text-sm group-hover:underline">Arc Network</span>
                 </div>
-                <p className="text-[10px] text-gray-400 mb-2">On-chain verification</p>
+                <p className="text-[10px] text-gray-400 mb-2">On-chain attestation</p>
                 <div className="space-y-1 text-[10px]">
                   <div className="flex items-center gap-1 text-gray-500">
                     <CheckCircle2 className="w-3 h-3 text-purple-400" />
@@ -1075,12 +1075,12 @@ export function CrossmintWalkthrough({
 
               {txHash && (
                 <div className="space-y-3">
-                  {/* On-Chain Verification Badge */}
+                  {/* On-Chain Attestation Badge */}
                   {verifiedOnChain && (
                     <div className="p-3 bg-purple-900/20 rounded-lg border border-purple-500/50">
                       <div className="flex items-center gap-2 mb-2">
                         <Shield className="w-4 h-4 text-purple-400" />
-                        <span className="text-purple-400 font-medium text-sm">On-Chain Verified</span>
+                        <span className="text-purple-400 font-medium text-sm">Proof Attested</span>
                       </div>
                       <div className="text-[10px] text-gray-400">
                         Proof attested via SpendingGate contract
@@ -1170,7 +1170,7 @@ export function CrossmintWalkthrough({
                     <div className={`p-2 rounded-lg border text-center ${verifiedOnChain ? 'bg-purple-900/20 border-purple-500/30' : 'bg-[#00D4AA]/10 border-[#00D4AA]/30'}`}>
                       <div className="text-xs text-gray-400">Verified</div>
                       <div className={`font-medium text-sm ${verifiedOnChain ? 'text-purple-400' : 'text-[#00D4AA]'}`}>
-                        {verifiedOnChain ? 'On-Chain' : 'zkML Proof'}
+                        {verifiedOnChain ? 'Attested' : 'zkML Proof'}
                       </div>
                     </div>
                   </div>
@@ -1217,8 +1217,8 @@ export function CrossmintWalkthrough({
             </h2>
             <p className="text-gray-400 max-w-2xl mb-5 text-sm">
               An AI agent purchased a service using <span className="text-blue-400">USDC</span> on <span className="text-purple-400">Arc Network</span>.
-              <span className="text-yellow-400"> Jolt-Atlas</span> generated a SNARK proof verified on-chain.
-              The <span className="text-[#00D4AA]">Crossmint Wallet</span> released funds only after cryptographic verification. No trust required - only math.
+              <span className="text-yellow-400"> Jolt-Atlas</span> generated a SNARK proof attested on Arc.
+              The <span className="text-[#00D4AA]">Crossmint Wallet</span> released funds only after proof attestation. No trust required - only math.
             </p>
 
             {/* Transaction Summary */}
@@ -1233,7 +1233,7 @@ export function CrossmintWalkthrough({
               </div>
               <div className="p-2 bg-[#0d1117] border border-purple-500/30 rounded-xl text-center">
                 <div className="text-lg font-bold text-purple-400">Arc</div>
-                <div className="text-[10px] text-gray-400">On-Chain Verified</div>
+                <div className="text-[10px] text-gray-400">Proof Attested</div>
               </div>
               <div className="p-2 bg-[#0d1117] border border-[#00D4AA]/30 rounded-xl text-center">
                 <div className="text-lg font-bold text-[#00D4AA]">MPC</div>
@@ -1265,8 +1265,8 @@ export function CrossmintWalkthrough({
                 <div className="flex items-start gap-3 p-3 bg-purple-900/20 rounded-lg border border-purple-500/30">
                   <Shield className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-purple-400 font-medium">3. Arc Network Verified Proof</span>
-                    <p className="text-gray-400 mt-1">The ProofAttestation contract on Arc Network verified the SNARK proof. SpendingGate contract checked the proof hash before authorizing the transfer.</p>
+                    <span className="text-purple-400 font-medium">3. Proof Attested on Arc</span>
+                    <p className="text-gray-400 mt-1">The ProofAttestation contract on Arc Network recorded the SNARK proof hash. SpendingGate contract checked the attestation before authorizing the transfer.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-[#00D4AA]/10 rounded-lg border border-[#00D4AA]/30">

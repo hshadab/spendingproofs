@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // If proofHash is provided, try the verified flow (REAL on-chain verification)
+    // If proofHash is provided, try the attested flow (proof attestation on Arc)
     if (proofHash) {
-      console.log('Attempting VERIFIED transfer with on-chain proof verification');
+      console.log('Attempting transfer with proof attestation on Arc');
 
       const formattedProofHash = formatProofHash(proofHash);
 
