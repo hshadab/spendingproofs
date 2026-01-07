@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { useProofGeneration } from '@/hooks/useProofGeneration';
 import { useCrossmintWallet } from '@/hooks/useCrossmintWallet';
-import { createDefaultInput, type SpendingModelInput } from '@/lib/spendingModel';
+import { createDefaultInput, runSpendingModel, DEFAULT_SPENDING_POLICY, type SpendingModelInput, type SpendingModelOutput } from '@/lib/spendingModel';
 import { ProofProgress } from './ProofProgress';
 
 // Highlight colors for different concepts
@@ -109,24 +109,24 @@ const WORKFLOW_STEPS: WalkthroughStep[] = [
   {
     id: 'wallet-1',
     phase: 'wallet',
-    title: 'zkML Proof Attestation',
-    description: 'The Crossmint Wallet receives the payment request with the zkML proof. The proof is attested on Arc: valid proof? correct transaction? model approved? No valid attestation = no payment.',
-    crossmintNote: 'Crossmint Wallets can require zkML proof attestation before releasing funds.',
+    title: 'Off-Chain Proof Verification',
+    description: 'The Crossmint Wallet receives the payment request with the zkML proof. Off-chain verification checks: valid SNARK proof? correct transaction binding? model output APPROVED? Verification passes = payment authorized.',
+    crossmintNote: 'Crossmint verifies the proof off-chain before releasing funds. No on-chain verification required for payment.',
     duration: 5000,
   },
   {
     id: 'execution-1',
     phase: 'execution',
-    title: 'Crossmint Executes Payment',
-    description: 'Proof attested! Crossmint executes the $0.05 USDC transfer. The proof hash is recorded on Arc, preventing replay attacks.',
+    title: 'Payment + Attestation',
+    description: 'Proof verified! Crossmint executes the $0.05 USDC transfer. The proof hash is posted to Arc for audit trail and replay protection - attestation is for transparency, not payment gating.',
     duration: 5000,
   },
   {
     id: 'conclusion-1',
     phase: 'conclusion',
     title: 'Trustless Agent Commerce',
-    description: 'The agent purchased a service with cryptographic proof of policy compliance. No party needed to trust the agent code. This is enterprise-ready autonomous commerce.',
-    crossmintNote: 'Crossmint + zkML = The only agent wallet with cryptographic spending enforcement.',
+    description: 'The agent purchased a service with cryptographic proof of policy compliance. Payment was authorized by off-chain proof verification. On-chain attestation provides an immutable audit trail.',
+    crossmintNote: 'Crossmint + zkML = Enterprise wallet with cryptographic spending enforcement and full auditability.',
     duration: 6000,
   },
 ];
@@ -154,6 +154,8 @@ export function CrossmintWalkthrough({
   const [verifiedOnChain, setVerifiedOnChain] = useState<boolean>(false);
   const [attestationTxHash, setAttestationTxHash] = useState<string | null>(null);
   const [verificationSteps, setVerificationSteps] = useState<Array<{ step: string; status: string; txHash?: string }>>([]);
+  const [modelDecision, setModelDecision] = useState<SpendingModelOutput | null>(null);
+  const [demoInput, setDemoInput] = useState<SpendingModelInput | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isPlayingRef = useRef(false);
 
@@ -183,25 +185,7 @@ export function CrossmintWalkthrough({
 
     // Trigger phase-specific effects
     if (step.phase === 'agent' && step.id === 'agent-2') {
-      const thoughts = [
-        'Evaluating Weather Data API...',
-        'Price: $0.05 USDC',
-        'Service reliability: 98%',
-        'Checking policy constraints...',
-        'Decision: APPROVE',
-      ];
-      setAgentThoughts([]);
-      thoughts.forEach((thought, i) => {
-        setTimeout(() => {
-          if (isPlayingRef.current) {
-            setAgentThoughts(prev => [...prev, thought]);
-          }
-        }, i * 800);
-      });
-    }
-
-    if (step.phase === 'proof' && step.id === 'proof-1') {
-      setShowProof(true);
+      // Create demo input and run REAL spending model
       const input: SpendingModelInput = {
         ...createDefaultInput(),
         serviceName: 'Weather Data API',
@@ -212,6 +196,49 @@ export function CrossmintWalkthrough({
         spentTodayUsdc: 0.10,
         dailyLimitUsdc: 0.50,
         serviceTotalCalls: 50,
+        purchasesInCategory: 3,
+        timeSinceLastPurchase: 300,
+      };
+      setDemoInput(input);
+
+      // Run the REAL spending model
+      const decision = runSpendingModel(input, DEFAULT_SPENDING_POLICY);
+      setModelDecision(decision);
+
+      // Show real reasoning from model
+      const thoughts = [
+        'Running spending model...',
+        `Price: $${input.priceUsdc.toFixed(2)} USDC`,
+        `Service reliability: ${(input.serviceSuccessRate * 100).toFixed(0)}%`,
+        `Budget remaining: $${(input.budgetUsdc - input.spentTodayUsdc).toFixed(2)}`,
+        ...decision.reasons.slice(0, 2),
+        `Decision: ${decision.shouldBuy ? 'APPROVE' : 'REJECT'} (${(decision.confidence * 100).toFixed(0)}% confidence)`,
+      ];
+      setAgentThoughts([]);
+      thoughts.forEach((thought, i) => {
+        setTimeout(() => {
+          if (isPlayingRef.current) {
+            setAgentThoughts(prev => [...prev, thought]);
+          }
+        }, i * 600);
+      });
+    }
+
+    if (step.phase === 'proof' && step.id === 'proof-1') {
+      setShowProof(true);
+      // Use the same input from agent phase or create default
+      const input: SpendingModelInput = demoInput || {
+        ...createDefaultInput(),
+        serviceName: 'Weather Data API',
+        serviceUrl: 'https://api.weather.example.com/v1/forecast',
+        priceUsdc: 0.05,
+        serviceSuccessRate: 0.98,
+        budgetUsdc: 2.00,
+        spentTodayUsdc: 0.10,
+        dailyLimitUsdc: 0.50,
+        serviceTotalCalls: 50,
+        purchasesInCategory: 3,
+        timeSinceLastPurchase: 300,
       };
       generateProof(input).then(result => {
         // Store proof hash for transfer audit trail
@@ -280,7 +307,7 @@ export function CrossmintWalkthrough({
         clearTimeout(timerRef.current);
       }
     };
-  }, [currentStepIndex, isPlaying, generateProof, executeTransfer, proofHash, onProofGenerated, onTxExecuted]);
+  }, [currentStepIndex, isPlaying, generateProof, executeTransfer, proofHash, demoInput, onProofGenerated, onTxExecuted]);
 
   // Notify parent
   useEffect(() => {
@@ -312,6 +339,8 @@ export function CrossmintWalkthrough({
     setVerifiedOnChain(false);
     setAttestationTxHash(null);
     setVerificationSteps([]);
+    setModelDecision(null);
+    setDemoInput(null);
     resetProof();
     resetTransfer();
     if (timerRef.current) {
@@ -558,7 +587,8 @@ export function CrossmintWalkthrough({
             <p className="text-gray-400 max-w-2xl mb-5 text-sm">
               AI agents use <span className="text-[#00D4AA]">Crossmint MPC Wallets</span> to hold funds.
               <span className="text-yellow-400"> Jolt-Atlas</span> generates SNARK proofs of spending policy compliance.
-              <span className="text-purple-400"> Arc Network</span> verifies proofs on-chain before <span className="text-blue-400">USDC</span> transfers execute.
+              <span className="text-[#00D4AA]">Crossmint</span> verifies proofs off-chain before <span className="text-blue-400">USDC</span> transfers.
+              <span className="text-purple-400"> Arc Network</span> attests proofs for audit trail.
             </p>
 
             {/* Three-Column Tech Stack */}
@@ -904,24 +934,31 @@ export function CrossmintWalkthrough({
               <div className="p-4 border-b border-gray-800">
                 <div className="text-xs text-[#00D4AA] mb-3 flex items-center gap-2">
                   <Shield className={`w-3 h-3 ${isPlaying ? 'animate-pulse' : ''}`} />
-                  Crossmint Verification Engine
+                  Off-Chain Proof Verification
                   {isPlaying && <span className="text-[#00D4AA] text-[10px] animate-pulse">● ACTIVE</span>}
                 </div>
-                <div className={`p-3 bg-green-900/20 border rounded-lg transition-all duration-300 ${isPlaying ? 'border-green-500 shadow-md shadow-green-500/20' : 'border-green-700/50'}`}>
+                <div className={`p-3 ${modelDecision?.shouldBuy ? 'bg-green-900/20' : 'bg-red-900/20'} border rounded-lg transition-all duration-300 ${isPlaying ? (modelDecision?.shouldBuy ? 'border-green-500 shadow-md shadow-green-500/20' : 'border-red-500 shadow-md shadow-red-500/20') : 'border-green-700/50'}`}>
                   <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle2 className={`w-4 h-4 text-green-400 ${isPlaying ? 'animate-bounce' : ''}`} />
-                    <span className="font-medium text-green-400">zkML Proof Verified</span>
+                    <CheckCircle2 className={`w-4 h-4 ${modelDecision?.shouldBuy ? 'text-green-400' : 'text-red-400'} ${isPlaying ? 'animate-bounce' : ''}`} />
+                    <span className={`font-medium ${modelDecision?.shouldBuy ? 'text-green-400' : 'text-red-400'}`}>zkML Proof Verified (Off-Chain)</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
                       <span className="text-gray-400">Decision:</span>
-                      <span className="ml-1 text-green-400 font-mono">APPROVED</span>
+                      <span className={`ml-1 font-mono ${modelDecision?.shouldBuy ? 'text-green-400' : 'text-red-400'}`}>
+                        {modelDecision?.shouldBuy ? 'APPROVED' : 'REJECTED'}
+                      </span>
                     </div>
                     <div>
                       <span className="text-gray-400">Confidence:</span>
-                      <span className="ml-1 font-mono">87%</span>
+                      <span className="ml-1 font-mono">{modelDecision ? `${(modelDecision.confidence * 100).toFixed(0)}%` : '...'}</span>
                     </div>
                   </div>
+                  {modelDecision?.reasons && modelDecision.reasons.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-gray-700/50 text-[10px] text-gray-400">
+                      {modelDecision.reasons[0]}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -943,14 +980,14 @@ export function CrossmintWalkthrough({
             <div className={`bg-[#0d1117] border rounded-xl p-6 transition-all duration-300 ${isPlaying ? 'border-[#00D4AA]/50' : 'border-gray-800'}`}>
               <h4 className="font-semibold mb-4 flex items-center gap-2">
                 <Shield className="w-4 h-4 text-[#00D4AA]" />
-                zkML Proof Verification
+                Off-Chain Proof Verification
               </h4>
               <div className="space-y-3">
                 {[
                   { check: 'SNARK proof cryptographically valid?', delay: 0 },
                   { check: 'Proof binds to this exact transaction?', delay: 150 },
-                  { check: 'Spending model output: APPROVED?', delay: 300 },
-                  { check: 'Replay attack protection (proof hash)?', delay: 450 },
+                  { check: `Spending model output: ${modelDecision?.shouldBuy ? 'APPROVED' : 'REJECTED'}?`, delay: 300 },
+                  { check: 'Proof hash unique (replay protection)?', delay: 450 },
                 ].map((item, i) => (
                   <div
                     key={i}
@@ -966,7 +1003,7 @@ export function CrossmintWalkthrough({
               <div className={`mt-4 p-3 rounded-lg text-xs transition-all duration-500 ${isPlaying ? 'bg-[#00D4AA]/20 border border-[#00D4AA]/30' : 'bg-gray-800/30'}`}>
                 <div className="flex items-center gap-2">
                   <Wallet className="w-3 h-3 text-[#00D4AA]" />
-                  <span className="text-gray-300">Crossmint enterprise custody ensures funds only move with valid proofs</span>
+                  <span className="text-gray-300">Payment authorized by off-chain verification. Attestation posted to Arc for audit trail.</span>
                 </div>
               </div>
             </div>
@@ -1217,8 +1254,8 @@ export function CrossmintWalkthrough({
             </h2>
             <p className="text-gray-400 max-w-2xl mb-5 text-sm">
               An AI agent purchased a service using <span className="text-blue-400">USDC</span> on <span className="text-purple-400">Arc Network</span>.
-              <span className="text-yellow-400"> Jolt-Atlas</span> generated a SNARK proof attested on Arc.
-              The <span className="text-[#00D4AA]">Crossmint Wallet</span> released funds only after proof attestation. No trust required - only math.
+              <span className="text-yellow-400"> Jolt-Atlas</span> generated a SNARK proof verified off-chain by <span className="text-[#00D4AA]">Crossmint</span>.
+              The proof hash was attested on Arc for audit trail. Payment authorized by cryptographic proof - no trust required.
             </p>
 
             {/* Transaction Summary */}
@@ -1252,28 +1289,28 @@ export function CrossmintWalkthrough({
                   <Bot className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="text-purple-400 font-medium">1. AI Agent Evaluated Purchase</span>
-                    <p className="text-gray-400 mt-1">The agent discovered a Weather Data API at $0.05 with 98% reliability. Its spending model ran locally to determine if the purchase complied with configured policies.</p>
+                    <p className="text-gray-400 mt-1">The agent discovered a Weather Data API at $0.05 with 98% reliability. The real spending model ran locally: {modelDecision?.shouldBuy ? 'APPROVED' : 'REJECTED'} ({modelDecision ? `${(modelDecision.confidence * 100).toFixed(0)}%` : '...'} confidence).</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-yellow-900/20 rounded-lg border border-yellow-500/30">
-                  <Shield className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <Zap className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
                   <div>
                     <span className="text-yellow-400 font-medium">2. zkML Proof Generated</span>
-                    <p className="text-gray-400 mt-1">NovaNet&apos;s Jolt-Atlas prover compiled the spending model into a SNARK circuit and generated a ~48KB cryptographic proof that the decision was computed correctly.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-purple-900/20 rounded-lg border border-purple-500/30">
-                  <Shield className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <span className="text-purple-400 font-medium">3. Proof Attested on Arc</span>
-                    <p className="text-gray-400 mt-1">The ProofAttestation contract on Arc Network recorded the SNARK proof hash. SpendingGate contract checked the attestation before authorizing the transfer.</p>
+                    <p className="text-gray-400 mt-1">Jolt-Atlas compiled the spending model into a SNARK circuit and generated a ~48KB cryptographic proof that the decision was computed correctly.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-[#00D4AA]/10 rounded-lg border border-[#00D4AA]/30">
                   <Wallet className="w-4 h-4 text-[#00D4AA] flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-[#00D4AA] font-medium">4. Crossmint Executed Transfer</span>
-                    <p className="text-gray-400 mt-1">The Crossmint MPC wallet signed and broadcast the $0.05 USDC transfer on Arc Network. Sub-second finality with proof hash recorded for audit.</p>
+                    <span className="text-[#00D4AA] font-medium">3. Crossmint Verified & Executed</span>
+                    <p className="text-gray-400 mt-1">Crossmint verified the proof off-chain, then executed the $0.05 USDC transfer. Payment authorized by cryptographic proof verification.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-purple-900/20 rounded-lg border border-purple-500/30">
+                  <Shield className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-purple-400 font-medium">4. Proof Attested for Audit</span>
+                    <p className="text-gray-400 mt-1">The proof hash was posted to Arc Network&apos;s ProofAttestation contract for immutable audit trail. Attestation is for transparency, not payment gating.</p>
                   </div>
                 </div>
               </div>
