@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Play, CreditCard, AlertTriangle, Lock, Eye } from 'lucide-react';
+import { Play, CreditCard, AlertTriangle, Lock, Eye, Wallet } from 'lucide-react';
 
 export default function DemoHub() {
   return (
@@ -97,6 +97,33 @@ export default function DemoHub() {
                 <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Hash Comparison</span>
                 <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Tamper Simulation</span>
                 <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Verification Failure</span>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Crossmint Integration */}
+        <Link
+          href="/demo/crossmint"
+          className="group p-6 bg-[#0d1117] border border-gray-800 rounded-xl hover:border-[#00D4AA]/50 transition-colors"
+        >
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-[#00D4AA]/10 rounded-lg flex items-center justify-center group-hover:bg-[#00D4AA]/20 transition-colors">
+              <Wallet className="w-6 h-6 text-[#00D4AA]" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xl font-semibold">Crossmint Integration</h2>
+                <span className="text-xs text-[#00D4AA] bg-[#00D4AA]/10 px-2 py-1 rounded">Enterprise</span>
+              </div>
+              <p className="text-gray-400 mb-4">
+                See how Crossmint MPC wallets integrate with zkML spending proofs.
+                An annotated walkthrough showing enterprise-grade autonomous commerce with cryptographic policy enforcement.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Crossmint Wallets</span>
+                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Jolt-Atlas zkML</span>
+                <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">Arc Verification</span>
               </div>
             </div>
           </div>

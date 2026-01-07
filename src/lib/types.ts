@@ -128,3 +128,30 @@ export type ProveErrorCode =
   | 'RATE_LIMITED'
   | 'PROVER_UNAVAILABLE'
   | 'PROOF_GENERATION_FAILED';
+
+/**
+ * Verification step for on-chain proof verification (Crossmint demo)
+ */
+export interface VerificationStep {
+  step: string;
+  status: 'success' | 'failed' | 'skipped';
+  txHash?: string;
+}
+
+/**
+ * Transaction execution result (Crossmint demo)
+ */
+export interface TransactionResult {
+  success: boolean;
+  txHash?: string;
+  transferId?: string;
+  error?: string;
+  chain?: string;
+  amount?: string;
+  recipient?: string;
+  // On-chain verification fields
+  verifiedOnChain?: boolean;
+  attestationTxHash?: string;
+  steps?: VerificationStep[];
+  proofHash?: string;
+}
