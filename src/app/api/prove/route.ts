@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyProveRequest, isSignatureAuthEnabled } from '@/lib/signatureAuth';
+import { createLogger } from '@/lib/metrics';
+import { API_CONFIG } from '@/lib/config';
+import { createErrorResponse } from '@/lib/validation';
 import type { SignedProveRequest } from '@/lib/types';
 
-const PROVER_BACKEND_URL = process.env.PROVER_BACKEND_URL || 'http://localhost:3001';
+const logger = createLogger('api:prove');
+const PROVER_BACKEND_URL = API_CONFIG.proverBackendUrl;
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,25 +62,27 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Prover proxy error:', error);
+    logger.error('Prover proxy error', {
+      error,
+      action: 'proxy_request',
+    });
 
     // Check if it's a connection error (prover unavailable)
-    if (error instanceof TypeError && error.message.includes('fetch')) {
+    if (error instanceof TypeError) {
       return NextResponse.json(
-        {
-          success: false,
-          error: 'Prover service unavailable. Please ensure the prover is running.',
-          code: 'PROVER_UNAVAILABLE'
-        },
+        createErrorResponse(
+          'Prover service unavailable. Please ensure the prover is running.',
+          'PROVER_UNAVAILABLE'
+        ),
         { status: 503 }
       );
     }
 
     return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      },
+      createErrorResponse(
+        error instanceof Error ? error.message : 'Unknown error',
+        'INTERNAL_ERROR'
+      ),
       { status: 500 }
     );
   }

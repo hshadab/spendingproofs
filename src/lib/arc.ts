@@ -9,21 +9,25 @@
 
 import { createPublicClient, createWalletClient, http, parseAbi, type Hex } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
+import { createLogger } from './metrics';
+import { ARC_CHAIN, ADDRESSES } from './config';
 
-// Arc Testnet configuration
+const logger = createLogger('lib:arc');
+
+// Arc Testnet configuration (use centralized config)
 export const ARC_TESTNET = {
-  id: 5042002,
-  name: 'Arc Testnet',
-  nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-  rpcUrls: { default: { http: ['https://rpc.testnet.arc.network'] } },
-  blockExplorers: { default: { name: 'ArcScan', url: 'https://testnet.arcscan.app' } },
+  id: ARC_CHAIN.id,
+  name: ARC_CHAIN.name,
+  nativeCurrency: ARC_CHAIN.nativeCurrency,
+  rpcUrls: { default: { http: [ARC_CHAIN.rpcUrl] } },
+  blockExplorers: { default: { name: 'ArcScan', url: ARC_CHAIN.explorerUrl } },
 } as const;
 
-// Contract addresses
+// Contract addresses (use centralized config)
 export const CONTRACTS = {
-  USDC: process.env.NEXT_PUBLIC_USDC_ADDRESS || '0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213',
-  PROOF_ATTESTATION: process.env.NEXT_PUBLIC_PROOF_ATTESTATION || '0xBE9a5DF7C551324CB872584C6E5bF56799787952',
-  SPENDING_GATE: process.env.NEXT_PUBLIC_SPENDING_GATE_ADDRESS || '0x6A47D13593c00359a1c5Fc6f9716926aF184d138',
+  USDC: ADDRESSES.usdc,
+  PROOF_ATTESTATION: ADDRESSES.proofAttestation,
+  SPENDING_GATE: ADDRESSES.spendingGate,
 };
 
 // ABIs
@@ -84,7 +88,7 @@ export async function isProofAttested(proofHash: Hex): Promise<boolean> {
     });
     return isValid as boolean;
   } catch (error) {
-    console.error('Error checking proof attestation:', error);
+    logger.error('Error checking proof attestation', { action: 'check_attestation', error });
     return false;
   }
 }
@@ -116,7 +120,7 @@ export async function submitProofAttestation(
       txHash: hash,
     };
   } catch (error) {
-    console.error('Proof attestation error:', error);
+    logger.error('Proof attestation error', { action: 'submit_attestation', error });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -138,7 +142,7 @@ export async function isProofUsed(proofHash: Hex): Promise<boolean> {
     });
     return isUsed as boolean;
   } catch (error) {
-    console.error('Error checking proof usage:', error);
+    logger.error('Error checking proof usage', { action: 'check_proof_usage', error });
     return false;
   }
 }
@@ -199,7 +203,7 @@ export async function getSpendingGateInfo(): Promise<{
       owner: owner as string,
     };
   } catch (error) {
-    console.error('Error getting SpendingGate info:', error);
+    logger.error('Error getting SpendingGate info', { action: 'get_spending_gate_info', error });
     return {
       balance: '0.00',
       dailyLimit: '1000.00',
@@ -246,7 +250,7 @@ export async function executeGatedTransfer(
       txHash: hash,
     };
   } catch (error) {
-    console.error('Gated transfer error:', error);
+    logger.error('Gated transfer error', { action: 'gated_transfer', error });
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
 
     // Parse common revert reasons
@@ -356,7 +360,7 @@ export async function executeVerifiedTransfer(
       steps,
     };
   } catch (error) {
-    console.error('Verified transfer error:', error);
+    logger.error('Verified transfer error', { action: 'verified_transfer', error });
     return {
       success: false,
       steps,
@@ -390,7 +394,7 @@ export async function executeDirectTransfer(
       txHash: hash,
     };
   } catch (error) {
-    console.error('Direct transfer error:', error);
+    logger.error('Direct transfer error', { action: 'direct_transfer', error });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -412,7 +416,7 @@ export async function getUsdcBalance(address: Hex): Promise<string> {
     });
     return (Number(balance) / 1_000_000).toFixed(2);
   } catch (error) {
-    console.error('Error getting USDC balance:', error);
+    logger.error('Error getting USDC balance', { action: 'get_usdc_balance', error });
     return '0.00';
   }
 }

@@ -2,6 +2,8 @@
  * Retry utilities with exponential backoff
  */
 
+import { generateSecureJitter } from './crypto';
+
 export interface RetryOptions {
   /** Maximum number of retry attempts (default: 3) */
   maxAttempts?: number;
@@ -49,9 +51,9 @@ export function calculateDelay(
   // Cap at max delay
   const cappedDelay = Math.min(exponentialDelay, maxDelayMs);
 
-  // Add jitter: random value between -jitter% and +jitter%
+  // Add jitter using cryptographically secure randomness
   const jitterRange = cappedDelay * jitter;
-  const jitterValue = (Math.random() * 2 - 1) * jitterRange;
+  const jitterValue = generateSecureJitter(jitterRange);
 
   return Math.round(cappedDelay + jitterValue);
 }
@@ -76,33 +78,93 @@ export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
 }
 
 /**
- * Default retry check - retries on network errors and 5xx responses
+ * Known retryable error types
+ */
+export const RetryableErrorTypes = {
+  NETWORK: 'NETWORK',
+  SERVER_ERROR: 'SERVER_ERROR',
+  TIMEOUT: 'TIMEOUT',
+  PROVER_UNAVAILABLE: 'PROVER_UNAVAILABLE',
+} as const;
+
+/**
+ * Check if an error is a network-related error by type, not string matching
+ */
+function isNetworkError(error: unknown): boolean {
+  // TypeError is thrown by fetch for network failures
+  if (error instanceof TypeError) {
+    return true;
+  }
+
+  // Check for DOMException (AbortError, NetworkError)
+  if (error instanceof DOMException) {
+    return error.name === 'NetworkError' || error.name === 'AbortError';
+  }
+
+  // Check for Node.js system errors
+  if (error instanceof Error) {
+    const nodeError = error as Error & { code?: string };
+    const networkErrorCodes = [
+      'ECONNREFUSED',
+      'ECONNRESET',
+      'ENOTFOUND',
+      'ETIMEDOUT',
+      'ENETUNREACH',
+      'EHOSTUNREACH',
+      'EPIPE',
+      'EAI_AGAIN',
+    ];
+    if (nodeError.code && networkErrorCodes.includes(nodeError.code)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Check if an error indicates a server-side issue (5xx)
+ */
+function isServerError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const httpError = error as Error & { status?: number; statusCode?: number };
+    const status = httpError.status || httpError.statusCode;
+    if (status && status >= 500 && status < 600) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check if an error indicates the prover is unavailable
+ */
+function isProverUnavailableError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const proverError = error as Error & { code?: string };
+    return proverError.code === 'PROVER_UNAVAILABLE';
+  }
+  return false;
+}
+
+/**
+ * Default retry check - retries on network errors, timeouts, and 5xx responses
+ * Uses error types instead of fragile string matching
  */
 export function isRetryableError(error: unknown): boolean {
-  if (error instanceof Error) {
-    const msg = error.message.toLowerCase();
+  // Network errors (fetch failures, connection issues)
+  if (isNetworkError(error)) {
+    return true;
+  }
 
-    // Network errors
-    if (
-      msg.includes('fetch') ||
-      msg.includes('network') ||
-      msg.includes('connection') ||
-      msg.includes('timeout') ||
-      msg.includes('econnrefused') ||
-      msg.includes('enotfound')
-    ) {
-      return true;
-    }
+  // Server errors (5xx)
+  if (isServerError(error)) {
+    return true;
+  }
 
-    // Server errors (5xx)
-    if (msg.includes('500') || msg.includes('502') || msg.includes('503') || msg.includes('504')) {
-      return true;
-    }
-
-    // Prover unavailable
-    if (msg.includes('prover') && msg.includes('unavailable')) {
-      return true;
-    }
+  // Prover unavailable
+  if (isProverUnavailableError(error)) {
+    return true;
   }
 
   return false;

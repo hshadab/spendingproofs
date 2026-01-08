@@ -1,15 +1,13 @@
 import { verifyMessage, keccak256, toBytes } from 'viem';
 import type { SignedProveRequest, ProveErrorCode } from './types';
+import { AUTH_CONFIG } from './config';
 
-const SIGNATURE_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
+// Use centralized config for auth settings
+const SIGNATURE_EXPIRY_MS = AUTH_CONFIG.signatureExpiryMs;
+const CLOCK_SKEW_TOLERANCE_MS = AUTH_CONFIG.clockSkewToleranceMs;
 
 // Optional allowlist - if empty, all addresses are allowed
-const ALLOWED_ADDRESSES: Set<string> = new Set(
-  (typeof process !== 'undefined' && process.env?.ALLOWED_PROVER_ADDRESSES || '')
-    .split(',')
-    .map((addr) => addr.trim().toLowerCase())
-    .filter(Boolean)
-);
+const ALLOWED_ADDRESSES: Set<string> = new Set(AUTH_CONFIG.allowedAddresses);
 
 export interface SignatureVerificationResult {
   valid: boolean;
@@ -44,11 +42,11 @@ export async function verifyProveRequest(
     };
   }
 
-  // Check timestamp is not in the future (clock skew tolerance: 30s)
-  if (timestamp > now + 30000) {
+  // Check timestamp is not in the future (clock skew tolerance from config)
+  if (timestamp > now + CLOCK_SKEW_TOLERANCE_MS) {
     return {
       valid: false,
-      error: 'Signature timestamp is in the future',
+      error: `Signature timestamp is in the future (max clock skew: ${CLOCK_SKEW_TOLERANCE_MS / 1000}s)`,
       code: 'INVALID_SIGNATURE',
     };
   }

@@ -98,7 +98,7 @@ describe('signatureAuth', () => {
 
     it('should reject future timestamps', async () => {
       const now = Date.now();
-      const futureTimestamp = now + (60 * 1000); // 1 minute in future (beyond 30s tolerance)
+      const futureTimestamp = now + (60 * 1000); // 1 minute in future (beyond 10s tolerance)
 
       const result = await verifyProveRequest({
         inputs: mockInputs,
@@ -166,10 +166,10 @@ describe('signatureAuth', () => {
       });
     });
 
-    it('should allow slight clock skew (within 30s)', async () => {
+    it('should allow slight clock skew (within 10s)', async () => {
       vi.mocked(verifyMessage).mockResolvedValue(true);
       const now = Date.now();
-      const slightlyFuture = now + 20000; // 20 seconds in future
+      const slightlyFuture = now + 5000; // 5 seconds in future (within 10s tolerance)
 
       const result = await verifyProveRequest({
         inputs: mockInputs,
@@ -180,6 +180,22 @@ describe('signatureAuth', () => {
       });
 
       expect(result.valid).toBe(true);
+    });
+
+    it('should reject timestamps beyond clock skew tolerance', async () => {
+      const now = Date.now();
+      const beyondTolerance = now + 15000; // 15 seconds in future (beyond 10s tolerance)
+
+      const result = await verifyProveRequest({
+        inputs: mockInputs,
+        tag: mockTag,
+        address: mockAddress,
+        timestamp: beyondTolerance,
+        signature: mockSignature,
+      });
+
+      expect(result.valid).toBe(false);
+      expect(result.code).toBe('INVALID_SIGNATURE');
     });
   });
 

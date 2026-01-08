@@ -4,6 +4,10 @@ import {
   getWalletBalance,
   listWallets,
 } from '@/lib/crossmint';
+import { createLogger } from '@/lib/metrics';
+import { createErrorResponse } from '@/lib/validation';
+
+const logger = createLogger('api:crossmint:wallet');
 
 /**
  * GET /api/wallet - Get agent wallet info and balance
@@ -27,7 +31,7 @@ export async function GET(request: NextRequest) {
     try {
       balances = await getWalletBalance(wallet.address);
     } catch (error) {
-      console.warn('Could not fetch balance:', error);
+      logger.warn('Could not fetch balance', { action: 'get_balance', error });
     }
 
     // Find USDC balance
@@ -48,12 +52,12 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Wallet API error:', error);
+    logger.error('Wallet API error', { action: 'get_wallet', error });
     return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
+      createErrorResponse(
+        error instanceof Error ? error.message : 'Unknown error',
+        'INTERNAL_ERROR'
+      ),
       { status: 500 }
     );
   }
@@ -66,6 +70,8 @@ export async function POST() {
   try {
     const wallet = await getOrCreateAgentWallet();
 
+    logger.info('Wallet created/retrieved', { action: 'create_wallet', address: wallet.address });
+
     return NextResponse.json({
       success: true,
       wallet: {
@@ -76,12 +82,12 @@ export async function POST() {
       },
     });
   } catch (error) {
-    console.error('Create wallet error:', error);
+    logger.error('Create wallet error', { action: 'create_wallet', error });
     return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
+      createErrorResponse(
+        error instanceof Error ? error.message : 'Unknown error',
+        'INTERNAL_ERROR'
+      ),
       { status: 500 }
     );
   }

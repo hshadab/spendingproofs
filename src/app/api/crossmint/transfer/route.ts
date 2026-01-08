@@ -6,7 +6,15 @@ import {
   getSpendingGateInfo,
   CONTRACTS,
 } from '@/lib/arc';
+import { createLogger } from '@/lib/metrics';
+import {
+  validateTransferInput,
+  createValidationErrorResponse,
+  createErrorResponse,
+} from '@/lib/validation';
 import type { Hex } from 'viem';
+
+const logger = createLogger('api:crossmint:transfer');
 
 /**
  * POST /api/transfer - Execute USDC transfer with optional proof attestation
@@ -30,9 +38,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { to, amount, proofHash } = body;
 
-    if (!to || !amount) {
+    // Validate input
+    const validation = validateTransferInput({ to, amount, proofHash });
+    if (!validation.valid) {
       return NextResponse.json(
-        { success: false, error: 'Missing required fields: to, amount' },
+        createValidationErrorResponse(validation.errors),
         { status: 400 }
       );
     }
@@ -41,7 +51,7 @@ export async function POST(request: NextRequest) {
 
     if (!DEMO_PRIVATE_KEY) {
       return NextResponse.json(
-        { success: false, error: 'DEMO_WALLET_PRIVATE_KEY not configured' },
+        createErrorResponse('DEMO_WALLET_PRIVATE_KEY not configured', 'CONFIG_ERROR'),
         { status: 500 }
       );
     }
@@ -50,7 +60,7 @@ export async function POST(request: NextRequest) {
     const formattedProofHash = proofHash ? formatProofHash(proofHash) : null;
 
     // STEP 1: Execute the transfer (off-chain verification assumed to have passed)
-    console.log('Executing USDC transfer (off-chain proof verification passed)');
+    logger.info('Executing USDC transfer', { action: 'transfer', to, amount });
 
     const transferResult = await executeDirectTransfer(
       DEMO_PRIVATE_KEY,
@@ -60,19 +70,22 @@ export async function POST(request: NextRequest) {
 
     if (!transferResult.success) {
       return NextResponse.json(
-        { success: false, error: transferResult.error },
+        createErrorResponse(transferResult.error || 'Transfer failed', 'TRANSFER_FAILED'),
         { status: 400 }
       );
     }
 
-    console.log('Transfer succeeded:', transferResult.txHash);
+    logger.info('Transfer succeeded', { action: 'transfer', txHash: transferResult.txHash });
 
     // STEP 2: If proof hash provided, submit attestation for audit trail (non-blocking)
     let attestationTxHash: string | undefined;
     let attestationError: string | undefined;
 
     if (formattedProofHash) {
-      console.log('Submitting proof attestation for audit trail...');
+      logger.info('Submitting proof attestation for audit trail', {
+        action: 'attestation',
+        proofHash: formattedProofHash,
+      });
 
       try {
         const attestResult = await submitProofAttestation(
@@ -82,14 +95,23 @@ export async function POST(request: NextRequest) {
 
         if (attestResult.success) {
           attestationTxHash = attestResult.txHash;
-          console.log('Proof attested for audit:', attestationTxHash);
+          logger.info('Proof attested for audit', {
+            action: 'attestation',
+            txHash: attestationTxHash,
+          });
         } else {
           attestationError = attestResult.error;
-          console.warn('Attestation failed (non-critical):', attestResult.error);
+          logger.warn('Attestation failed (non-critical)', {
+            action: 'attestation',
+            error: attestResult.error,
+          });
         }
       } catch (err) {
         attestationError = err instanceof Error ? err.message : 'Unknown error';
-        console.warn('Attestation error (non-critical):', err);
+        logger.warn('Attestation error (non-critical)', {
+          action: 'attestation',
+          error: err,
+        });
       }
     }
 
@@ -122,12 +144,12 @@ export async function POST(request: NextRequest) {
       ],
     });
   } catch (error) {
-    console.error('Transfer API error:', error);
+    logger.error('Transfer API error', { action: 'transfer', error });
     return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
+      createErrorResponse(
+        error instanceof Error ? error.message : 'Unknown error',
+        'INTERNAL_ERROR'
+      ),
       { status: 500 }
     );
   }
@@ -153,12 +175,12 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Get SpendingGate info error:', error);
+    logger.error('Get SpendingGate info error', { action: 'get_info', error });
     return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
+      createErrorResponse(
+        error instanceof Error ? error.message : 'Unknown error',
+        'INTERNAL_ERROR'
+      ),
       { status: 500 }
     );
   }

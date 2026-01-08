@@ -60,30 +60,50 @@ describe('retry utilities', () => {
   });
 
   describe('isRetryableError', () => {
-    it('should return true for network errors', () => {
-      expect(isRetryableError(new Error('fetch failed'))).toBe(true);
-      expect(isRetryableError(new Error('network error'))).toBe(true);
-      expect(isRetryableError(new Error('connection refused'))).toBe(true);
-      expect(isRetryableError(new Error('timeout'))).toBe(true);
-      expect(isRetryableError(new Error('ECONNREFUSED'))).toBe(true);
-      expect(isRetryableError(new Error('ENOTFOUND'))).toBe(true);
+    it('should return true for TypeError (fetch failures)', () => {
+      // TypeError is thrown by fetch for network failures
+      expect(isRetryableError(new TypeError('Failed to fetch'))).toBe(true);
+      expect(isRetryableError(new TypeError('Network request failed'))).toBe(true);
     });
 
-    it('should return true for 5xx errors', () => {
-      expect(isRetryableError(new Error('Server error: 500'))).toBe(true);
-      expect(isRetryableError(new Error('502 Bad Gateway'))).toBe(true);
-      expect(isRetryableError(new Error('503 Service Unavailable'))).toBe(true);
-      expect(isRetryableError(new Error('504 Gateway Timeout'))).toBe(true);
+    it('should return true for Node.js network error codes', () => {
+      // Node.js uses error codes for network errors
+      const econnrefused = Object.assign(new Error('ECONNREFUSED'), { code: 'ECONNREFUSED' });
+      const enotfound = Object.assign(new Error('ENOTFOUND'), { code: 'ENOTFOUND' });
+      const etimedout = Object.assign(new Error('ETIMEDOUT'), { code: 'ETIMEDOUT' });
+      const econnreset = Object.assign(new Error('ECONNRESET'), { code: 'ECONNRESET' });
+
+      expect(isRetryableError(econnrefused)).toBe(true);
+      expect(isRetryableError(enotfound)).toBe(true);
+      expect(isRetryableError(etimedout)).toBe(true);
+      expect(isRetryableError(econnreset)).toBe(true);
     });
 
-    it('should return true for prover unavailable', () => {
-      expect(isRetryableError(new Error('prover unavailable'))).toBe(true);
+    it('should return true for 5xx server errors by status code', () => {
+      // HTTP errors with status codes
+      const error500 = Object.assign(new Error('Internal Server Error'), { status: 500 });
+      const error502 = Object.assign(new Error('Bad Gateway'), { status: 502 });
+      const error503 = Object.assign(new Error('Service Unavailable'), { status: 503 });
+      const error504 = Object.assign(new Error('Gateway Timeout'), { statusCode: 504 });
+
+      expect(isRetryableError(error500)).toBe(true);
+      expect(isRetryableError(error502)).toBe(true);
+      expect(isRetryableError(error503)).toBe(true);
+      expect(isRetryableError(error504)).toBe(true);
+    });
+
+    it('should return true for prover unavailable error code', () => {
+      const proverError = Object.assign(new Error('Prover unavailable'), { code: 'PROVER_UNAVAILABLE' });
+      expect(isRetryableError(proverError)).toBe(true);
     });
 
     it('should return false for non-retryable errors', () => {
       expect(isRetryableError(new Error('Invalid input'))).toBe(false);
       expect(isRetryableError(new Error('Validation failed'))).toBe(false);
       expect(isRetryableError(new Error('Some random error'))).toBe(false);
+      // 4xx errors should not be retried
+      const error400 = Object.assign(new Error('Bad Request'), { status: 400 });
+      expect(isRetryableError(error400)).toBe(false);
     });
 
     it('should return false for non-Error values', () => {
@@ -108,10 +128,11 @@ describe('retry utilities', () => {
     });
 
     it('should retry on retryable errors', async () => {
+      // Use TypeError for network-like failures
       const fn = vi
         .fn()
-        .mockRejectedValueOnce(new Error('network error'))
-        .mockRejectedValueOnce(new Error('timeout'))
+        .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+        .mockRejectedValueOnce(new TypeError('Network error'))
         .mockResolvedValue('success');
 
       const resultPromise = withRetry(fn, {
@@ -129,7 +150,8 @@ describe('retry utilities', () => {
     });
 
     it('should fail after max attempts', async () => {
-      const fn = vi.fn().mockRejectedValue(new Error('network error'));
+      // Use TypeError for network-like failures
+      const fn = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'));
 
       const resultPromise = withRetry(fn, {
         maxAttempts: 3,
@@ -158,9 +180,10 @@ describe('retry utilities', () => {
     });
 
     it('should call onRetry callback', async () => {
+      // Use TypeError for network-like failures
       const fn = vi
         .fn()
-        .mockRejectedValueOnce(new Error('network error'))
+        .mockRejectedValueOnce(new TypeError('Failed to fetch'))
         .mockResolvedValue('success');
       const onRetry = vi.fn();
 
@@ -178,7 +201,8 @@ describe('retry utilities', () => {
     });
 
     it('should respect abort signal', async () => {
-      const fn = vi.fn().mockRejectedValue(new Error('network error'));
+      // Use TypeError for network-like failures
+      const fn = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'));
       const controller = new AbortController();
 
       setTimeout(() => controller.abort(), 50);
@@ -211,7 +235,8 @@ describe('retry utilities', () => {
 
     it('should allow overriding options', async () => {
       const wrapper = createRetryWrapper({ maxAttempts: 2 });
-      const fn = vi.fn().mockRejectedValue(new Error('network error'));
+      // Use TypeError for network-like failures
+      const fn = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'));
 
       const resultPromise = wrapper(fn, { maxAttempts: 1 });
       await vi.runAllTimersAsync();
@@ -239,10 +264,17 @@ describe('retry utilities', () => {
       expect(isRetryable(new Error('forbidden'), 0)).toBe(false);
     });
 
-    it('should retry network errors', () => {
+    it('should retry TypeError (network errors)', () => {
       const isRetryable = proverRetryOptions.isRetryable!;
-      expect(isRetryable(new Error('network error'), 0)).toBe(true);
-      expect(isRetryable(new Error('timeout'), 0)).toBe(true);
+      // TypeError is thrown by fetch for network failures
+      expect(isRetryable(new TypeError('Failed to fetch'), 0)).toBe(true);
+      expect(isRetryable(new TypeError('Network error'), 0)).toBe(true);
+    });
+
+    it('should retry errors with network error codes', () => {
+      const isRetryable = proverRetryOptions.isRetryable!;
+      const econnrefused = Object.assign(new Error('Connection refused'), { code: 'ECONNREFUSED' });
+      expect(isRetryable(econnrefused, 0)).toBe(true);
     });
   });
 });

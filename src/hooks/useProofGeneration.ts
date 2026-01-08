@@ -6,6 +6,10 @@ import type { ProofGenerationState, ProveResponse, ProofStep, TxIntent } from '@
 import { spendingInputToNumeric, runSpendingModel, DEFAULT_SPENDING_POLICY, type SpendingModelInput } from '@/lib/spendingModel';
 import { withRetry, proverRetryOptions } from '@/lib/retry';
 import { ProverError, parseError } from '@/lib/errors';
+import { generateMockProofHash, generateMockHashes } from '@/lib/crypto';
+import { createLogger } from '@/lib/metrics';
+
+const logger = createLogger('hooks:useProofGeneration');
 
 /**
  * Create the message to sign for authenticated proof requests
@@ -41,12 +45,16 @@ function generateTxIntentHash(input: SpendingModelInput, txIntent?: Partial<TxIn
 // WARNING: Mock proofs are NOT cryptographically valid and cannot be verified
 function generateMockProof(input: SpendingModelInput, txIntent?: Partial<TxIntent>): ProveResponse {
   const decision = runSpendingModel(input, DEFAULT_SPENDING_POLICY);
-  const mockHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-  const inputHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-  const outputHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+  // Use cryptographically secure random generation
+  const mockHash = generateMockProofHash();
+  const { inputHash, outputHash } = generateMockHashes();
   const modelHash = '0x7a8b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890';
   const txIntentHash = generateTxIntentHash(input, txIntent);
-  const generationTime = 2000 + Math.random() * 4000;
+  // Use crypto for generation time jitter
+  const bytes = new Uint8Array(4);
+  crypto.getRandomValues(bytes);
+  const jitter = (bytes[0] | (bytes[1] << 8)) / 65535; // 0-1 range
+  const generationTime = 2000 + jitter * 4000;
 
   // Mock program_io - not valid for real verification
   const mockProgramIo = '0x' + Buffer.from(JSON.stringify({
@@ -208,7 +216,12 @@ export function useProofGeneration() {
           {
             ...proverRetryOptions,
             onRetry: (error, attempt, delayMs) => {
-              console.warn(`Prover request failed, retrying (attempt ${attempt}) in ${delayMs}ms:`, error);
+              logger.warn('Prover request failed, retrying', {
+                action: 'generate_proof',
+                attempt,
+                delayMs,
+                error,
+              });
               setState((prev) => ({
                 ...prev,
                 currentStep: `Retrying... (attempt ${attempt})`,
@@ -227,16 +240,21 @@ export function useProofGeneration() {
         // Prover not available (e.g., static GitHub Pages deployment)
         // Fall back to mock proof with realistic timing
         const parsedError = parseError(err);
-        console.warn('Prover unavailable after retries, using mock proof generation:', parsedError.message);
-        await new Promise((resolve) => setTimeout(resolve, 3000 + Math.random() * 2000));
+        logger.warn('Prover unavailable after retries, using mock proof generation', {
+          action: 'generate_proof',
+          error: parsedError.message,
+        });
+        // Use crypto for delay jitter
+        const bytes = new Uint8Array(4);
+        crypto.getRandomValues(bytes);
+        const jitter = (bytes[0] | (bytes[1] << 8)) / 65535;
+        await new Promise((resolve) => setTimeout(resolve, 3000 + jitter * 2000));
         result = generateMockProof(input);
-        // Warn about mock proof in console
-        console.warn(
-          '%c⚠️ MOCK PROOF GENERATED',
-          'background: #ff6b6b; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
-          '\nThis proof is NOT cryptographically valid and cannot be verified on-chain.',
-          '\nMock proofs are for demo purposes only. Connect to a real prover for valid proofs.'
-        );
+        // Log mock proof warning
+        logger.warn('Mock proof generated - not cryptographically valid', {
+          action: 'generate_proof',
+          isMock: true,
+        });
       }
 
       // Clear interval

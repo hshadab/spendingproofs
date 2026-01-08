@@ -5,15 +5,22 @@
  * Uses staging API with server-side API key.
  */
 
-const CROSSMINT_API_URL = process.env.CROSSMINT_API_URL || 'https://staging.crossmint.com/api';
+import { createLogger } from './metrics';
+import { API_CONFIG, ADDRESSES } from './config';
+
+const logger = createLogger('lib:crossmint');
+
+const CROSSMINT_API_URL = API_CONFIG.crossmintApiUrl;
 const CROSSMINT_SERVER_KEY = process.env.CROSSMINT_SERVER_KEY;
 
 if (!CROSSMINT_SERVER_KEY) {
-  console.warn('CROSSMINT_SERVER_KEY not set - Crossmint API calls will fail');
+  logger.warn('CROSSMINT_SERVER_KEY not set - Crossmint API calls will fail', {
+    action: 'init',
+  });
 }
 
 // API version for wallet endpoints (using latest)
-const API_VERSION = '2022-06-09';
+const API_VERSION = API_CONFIG.crossmintApiVersion;
 
 /**
  * Crossmint wallet types
@@ -149,7 +156,7 @@ export async function getWalletBalance(walletAddress: string): Promise<WalletBal
 
     return [];
   } catch (error) {
-    console.warn('Failed to fetch balance from Arc:', error);
+    logger.warn('Failed to fetch balance from Arc', { action: 'get_balance', error });
     return [];
   }
 }
@@ -205,7 +212,13 @@ export async function transferUsdc(
       args: [toAddress as `0x${string}`, amountWei],
     });
 
-    console.log(`Transfer executed: ${hash}, proofHash: ${proofHash || 'none'}`);
+    logger.info('Transfer executed', {
+      action: 'transfer',
+      txHash: hash,
+      proofHash: proofHash || 'none',
+      amount: amountUsdc,
+      recipient: toAddress,
+    });
 
     return {
       id: hash,
@@ -216,7 +229,7 @@ export async function transferUsdc(
       recipient: toAddress,
     };
   } catch (error) {
-    console.error('Arc transfer error:', error);
+    logger.error('Arc transfer error', { action: 'transfer', error });
     throw new Error(`Arc transfer failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
