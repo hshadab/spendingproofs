@@ -703,21 +703,6 @@ export function GuidedDemo() {
             </div>
           </div>
 
-          {/* CTA Button - shown on conclusion */}
-          {currentStep.phase === 'conclusion' && (
-            <div className="px-4 pb-3">
-              <a
-                href="https://openmind.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-2.5 bg-cyan-500 text-black font-medium rounded-lg hover:bg-cyan-400 transition-colors text-sm"
-              >
-                Explore OpenMind
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-          )}
-
           {/* Contracts Section */}
           <div className="px-4 py-2 border-t border-gray-800">
             <div className="text-[10px] text-gray-500 mb-1.5">Smart Contracts (Arc Testnet)</div>
@@ -825,7 +810,7 @@ export function GuidedDemo() {
                     </div>
                   </a>
 
-                  <a href="https://novanet.xyz" target="_blank" rel="noopener noreferrer" className="bg-[#0d1117] border border-yellow-500/30 rounded-xl p-3 hover:border-yellow-500/60 transition-colors group">
+                  <a href="https://github.com/ICME-Lab/jolt-atlas" target="_blank" rel="noopener noreferrer" className="bg-[#0d1117] border border-yellow-500/30 rounded-xl p-3 hover:border-yellow-500/60 transition-colors group">
                     <div className="flex items-center gap-2 mb-2">
                       <Zap className="w-4 h-4 text-yellow-400" />
                       <span className="text-yellow-400 font-semibold text-sm group-hover:underline">Jolt-Atlas</span>

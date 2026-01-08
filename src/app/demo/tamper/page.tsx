@@ -77,7 +77,7 @@ export default function TamperPage() {
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
                   When a proof is generated, it includes a cryptographic hash of all inputs.
                   If anyone tries to modify the inputs after the proof is created, the hash
-                  won't match and verification will fail. This prevents:
+                  won&apos;t match and verification will fail. This prevents:
                 </p>
                 <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
                   <li>• Changing the purchase price after approval</li>
@@ -152,7 +152,7 @@ export default function TamperPage() {
                 Proof Generated Successfully
               </div>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Now try modifying the inputs on the right and verify - you'll see the verification fail.
+                Now try modifying the inputs on the right and verify - you&apos;ll see the verification fail.
               </p>
             </div>
           </div>

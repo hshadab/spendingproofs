@@ -106,6 +106,7 @@ export const SAMPLE_SERVICES: ServicePayment[] = [
     priceUsdc: 0.50,
     reliabilityScore: 0.98,
     description: 'Fast charging session (15 min, 50kW)',
+    providerAddress: '0x8ba1f109551bD432803012645Ac136ddd64DBA72',
   },
   {
     serviceId: 'nav-api-mapbox',
@@ -114,6 +115,7 @@ export const SAMPLE_SERVICES: ServicePayment[] = [
     priceUsdc: 0.004,
     reliabilityScore: 0.99,
     description: 'Real-time route calculation with traffic',
+    providerAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f4bF8E',
   },
   {
     serviceId: 'compute-aws-lambda',
@@ -122,6 +124,7 @@ export const SAMPLE_SERVICES: ServicePayment[] = [
     priceUsdc: 0.02,
     reliabilityScore: 0.9999,
     description: 'Vision processing inference (100ms)',
+    providerAddress: '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed',
   },
   {
     serviceId: 'weather-data-api',
@@ -130,6 +133,7 @@ export const SAMPLE_SERVICES: ServicePayment[] = [
     priceUsdc: 0.001,
     reliabilityScore: 0.97,
     description: 'Current weather conditions',
+    providerAddress: '0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359',
   },
   {
     serviceId: 'waymo-ride-request',
@@ -138,6 +142,7 @@ export const SAMPLE_SERVICES: ServicePayment[] = [
     priceUsdc: 15.00,
     reliabilityScore: 0.96,
     description: 'Autonomous vehicle transport (5 miles)',
+    providerAddress: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe',
   },
   {
     serviceId: 'maintenance-diagnostic',
@@ -146,6 +151,7 @@ export const SAMPLE_SERVICES: ServicePayment[] = [
     priceUsdc: 5.00,
     reliabilityScore: 0.92,
     description: 'Full system diagnostic scan',
+    providerAddress: '0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8',
   },
 ];
 

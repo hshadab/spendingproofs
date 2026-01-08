@@ -54,7 +54,7 @@ export function ArcIntegrationSection() {
                 </div>
               </div>
               <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6">
-                <div className="text-xs text-gray-500 mb-3 font-mono">// Native precompile call</div>
+                <div className="text-xs text-gray-500 mb-3 font-mono">{`// Native precompile call`}</div>
                 <pre className="text-sm font-mono text-gray-300 overflow-x-auto">
 {`// Precompile at 0x0f (proposed)
 address constant JOLT_VERIFIER =

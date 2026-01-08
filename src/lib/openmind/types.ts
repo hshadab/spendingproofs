@@ -73,6 +73,8 @@ export interface ServicePayment {
   reliabilityScore: number;
   /** Description of what's being purchased */
   description: string;
+  /** Provider wallet address for payment */
+  providerAddress: `0x${string}`;
 }
 
 /**
