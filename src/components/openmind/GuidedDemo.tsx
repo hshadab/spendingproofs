@@ -116,15 +116,15 @@ const DEMO_STEPS: DemoStep[] = [
   {
     id: 'payment-1',
     phase: 'payment',
-    title: 'x402 Payment with Proof',
-    description: 'The robot submits the payment request with the zkML proof attached. The charging station verifies the proof before accepting payment.',
+    title: 'Off-Chain Verification',
+    description: 'The zkML proof is verified locally (<150ms). If valid, payment is authorized. This is fast and cheap - no on-chain verification needed.',
     duration: 4000,
   },
   {
     id: 'payment-2',
     phase: 'payment',
-    title: 'USDC Transfer on Arc',
-    description: 'USDC transferred on Arc testnet. The proof hash is stored on-chain as an audit trail. Robot begins charging.',
+    title: 'USDC Transfer + Attestation',
+    description: 'Two transactions: (1) USDC payment to ChargePoint, (2) proofHash submitted to ProofAttestation contract for audit trail.',
     duration: 4000,
   },
   {
