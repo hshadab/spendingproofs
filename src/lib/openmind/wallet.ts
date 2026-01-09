@@ -89,6 +89,7 @@ function getWalletClient() {
 
 /**
  * Get USDC balance for the OpenMind demo wallet
+ * Arc testnet uses native USDC (18 decimals) as the native currency
  */
 export async function getWalletBalance(): Promise<{
   balanceUsdc: number;
@@ -98,14 +99,11 @@ export async function getWalletBalance(): Promise<{
   const address = getWalletAddress();
 
   try {
-    const balance = await publicClient.readContract({
-      address: ADDRESSES.usdc,
-      abi: USDC_ABI,
-      functionName: 'balanceOf',
-      args: [address],
-    });
+    // Arc testnet uses native USDC as the gas token (18 decimals)
+    const balance = await publicClient.getBalance({ address });
 
-    const balanceUsdc = parseFloat(formatUnits(balance, 6));
+    // Convert from 18 decimals to USDC amount
+    const balanceUsdc = parseFloat(formatUnits(balance, 18));
 
     logger.info('Wallet balance fetched', {
       action: 'get_balance',
@@ -125,7 +123,8 @@ export async function getWalletBalance(): Promise<{
 }
 
 /**
- * Execute a USDC transfer on Arc testnet
+ * Execute a native USDC transfer on Arc testnet
+ * Arc uses native USDC (18 decimals) as the gas token
  */
 export async function executeUsdcTransfer(
   to: `0x${string}`,
@@ -137,20 +136,20 @@ export async function executeUsdcTransfer(
   explorerUrl: string;
 }> {
   const walletClient = getWalletClient();
-  const amountRaw = parseUnits(amountUsdc.toString(), 6);
+  // Arc uses 18 decimals for native USDC
+  const amountRaw = parseUnits(amountUsdc.toString(), 18);
 
-  logger.info('Executing USDC transfer', {
+  logger.info('Executing native USDC transfer', {
     action: 'transfer',
     to,
     amountUsdc,
   });
 
   try {
-    const txHash = await walletClient.writeContract({
-      address: ADDRESSES.usdc,
-      abi: USDC_ABI,
-      functionName: 'transfer',
-      args: [to, amountRaw],
+    // Send native USDC (not ERC-20)
+    const txHash = await walletClient.sendTransaction({
+      to,
+      value: amountRaw,
     });
 
     logger.info('USDC transfer submitted', {
