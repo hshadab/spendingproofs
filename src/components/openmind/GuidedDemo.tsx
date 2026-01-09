@@ -198,6 +198,8 @@ export function GuidedDemo() {
   const [paymentResult, setPaymentResult] = useState<{
     txHash: string;
     explorerUrl: string;
+    attestationTxHash?: string;
+    note?: string;
   } | null>(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
 
@@ -415,6 +417,8 @@ export function GuidedDemo() {
         setPaymentResult({
           txHash: data.transfer.txHash,
           explorerUrl: data.transfer.explorerUrl,
+          attestationTxHash: data.transfer.attestationTxHash,
+          note: data.transfer.note,
         });
         // Refresh wallet balance after payment
         fetchWalletBalance();
@@ -1378,10 +1382,26 @@ export function GuidedDemo() {
                           </a>
                         )}
 
-                        <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-                          <div className="text-xs text-gray-400 mb-1">Proof attested on-chain</div>
-                          <div className="font-mono text-xs text-purple-400 truncate">{proofResult.proofHash}</div>
-                        </div>
+                        {/* Attestation transaction */}
+                        {paymentResult?.attestationTxHash ? (
+                          <a
+                            href={`${ARC_CHAIN.explorerUrl}/tx/${paymentResult.attestationTxHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg hover:bg-purple-500/20 transition-colors"
+                          >
+                            <div>
+                              <div className="text-xs text-gray-400 mb-1">Proof Attestation (Audit Trail)</div>
+                              <div className="font-mono text-xs text-purple-400 truncate">{paymentResult.attestationTxHash}</div>
+                            </div>
+                            <ExternalLink className="w-4 h-4 text-purple-400 flex-shrink-0 ml-2" />
+                          </a>
+                        ) : (
+                          <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                            <div className="text-xs text-gray-400 mb-1">Proof Hash (for audit)</div>
+                            <div className="font-mono text-xs text-purple-400 truncate">{proofResult.proofHash}</div>
+                          </div>
+                        )}
 
                         {/* Contract links */}
                         <div className="grid grid-cols-2 gap-2">
