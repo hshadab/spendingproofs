@@ -1,6 +1,6 @@
 # OpenMind Robot Payments Demo
 
-**Autonomous robots making USDC payments via x402 with zkML spending proofs powered by [Jolt Atlas](https://github.com/ICME-Lab/jolt-atlas).**
+**Autonomous robots making USDC payments via x402 with zkML spending proof guardrails powered by [Jolt Atlas](https://github.com/ICME-Lab/jolt-atlas).**
 
 > This demo showcases how OpenMind's OM1 robot operating system can integrate with
 > zkML spending proofs to enable trustless autonomous commerce for embodied AI.
