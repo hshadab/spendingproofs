@@ -60,7 +60,8 @@ const DEMO_STEPS: DemoStep[] = [
     phase: 'intro',
     title: 'The Challenge of Robot Commerce',
     description: 'Robots operating autonomously need to pay for charging, APIs, compute, and data. But owners can\'t monitor every transaction. How do you trust a robot with your money?',
-    technicalNote: 'From OpenMind x402 docs: "autonomous (and inherently unpredictable) real world actions"',
+    technicalNote: 'OpenMind x402 warns that robot spending results in "autonomous (and inherently unpredictable) real world actions"',
+    technicalNoteUrl: 'https://docs.openmind.org/robotics/coinbase-x402',
     duration: 5000,
   },
   {
@@ -639,7 +640,19 @@ export function GuidedDemo() {
               <div className="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-lg mb-3">
                 <div className="flex items-start gap-2">
                   <Bot className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-gray-300">{currentStep.technicalNote}</p>
+                  {currentStep.technicalNoteUrl ? (
+                    <a
+                      href={currentStep.technicalNoteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-gray-300 hover:text-cyan-400 transition-colors underline decoration-dotted underline-offset-2"
+                    >
+                      {currentStep.technicalNote}
+                      <ExternalLink className="w-2.5 h-2.5 inline ml-1" />
+                    </a>
+                  ) : (
+                    <p className="text-xs text-gray-300">{currentStep.technicalNote}</p>
+                  )}
                 </div>
               </div>
             )}

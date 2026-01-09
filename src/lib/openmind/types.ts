@@ -152,6 +152,7 @@ export interface DemoStep {
   title: string;
   description: string;
   technicalNote?: string;
+  technicalNoteUrl?: string;
   duration: number;
 }
 
