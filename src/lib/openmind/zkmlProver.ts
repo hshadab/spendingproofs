@@ -146,6 +146,7 @@ export async function generateRobotPaymentProof(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        model_id: 'spending-model',
         inputs: [
           spendingInput.priceUsdc,
           spendingInput.budgetUsdc,
