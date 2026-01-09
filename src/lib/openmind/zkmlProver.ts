@@ -136,7 +136,10 @@ export async function generateRobotPaymentProof(
   }, 200);
 
   try {
-    // Call the existing prover API
+    // Call the existing prover API with 30s timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     const response = await fetch(`${PROVER_URL}/prove`, {
       method: 'POST',
       headers: {
@@ -155,7 +158,10 @@ export async function generateRobotPaymentProof(
         ],
         tag: `openmind-${robotId}-${service.category}`,
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     clearInterval(progressInterval);
 

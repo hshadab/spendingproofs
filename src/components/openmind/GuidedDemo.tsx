@@ -367,8 +367,22 @@ export function GuidedDemo() {
       });
       setProofResult(result);
     } catch (error) {
-      console.error('Proof generation failed:', error);
-      setProofStatus('Error generating proof');
+      console.error('Proof generation failed, falling back to mock:', error);
+      // Fallback to mock proof if real prover fails (timeout, network error, etc.)
+      if (useRealProver) {
+        setProofStatus('Real prover unavailable, using mock...');
+        try {
+          const mockResult = await generateMockProof(request, (progress, status) => {
+            setProofProgress(progress);
+            setProofStatus(status);
+          });
+          setProofResult(mockResult);
+        } catch {
+          setProofStatus('Error generating proof');
+        }
+      } else {
+        setProofStatus('Error generating proof');
+      }
     } finally {
       setIsGeneratingProof(false);
     }
