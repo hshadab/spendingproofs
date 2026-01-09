@@ -1,6 +1,6 @@
 # OpenMind Robot Payments Demo
 
-**Autonomous robots making USDC payments via x402 with zkML spending proofs**
+**Autonomous robots making USDC payments via x402 with zkML spending proofs powered by [Jolt Atlas](https://github.com/ICME-Lab/jolt-atlas).**
 
 > This demo showcases how OpenMind's OM1 robot operating system can integrate with
 > zkML spending proofs to enable trustless autonomous commerce for embodied AI.
@@ -33,9 +33,9 @@ Before every x402 USDC payment, the robot generates a zkML proof that:
 | Step | Description |
 |------|-------------|
 | 1. Robot Agent | Delivery robot running OM1 with USDC wallet |
-| 2. Service Request | Robot needs to pay $0.50 for charging |
+| 2. Service Request | Robot needs to pay $0.10 for charging |
 | 3. Policy Check | Evaluate against owner's spending limits |
-| 4. zkML Proof | Generate 48KB SNARK proof of compliance |
+| 4. zkML Proof | Generate SNARK proof of compliance |
 | 5. x402 Payment | Execute USDC transfer with proof attached |
 | 6. Audit Trail | Proof hash stored for compliance |
 
@@ -69,7 +69,7 @@ interface RobotSpendingPolicy {
 
 | Metric | Value |
 |--------|-------|
-| Proof Size | ~48KB |
+| Proof Size | ~50KB |
 | Generation Time | 4-12s (real), <2s (simulated) |
 | Prover | Jolt-Atlas SNARK |
 | Verification | <150ms |
