@@ -60,7 +60,7 @@ const DEMO_STEPS: DemoStep[] = [
     phase: 'intro',
     title: 'The Challenge of Robot Commerce',
     description: 'Robots operating autonomously need to pay for charging, APIs, compute, and data. But owners can\'t monitor every transaction. How do you trust a robot with your money?',
-    technicalNote: 'From OpenMind docs: "autonomous actions by your robot are inherently unpredictable"',
+    technicalNote: 'From OpenMind x402 docs: "autonomous (and inherently unpredictable) real world actions"',
     duration: 5000,
   },
   {
