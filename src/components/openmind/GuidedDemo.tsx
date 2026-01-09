@@ -82,7 +82,7 @@ const DEMO_STEPS: DemoStep[] = [
     id: 'service-1',
     phase: 'service',
     title: 'Robot Needs to Charge',
-    description: 'Battery at 23%. The robot discovers a nearby ChargePoint station offering fast charging for $0.50 USDC via x402.',
+    description: 'Battery at 23%. The robot discovers a nearby ChargePoint station offering fast charging for $0.10 USDC via x402.',
     duration: 4000,
   },
   {
@@ -96,7 +96,7 @@ const DEMO_STEPS: DemoStep[] = [
     id: 'policy-2',
     phase: 'policy',
     title: 'OpenMind LLM Decision',
-    description: 'Calling OpenMind API to evaluate the spending decision...',
+    description: 'Evaluating the spending request against the owner\'s policy...',
     duration: 5000,
   },
   {
@@ -110,7 +110,7 @@ const DEMO_STEPS: DemoStep[] = [
     id: 'proof-2',
     phase: 'proof',
     title: 'Jolt-Atlas SNARK',
-    description: 'Generating a ~48KB zero-knowledge proof using Jolt-Atlas. This proves the spending decision was computed correctly without revealing the full policy.',
+    description: 'Generating a zero-knowledge proof using Jolt-Atlas. This proves the spending decision was computed correctly without revealing the full policy.',
     duration: 6000,
   },
   {
@@ -832,7 +832,7 @@ export function GuidedDemo() {
                     <div className="space-y-1 text-[10px]">
                       <div className="flex items-center gap-1 text-gray-500">
                         <CheckCircle2 className="w-3 h-3 text-yellow-400" />
-                        <span>SNARK Proofs (~48KB)</span>
+                        <span>SNARK Proofs</span>
                       </div>
                       <div className="flex items-center gap-1 text-gray-500">
                         <CheckCircle2 className="w-3 h-3 text-yellow-400" />
@@ -1450,8 +1450,8 @@ export function GuidedDemo() {
                     <div className="text-[10px] text-gray-400">USDC Paid</div>
                   </div>
                   <div className="p-2 bg-[#0d1117] border border-yellow-500/30 rounded-xl text-center">
-                    <div className="text-lg font-bold text-yellow-400">~48KB</div>
-                    <div className="text-[10px] text-gray-400">Proof Size</div>
+                    <div className="text-lg font-bold text-yellow-400">SNARK</div>
+                    <div className="text-[10px] text-gray-400">Proof Type</div>
                   </div>
                   <div className="p-2 bg-[#0d1117] border border-purple-500/30 rounded-xl text-center">
                     <div className="text-lg font-bold text-purple-400">Arc</div>
@@ -1474,7 +1474,7 @@ export function GuidedDemo() {
                       <Bot className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
                       <div>
                         <span className="text-purple-400 font-medium">1. Robot Needed Service</span>
-                        <p className="text-gray-400 mt-1">DeliveryBot-7 discovered low battery and found a ChargePoint station offering fast charging for $0.50 via x402.</p>
+                        <p className="text-gray-400 mt-1">DeliveryBot-7 discovered low battery and found a ChargePoint station offering fast charging for $0.10 via x402.</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-green-900/20 rounded-lg border border-green-500/30">
@@ -1488,7 +1488,7 @@ export function GuidedDemo() {
                       <Zap className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
                       <div>
                         <span className="text-yellow-400 font-medium">3. zkML Proof Generated</span>
-                        <p className="text-gray-400 mt-1">Jolt-Atlas generated a ~48KB SNARK proof that the spending decision was computed correctly without revealing policy details.</p>
+                        <p className="text-gray-400 mt-1">Jolt-Atlas generated a SNARK proof that the spending decision was computed correctly without revealing policy details.</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-blue-900/20 rounded-lg border border-blue-500/30">

@@ -103,7 +103,7 @@ export const SAMPLE_SERVICES: ServicePayment[] = [
     serviceId: 'charging-station-sf-001',
     serviceName: 'ChargePoint Station #4521',
     category: 'charging',
-    priceUsdc: 0.50,
+    priceUsdc: 0.10,
     reliabilityScore: 0.98,
     description: 'Fast charging session (15 min, 50kW)',
     providerAddress: '0x8ba1f109551bD432803012645Ac136ddd64DBA72',
