@@ -127,7 +127,7 @@ export async function generateRobotPaymentProof(
         : newProgress < 50
         ? 'Running spending model inference...'
         : newProgress < 70
-        ? 'Generating Jolt-Atlas proof (~48KB)...'
+        ? 'Generating Jolt-Atlas proof...'
         : newProgress < 80
         ? 'Finalizing cryptographic commitments...'
         : 'Verifying proof integrity...';

@@ -340,13 +340,6 @@ export function GuidedDemo() {
     }
   }, [currentStep.id, llmDecision, llmLoading, fetchLLMDecision]);
 
-  // Trigger proof generation at the right step
-  useEffect(() => {
-    if (currentStep.id === 'proof-2' && !proofResult && !isGeneratingProof) {
-      generateProof();
-    }
-  }, [currentStep.id, proofResult, isGeneratingProof]);
-
   const generateProof = useCallback(async () => {
     setIsGeneratingProof(true);
     setProofProgress(0);
@@ -380,6 +373,13 @@ export function GuidedDemo() {
       setIsGeneratingProof(false);
     }
   }, [robot, service, walletInfo, spentToday, policy, useRealProver]);
+
+  // Trigger proof generation at the right step
+  useEffect(() => {
+    if (currentStep.id === 'proof-2' && !proofResult && !isGeneratingProof) {
+      generateProof();
+    }
+  }, [currentStep.id, proofResult, isGeneratingProof, generateProof]);
 
   // Execute real payment
   const executePayment = useCallback(async () => {
