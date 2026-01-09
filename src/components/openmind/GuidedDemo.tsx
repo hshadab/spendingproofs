@@ -96,21 +96,21 @@ const DEMO_STEPS: DemoStep[] = [
     id: 'policy-2',
     phase: 'policy',
     title: 'OpenMind LLM Decision',
-    description: 'Evaluating the spending request against the owner\'s policy...',
+    description: 'The OpenMind LLM reasons about context: "Should I charge now or keep delivering? Is this station on my route? Can I reach a cheaper station?" This contextual reasoning is smart but NOT cryptographically proven.',
     duration: 5000,
   },
   {
     id: 'proof-1',
     phase: 'proof',
-    title: 'Generating zkML Proof',
-    description: 'The x402 payment gateway requires a cryptographic PROOF that the policy model was executed correctly.',
+    title: 'Policy Model Check',
+    description: 'A small ONNX policy model runs the hard limit checks: price within budget, category allowed, reliability threshold met. This deterministic model IS what gets proven.',
     duration: 4000,
   },
   {
     id: 'proof-2',
     phase: 'proof',
-    title: 'Jolt-Atlas SNARK',
-    description: 'Generating a zero-knowledge proof using Jolt-Atlas. This proves the spending decision was computed correctly without revealing the full policy.',
+    title: 'zkML Proof Generation',
+    description: 'Jolt-Atlas generates a SNARK proof that the policy model executed correctly. This proves the spending limits were checked - without revealing the actual limits.',
     duration: 6000,
   },
   {
@@ -1480,15 +1480,15 @@ export function GuidedDemo() {
                     <div className="flex items-start gap-3 p-3 bg-green-900/20 rounded-lg border border-green-500/30">
                       <Shield className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
                       <div>
-                        <span className="text-green-400 font-medium">2. Policy Evaluation</span>
-                        <p className="text-gray-400 mt-1">OpenMind LLM evaluated the request against owner-configured spending policy. Decision: {llmDecision?.decision.toUpperCase()} ({llmDecision ? `${(llmDecision.confidence * 100).toFixed(0)}%` : '...'})</p>
+                        <span className="text-green-400 font-medium">2. LLM + Policy Model</span>
+                        <p className="text-gray-400 mt-1">OpenMind LLM reasoned about timing and route ("charge now vs later?") and said "{llmDecision?.decision.toUpperCase() || 'APPROVE'}". Then policy model checked hard limits (this IS proven).</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-yellow-900/20 rounded-lg border border-yellow-500/30">
                       <Zap className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
                       <div>
                         <span className="text-yellow-400 font-medium">3. zkML Proof Generated</span>
-                        <p className="text-gray-400 mt-1">Jolt-Atlas generated a SNARK proof that the spending decision was computed correctly without revealing policy details.</p>
+                        <p className="text-gray-400 mt-1">Jolt-Atlas proved the policy model executed correctly - guaranteeing spending limits were enforced without revealing them.</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-blue-900/20 rounded-lg border border-blue-500/30">
