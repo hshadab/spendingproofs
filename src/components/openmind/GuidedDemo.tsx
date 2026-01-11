@@ -1515,7 +1515,7 @@ export function GuidedDemo() {
                       <Shield className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
                       <div>
                         <span className="text-green-400 font-medium">2. LLM + Policy Model</span>
-                        <p className="text-gray-400 mt-1">OpenMind LLM reasoned about timing and route ("charge now vs later?") and said "{llmDecision?.decision.toUpperCase() || 'APPROVE'}". Then policy model checked hard limits (this IS proven).</p>
+                        <p className="text-gray-400 mt-1">OpenMind LLM reasoned about timing and route (&quot;charge now vs later?&quot;) and said &quot;{llmDecision?.decision.toUpperCase() || 'APPROVE'}&quot;. Then policy model checked hard limits (this IS proven).</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-yellow-900/20 rounded-lg border border-yellow-500/30">

@@ -136,6 +136,8 @@ export interface VerificationStep {
   step: string;
   status: 'success' | 'failed' | 'skipped';
   txHash?: string;
+  details?: string;
+  timeMs?: number;
 }
 
 /**
@@ -154,4 +156,9 @@ export interface TransactionResult {
   attestationTxHash?: string;
   steps?: VerificationStep[];
   proofHash?: string;
+  // Proof verification fields
+  proofVerified?: boolean;
+  method?: 'crossmint' | 'direct';
+  integrationMode?: string;
+  crossmintTransactionId?: string;
 }

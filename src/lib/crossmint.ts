@@ -2,16 +2,25 @@
  * Crossmint API Client
  *
  * Server-side client for Crossmint wallet and transfer operations.
- * Uses staging API with server-side API key.
+ *
+ * INTEGRATION MODES:
+ * 1. "crossmint" - Full Crossmint-managed transfers (requires supported chain)
+ * 2. "hybrid" - Crossmint wallet + direct on-chain transfer (for unsupported chains like Arc)
+ *
+ * Supported chains for Crossmint transfers: Base, Polygon, Arbitrum, Optimism, etc.
+ * Arc testnet requires Crossmint sales enablement.
  */
 
 import { createLogger } from './metrics';
-import { API_CONFIG, ADDRESSES } from './config';
+import { API_CONFIG } from './config';
 
 const logger = createLogger('lib:crossmint');
 
 const CROSSMINT_API_URL = API_CONFIG.crossmintApiUrl;
 const CROSSMINT_SERVER_KEY = process.env.CROSSMINT_SERVER_KEY;
+
+// Integration mode: 'crossmint' for full Crossmint transfers, 'hybrid' for Crossmint wallet + direct transfer
+export const INTEGRATION_MODE = process.env.CROSSMINT_INTEGRATION_MODE || 'hybrid';
 
 if (!CROSSMINT_SERVER_KEY) {
   logger.warn('CROSSMINT_SERVER_KEY not set - Crossmint API calls will fail', {
@@ -231,6 +240,186 @@ export async function transferUsdc(
   } catch (error) {
     logger.error('Arc transfer error', { action: 'transfer', error });
     throw new Error(`Arc transfer failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
+ * Transfer tokens via Crossmint API (for supported chains)
+ *
+ * This is the REAL Crossmint integration. It:
+ * 1. Calls Crossmint's transfer API
+ * 2. Crossmint handles gas, signing, and execution
+ * 3. Returns transaction hash
+ *
+ * Supported chains: base-sepolia, polygon-amoy, base, polygon, arbitrum, optimism
+ * Arc testnet requires Crossmint sales enablement.
+ *
+ * API: POST /wallets/{locator}/tokens/{token}/transfers
+ */
+export async function transferViaCrossmint(
+  walletLocator: string,
+  toAddress: string,
+  amountUsdc: number,
+  chain: string = 'base-sepolia',
+  proofHash?: string
+): Promise<TransferResult & { crossmintTransactionId?: string }> {
+  if (!CROSSMINT_SERVER_KEY) {
+    throw new Error('CROSSMINT_SERVER_KEY not configured');
+  }
+
+  // Crossmint uses chain-specific token identifiers
+  const tokenMap: Record<string, string> = {
+    'base-sepolia': 'usdc', // Crossmint's testnet USDC
+    'polygon-amoy': 'usdc',
+    'base': 'usdc',
+    'polygon': 'usdc',
+    'arbitrum': 'usdc',
+  };
+
+  const token = tokenMap[chain] || 'usdc';
+
+  logger.info('Initiating Crossmint transfer', {
+    action: 'crossmint_transfer',
+    wallet: walletLocator,
+    to: toAddress,
+    amount: amountUsdc,
+    chain,
+    proofHash: proofHash || 'none',
+  });
+
+  try {
+    // Step 1: Initiate transfer via Crossmint API
+    const response = await fetch(
+      `${CROSSMINT_API_URL}/v1-alpha2/wallets/${walletLocator}/tokens/${token}/transfers`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': CROSSMINT_SERVER_KEY,
+        },
+        body: JSON.stringify({
+          recipient: `evm:${chain}:${toAddress}`,
+          amount: amountUsdc.toString(),
+          // Include proof hash in metadata for audit
+          metadata: proofHash ? { zkmlProofHash: proofHash } : undefined,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error('Crossmint transfer failed', {
+        action: 'crossmint_transfer',
+        status: response.status,
+        error: errorText,
+      });
+      throw new Error(`Crossmint transfer failed: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    logger.info('Crossmint transfer initiated', {
+      action: 'crossmint_transfer',
+      transactionId: data.id,
+      status: data.status,
+    });
+
+    // For API key auth (admin signer), transfer executes immediately
+    // For delegated signers, would need approval step
+
+    return {
+      id: data.id,
+      status: data.status === 'succeeded' ? 'success' : data.status,
+      txHash: data.onChain?.txId,
+      chain,
+      amount: amountUsdc.toString(),
+      recipient: toAddress,
+      crossmintTransactionId: data.id,
+    };
+  } catch (error) {
+    logger.error('Crossmint transfer error', { action: 'crossmint_transfer', error });
+    throw error;
+  }
+}
+
+/**
+ * Poll for Crossmint transaction completion
+ */
+export async function waitForCrossmintTransaction(
+  transactionId: string,
+  maxAttempts: number = 30,
+  intervalMs: number = 2000
+): Promise<TransferResult> {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const status = await getCrossmintTransactionStatus(transactionId);
+
+    if (status.status === 'success' || status.status === 'failed') {
+      return status;
+    }
+
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error(`Transaction ${transactionId} did not complete within timeout`);
+}
+
+/**
+ * Get Crossmint transaction status
+ */
+export async function getCrossmintTransactionStatus(
+  transactionId: string
+): Promise<TransferResult> {
+  const response = await fetch(
+    `${CROSSMINT_API_URL}/v1-alpha2/transactions/${transactionId}`,
+    {
+      headers: {
+        'X-API-KEY': CROSSMINT_SERVER_KEY!,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to get transaction status: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  return {
+    id: data.id,
+    status: data.status === 'succeeded' ? 'success' : data.status,
+    txHash: data.onChain?.txId,
+    chain: data.chain || 'unknown',
+    amount: data.amount || '0',
+    recipient: data.recipient || '',
+  };
+}
+
+/**
+ * Smart transfer function that chooses the right method based on chain support
+ *
+ * - For Crossmint-supported chains: Uses Crossmint API
+ * - For unsupported chains (Arc): Uses direct on-chain transfer
+ */
+export async function smartTransfer(
+  walletLocator: string,
+  toAddress: string,
+  amountUsdc: number,
+  chain: string = 'arc-testnet',
+  proofHash?: string
+): Promise<TransferResult & { method: 'crossmint' | 'direct' }> {
+  // Chains supported by Crossmint for transfers
+  const crossmintSupportedChains = [
+    'base-sepolia', 'polygon-amoy', 'base', 'polygon', 'arbitrum', 'optimism'
+  ];
+
+  if (crossmintSupportedChains.includes(chain) && INTEGRATION_MODE === 'crossmint') {
+    logger.info('Using Crossmint-managed transfer', { action: 'smart_transfer', chain });
+    const result = await transferViaCrossmint(walletLocator, toAddress, amountUsdc, chain, proofHash);
+    return { ...result, method: 'crossmint' };
+  } else {
+    logger.info('Using direct on-chain transfer', { action: 'smart_transfer', chain });
+    const result = await transferUsdc(walletLocator, toAddress, amountUsdc, chain, proofHash);
+    return { ...result, method: 'direct' };
   }
 }
 

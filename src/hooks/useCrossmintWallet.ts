@@ -18,6 +18,22 @@ interface TransferState {
   error: string | null;
 }
 
+/**
+ * Extended proof data for cryptographic verification before transfer
+ */
+export interface ProofDataForTransfer {
+  /** Full SNARK proof (hex string) */
+  proof?: string;
+  /** Proof hash for attestation */
+  proofHash?: string;
+  /** Serialized program I/O for verification */
+  programIo?: string;
+  /** Model hash for verification */
+  modelHash?: string;
+  /** Skip verification (for demo without prover) */
+  skipVerification?: boolean;
+}
+
 const INITIAL_WALLET_STATE: WalletState = {
   address: null,
   chain: null,
@@ -75,12 +91,15 @@ export function useCrossmintWallet() {
   }, []);
 
   /**
-   * Execute a USDC transfer
+   * Execute a USDC transfer with optional cryptographic proof verification
+   *
+   * When full proof data is provided (proof, programIo, modelHash), the transfer API
+   * will verify the proof cryptographically before executing the transfer.
    */
   const executeTransfer = useCallback(async (
     to: string,
     amount: number,
-    proofHash?: string
+    proofData?: ProofDataForTransfer | string
   ): Promise<TransactionResult> => {
     setTransfer({
       status: 'pending',
@@ -90,16 +109,33 @@ export function useCrossmintWallet() {
     });
 
     try {
+      // Support both legacy string (proofHash only) and full proof data
+      const transferPayload: Record<string, unknown> = {
+        to,
+        amount,
+      };
+
+      if (typeof proofData === 'string') {
+        // Legacy: just proofHash
+        transferPayload.proofHash = proofData;
+        transferPayload.skipVerification = true; // Can't verify without full proof
+      } else if (proofData) {
+        // Full proof data for real verification
+        if (proofData.proof) transferPayload.proof = proofData.proof;
+        if (proofData.proofHash) transferPayload.proofHash = proofData.proofHash;
+        if (proofData.programIo) transferPayload.programIo = proofData.programIo;
+        if (proofData.modelHash) transferPayload.modelHash = proofData.modelHash;
+        if (proofData.skipVerification !== undefined) {
+          transferPayload.skipVerification = proofData.skipVerification;
+        }
+      }
+
       const response = await fetch('/api/crossmint/transfer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          to,
-          amount,
-          proofHash,
-        }),
+        body: JSON.stringify(transferPayload),
       });
 
       const data = await response.json();
@@ -130,6 +166,11 @@ export function useCrossmintWallet() {
         attestationTxHash: data.transfer.attestationTxHash,
         steps: data.steps,
         proofHash: data.transfer.proofHash,
+        // Proof verification fields
+        proofVerified: data.transfer.proofVerified,
+        method: data.transfer.method,
+        integrationMode: data.transfer.integrationMode,
+        crossmintTransactionId: data.transfer.crossmintTransactionId,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';

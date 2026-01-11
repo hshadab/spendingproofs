@@ -42,13 +42,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Forward request to prover backend (only send inputs and tag)
+    // Forward request to prover backend with model_id
     const response = await fetch(`${PROVER_BACKEND_URL}/prove`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ inputs: body.inputs, tag: body.tag }),
+      body: JSON.stringify({
+        model_id: body.model_id || 'spending-model',  // Default to spending-model
+        inputs: body.inputs,
+        tag: body.tag
+      }),
     });
 
     if (!response.ok) {
