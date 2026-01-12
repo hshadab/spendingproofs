@@ -71,7 +71,8 @@ export async function createWallet(
       'X-API-KEY': CROSSMINT_SERVER_KEY!,
     },
     body: JSON.stringify({
-      type: 'evm-mpc-wallet',
+      chainType: 'evm',
+      type: 'mpc',
       linkedUser: `userId:${userId}`,
     }),
   });
@@ -85,7 +86,7 @@ export async function createWallet(
   return {
     address: data.address,
     type: data.type,
-    chain: 'evm', // MPC wallets are multi-chain
+    chain: 'evm',
     linkedUser: data.linkedUser,
     createdAt: data.createdAt,
   };
@@ -126,19 +127,23 @@ export async function listWallets(): Promise<CrossmintWallet[]> {
 
 /**
  * Get wallet balance
- * Fetches directly from Arc testnet since Crossmint staging API doesn't support MPC wallet balances
+ * For Base Sepolia, we query the USDC balance via RPC
+ * Crossmint production API may support balance queries - this is a fallback
  */
 export async function getWalletBalance(walletAddress: string): Promise<WalletBalance[]> {
+  const chain = process.env.NEXT_PUBLIC_CROSSMINT_CHAIN || 'base-sepolia';
+
   try {
-    // Query Arc testnet USDC balance directly via RPC
-    const ARC_RPC = 'https://rpc.testnet.arc.network';
-    const USDC_ADDRESS = '0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213';
+    // Base Sepolia RPC and USDC address
+    const BASE_SEPOLIA_RPC = 'https://sepolia.base.org';
+    // Testnet USDC on Base Sepolia (from faucet)
+    const USDC_ADDRESS = '0x3e4ed2d6d6235f9d26707fd5d5af476fb9c91b0f';
 
     // balanceOf(address) selector + padded address
     const paddedAddress = walletAddress.slice(2).toLowerCase().padStart(64, '0');
     const data = `0x70a08231${paddedAddress}`;
 
-    const response = await fetch(ARC_RPC, {
+    const response = await fetch(BASE_SEPOLIA_RPC, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -159,13 +164,13 @@ export async function getWalletBalance(walletAddress: string): Promise<WalletBal
       return [{
         currency: 'usdc',
         amount: balanceUsdc.toFixed(2),
-        chain: 'arc-testnet',
+        chain,
       }];
     }
 
     return [];
   } catch (error) {
-    logger.warn('Failed to fetch balance from Arc', { action: 'get_balance', error });
+    logger.warn('Failed to fetch balance from Base Sepolia', { action: 'get_balance', error });
     return [];
   }
 }
@@ -267,16 +272,8 @@ export async function transferViaCrossmint(
     throw new Error('CROSSMINT_SERVER_KEY not configured');
   }
 
-  // Crossmint uses chain-specific token identifiers
-  const tokenMap: Record<string, string> = {
-    'base-sepolia': 'usdc', // Crossmint's testnet USDC
-    'polygon-amoy': 'usdc',
-    'base': 'usdc',
-    'polygon': 'usdc',
-    'arbitrum': 'usdc',
-  };
-
-  const token = tokenMap[chain] || 'usdc';
+  // Crossmint uses chain:token format for token locator
+  const tokenLocator = `${chain}:usdc`;
 
   logger.info('Initiating Crossmint transfer', {
     action: 'crossmint_transfer',
@@ -284,13 +281,14 @@ export async function transferViaCrossmint(
     to: toAddress,
     amount: amountUsdc,
     chain,
+    tokenLocator,
     proofHash: proofHash || 'none',
   });
 
   try {
-    // Step 1: Initiate transfer via Crossmint API
+    // Step 1: Initiate transfer via Crossmint API (2025-06-09 version)
     const response = await fetch(
-      `${CROSSMINT_API_URL}/v1-alpha2/wallets/${walletLocator}/tokens/${token}/transfers`,
+      `${CROSSMINT_API_URL}/${API_VERSION}/wallets/${walletLocator}/tokens/${tokenLocator}/transfers`,
       {
         method: 'POST',
         headers: {
@@ -298,10 +296,8 @@ export async function transferViaCrossmint(
           'X-API-KEY': CROSSMINT_SERVER_KEY,
         },
         body: JSON.stringify({
-          recipient: `evm:${chain}:${toAddress}`,
+          recipient: toAddress,
           amount: amountUsdc.toString(),
-          // Include proof hash in metadata for audit
-          metadata: proofHash ? { zkmlProofHash: proofHash } : undefined,
         }),
       }
     );
@@ -370,7 +366,7 @@ export async function getCrossmintTransactionStatus(
   transactionId: string
 ): Promise<TransferResult> {
   const response = await fetch(
-    `${CROSSMINT_API_URL}/v1-alpha2/transactions/${transactionId}`,
+    `${CROSSMINT_API_URL}/${API_VERSION}/transactions/${transactionId}`,
     {
       headers: {
         'X-API-KEY': CROSSMINT_SERVER_KEY!,

@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   executeDirectTransfer,
-  submitProofAttestation,
-  formatProofHash,
+  submitProofAttestation as submitArcAttestation,
+  formatProofHash as formatArcProofHash,
   getSpendingGateInfo,
   CONTRACTS,
 } from '@/lib/arc';
+import {
+  submitProofAttestation as submitBaseSepoliaAttestation,
+  formatProofHash as formatBaseSepoliaProofHash,
+  BASE_SEPOLIA_CONTRACTS,
+} from '@/lib/baseSepolia';
 import {
   smartTransfer,
   getOrCreateAgentWallet,
@@ -76,7 +81,7 @@ async function verifyProofBeforeTransfer(
  * Body: {
  *   to: string,           // Recipient address
  *   amount: number,       // Amount in USDC
- *   chain?: string,       // Target chain (default: arc-testnet)
+ *   chain?: string,       // Target chain (default: base-sepolia)
  *   proof?: string,       // Full SNARK proof (hex)
  *   proofHash?: string,   // Proof hash (for attestation)
  *   programIo?: string,   // Serialized program I/O (for verification)
@@ -90,7 +95,7 @@ export async function POST(request: NextRequest) {
     const {
       to,
       amount,
-      chain = 'arc-testnet',
+      chain = process.env.NEXT_PUBLIC_CROSSMINT_CHAIN || 'base-sepolia',
       proof,
       proofHash,
       programIo,
@@ -260,16 +265,40 @@ export async function POST(request: NextRequest) {
     let attestationTxHash: string | undefined;
     let attestationError: string | undefined;
 
-    const formattedProofHash = proofHash ? formatProofHash(proofHash) : null;
+    const DEMO_PRIVATE_KEY = process.env.DEMO_WALLET_PRIVATE_KEY as Hex;
 
-    if (formattedProofHash && chain === 'arc-testnet') {
-      const DEMO_PRIVATE_KEY = process.env.DEMO_WALLET_PRIVATE_KEY as Hex;
-
-      if (DEMO_PRIVATE_KEY) {
-        try {
-          const attestResult = await submitProofAttestation(
+    if (proofHash && DEMO_PRIVATE_KEY) {
+      try {
+        if (chain === 'base-sepolia') {
+          // Submit attestation to Base Sepolia
+          const formattedHash = formatBaseSepoliaProofHash(proofHash);
+          const attestResult = await submitBaseSepoliaAttestation(
             DEMO_PRIVATE_KEY,
-            formattedProofHash
+            formattedHash
+          );
+
+          if (attestResult.success) {
+            attestationTxHash = attestResult.txHash;
+            steps.push({
+              step: 'Proof Attestation',
+              status: 'success',
+              details: 'Proof hash recorded on Base Sepolia for audit',
+              txHash: attestationTxHash,
+            });
+          } else {
+            attestationError = attestResult.error;
+            steps.push({
+              step: 'Proof Attestation',
+              status: 'skipped',
+              details: attestResult.error,
+            });
+          }
+        } else if (chain === 'arc-testnet') {
+          // Submit attestation to Arc (legacy)
+          const formattedHash = formatArcProofHash(proofHash);
+          const attestResult = await submitArcAttestation(
+            DEMO_PRIVATE_KEY,
+            formattedHash
           );
 
           if (attestResult.success) {
@@ -288,14 +317,14 @@ export async function POST(request: NextRequest) {
               details: attestResult.error,
             });
           }
-        } catch (err) {
-          attestationError = err instanceof Error ? err.message : 'Unknown error';
-          steps.push({
-            step: 'Proof Attestation',
-            status: 'skipped',
-            details: attestationError,
-          });
         }
+      } catch (err) {
+        attestationError = err instanceof Error ? err.message : 'Unknown error';
+        steps.push({
+          step: 'Proof Attestation',
+          status: 'skipped',
+          details: attestationError,
+        });
       }
     }
 
@@ -309,7 +338,7 @@ export async function POST(request: NextRequest) {
         amount: amount.toString(),
         chain,
         method: transferResult.method,
-        proofHash: formattedProofHash,
+        proofHash,
         proofVerified,
         attestationTxHash,
         crossmintTransactionId: transferResult.crossmintTransactionId,
