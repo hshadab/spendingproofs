@@ -109,28 +109,28 @@ const WORKFLOW_STEPS: WalkthroughStep[] = [
   {
     id: 'intro-1',
     phase: 'intro',
-    title: 'The Smart Contract Ceiling',
-    description: 'Smart contracts can enforce simple rules: "if amount > $10K, revert." But enterprise spending policies involve ML-based vendor risk scoring, historical pattern analysis, multi-factor approval logic, and category budgets. This computation is infeasible on-chain.',
-    crossmintNote: 'Gas costs explode with complexity. ML inference cannot run in EVM.',
+    title: 'Crossmint + zkML',
+    description: 'Crossmint provides robust on-chain spending controls — limits, multi-sig, role-based permissions. These work great for rule-based policies. But some enterprise scenarios require ML inference: vendor risk scoring, historical analysis, dynamic compliance.',
+    crossmintNote: 'Crossmint enforces rule-based policies on-chain. zkML extends this to ML-based policies.',
     duration: 6000,
     businessAnnotation: {
-      title: 'The Verification Gap',
-      takeaway: 'Your CFO\'s policy has 6 factors. Your smart contract checks 1. What proves the other 5 were evaluated?',
-      color: 'enterprise',
-      metric: '6→1',
-      metricLabel: 'factors lost',
+      title: 'Extending On-Chain Controls',
+      takeaway: 'Crossmint handles rule-based policies. zkML proves ML-based policies were evaluated correctly.',
+      color: 'crossmint',
+      metric: '6',
+      metricLabel: 'ML factors verified',
     },
   },
   {
     id: 'intro-2',
     phase: 'intro',
-    title: 'Why zkML Is Required',
-    description: 'Without zkML, enterprises face an impossible choice: simplify policies to fit smart contracts (lose nuance), or trust off-chain systems (lose verifiability). zkML bridges this gap — run complex policy models off-chain, generate cryptographic proofs that can be verified on-chain.',
-    crossmintNote: 'Prove the model ran correctly without re-running it on-chain.',
+    title: 'Why zkML for ML Policies',
+    description: 'ML models can\'t run on-chain — gas costs explode, EVM can\'t execute neural networks. zkML solves this: run the model off-chain, generate a cryptographic proof of correct execution, verify the proof before payment.',
+    crossmintNote: 'Prove the ML model ran correctly without re-running it on-chain.',
     duration: 6000,
     businessAnnotation: {
-      title: 'Best of Both Worlds',
-      takeaway: 'Complex decisions off-chain. Cryptographic verification on-chain. No tradeoff required.',
+      title: 'Complementary Verification',
+      takeaway: 'On-chain controls for rules. zkML proofs for ML. Full policy coverage.',
       color: 'zkml',
       metric: '100%',
       metricLabel: 'verifiable',
@@ -891,42 +891,42 @@ export function CrossmintWalkthrough({
             </div>
 
             <h2 className="text-2xl font-bold mb-2">
-              The Smart Contract Ceiling
+              Crossmint + zkML
             </h2>
             <p className="text-gray-400 max-w-2xl mb-4 text-sm">
-              Smart contracts can enforce simple rules. Enterprise spending policies cannot be verified on-chain.
+              Extending Crossmint&apos;s on-chain spending controls with zkML proofs for ML-based policies.
             </p>
 
-            {/* Smart Contract Limitation Section */}
-            <div className="bg-gradient-to-r from-red-900/20 to-purple-900/20 border border-red-500/30 rounded-xl p-4 max-w-2xl mb-5">
+            {/* Complementary Capabilities Section */}
+            <div className="bg-gradient-to-r from-[#00D4AA]/10 to-yellow-900/20 border border-[#00D4AA]/30 rounded-xl p-4 max-w-2xl mb-5">
               <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="w-4 h-4 text-red-400" />
-                <span className="text-red-400 font-semibold text-sm">What Smart Contracts Can&apos;t Do</span>
+                <CheckCircle2 className="w-4 h-4 text-[#00D4AA]" />
+                <span className="text-[#00D4AA] font-semibold text-sm">Complementary Verification</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-[#0d1117] border border-green-500/30 rounded-lg">
+                <div className="p-3 bg-[#0d1117] border border-[#00D4AA]/30 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle2 className="w-3 h-3 text-green-400" />
-                    <span className="text-green-400 font-medium text-xs">On-Chain ✓</span>
+                    <Wallet className="w-3 h-3 text-[#00D4AA]" />
+                    <span className="text-[#00D4AA] font-medium text-xs">Crossmint On-Chain</span>
                   </div>
                   <code className="text-[10px] text-gray-300 bg-gray-800 px-2 py-1 rounded block">
-                    require(amount &lt;= limit);
+                    limits, multi-sig, permissions
                   </code>
-                  <p className="text-[9px] text-gray-500 mt-2">Simple threshold checks</p>
+                  <p className="text-[9px] text-gray-500 mt-2">Rule-based policy enforcement</p>
                 </div>
-                <div className="p-3 bg-[#0d1117] border border-red-500/30 rounded-lg">
+                <div className="p-3 bg-[#0d1117] border border-yellow-500/30 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <XCircle className="w-3 h-3 text-red-400" />
-                    <span className="text-red-400 font-medium text-xs">On-Chain ✗</span>
+                    <Zap className="w-3 h-3 text-yellow-400" />
+                    <span className="text-yellow-400 font-medium text-xs">zkML Proofs</span>
                   </div>
                   <code className="text-[10px] text-gray-300 bg-gray-800 px-2 py-1 rounded block whitespace-nowrap overflow-hidden">
                     mlModel.evaluate(risk, history...)
                   </code>
-                  <p className="text-[9px] text-gray-500 mt-2">ML inference, multi-factor scoring</p>
+                  <p className="text-[9px] text-gray-500 mt-2">ML-based policy verification</p>
                 </div>
               </div>
               <div className="mt-3 pt-3 border-t border-gray-700/50 text-[10px] text-gray-400">
-                <span className="text-purple-400 font-medium">The gap:</span> Enterprise policies need vendor risk scoring, historical analysis, category budgets, compliance checks — computation that&apos;s infeasible on-chain.
+                <span className="text-[#00D4AA] font-medium">Together:</span> Full policy coverage — from simple spending limits to complex ML-based vendor scoring and compliance checks.
               </div>
             </div>
 

@@ -8,28 +8,30 @@ zkML infrastructure that proves AI agents followed their spending policies — e
 
 > **Testnet Alpha** — Live on Base Sepolia with Crossmint wallet integration. Real zkML proofs, real transfers.
 
-## The Problem
+## On-Chain Controls + ML Verification
 
-Smart contracts can enforce simple rules:
+**Wallets like Crossmint** provide robust on-chain spending controls:
+- Spending limits, multi-sig, role-based permissions
+- Programmable policies enforced at the smart contract level
+
+**Some enterprise policies require ML inference** that can't run on-chain:
+- Vendor risk scoring models
+- Historical performance analysis
+- Multi-factor approval matrices
+
 ```solidity
-require(amount <= limit);  // ✓ Works
+// ML inference is infeasible on-chain — gas costs explode, EVM can't run neural networks
+require(mlModel.evaluate(vendorRisk, history, budget, compliance) == APPROVE);
 ```
-
-Enterprise spending policies require ML-based decisions:
-```solidity
-require(mlModel.evaluate(vendorRisk, history, budget, compliance) == APPROVE);  // ✗ Infeasible on-chain
-```
-
-**This computation cannot run on-chain.** Gas costs explode with complexity. ML inference is infeasible in the EVM.
 
 ## The Solution
 
-**zkML** bridges the gap:
+**zkML extends on-chain controls** to ML-based policies:
 - Run complex policy models **off-chain**
-- Generate cryptographic proofs of correct execution
+- Generate cryptographic proofs of correct execution (~48KB SNARK)
 - Verify proofs before authorizing payments
 
-Your CFO's policy has 6 factors. Your smart contract checks 1. zkML proves all 6 were evaluated.
+On-chain controls handle rule-based policies. zkML proves ML-based policies were evaluated correctly.
 
 ## Quick Start
 

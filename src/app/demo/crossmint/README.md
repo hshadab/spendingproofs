@@ -1,40 +1,49 @@
 # Verifiable Agentic Commerce: Crossmint + zkML
 
-Combining **Crossmint's enterprise wallet infrastructure** with **zkML policy proofs** for cryptographically verifiable AI spending decisions.
+Extending **Crossmint's on-chain spending controls** with **zkML proofs for ML-based policies** — enabling cryptographically verifiable AI spending decisions.
 
-## The Problem: Smart Contracts Have a Complexity Ceiling
+## Crossmint's On-Chain Policy Enforcement
 
-Smart contracts excel at simple rules:
-```solidity
-require(amount <= limit);  // ✓ Works great
-```
+Crossmint already provides robust on-chain spending controls:
+- **Spending limits** enforced at the smart contract level
+- **Multi-sig requirements** for high-value transactions
+- **Role-based permissions** with delegated signers
+- **Programmable policies** stored on-chain, not in opaque TEEs
 
-But enterprise spending policies require:
-- ML-based vendor risk scoring
+These work excellently for rule-based policies like `require(amount <= limit)`.
+
+## Extending to ML-Based Policies
+
+Some enterprise scenarios require ML inference that can't run on-chain:
+- Vendor risk scoring models
 - Historical performance analysis
 - Multi-factor approval matrices
-- Category budget tracking
-- Compliance verification
+- Dynamic compliance evaluation
 
 ```solidity
-require(mlModel.evaluate(vendorRisk, history, budget, compliance) == APPROVE);  // ✗ Infeasible
+// ML inference is infeasible on-chain — gas costs explode, EVM can't run neural networks
+require(mlModel.evaluate(vendorRisk, history, budget, compliance) == APPROVE);
 ```
 
-**This computation is infeasible on-chain.** Gas costs explode with complexity. ML inference cannot run in the EVM.
-
-## The Solution: zkML + Crossmint
-
-**zkML** bridges this gap:
+**zkML extends Crossmint's verification capabilities** to these ML-based policies:
 - Run complex policy models **off-chain**
-- Generate cryptographic proofs of correct execution
-- Verify proofs **on-chain** (or off-chain before payment)
+- Generate cryptographic proofs of correct execution (~48KB SNARK)
+- Verify proofs before payment execution
+- Crossmint handles the actual wallet + transfer infrastructure
 
-**Crossmint** provides the enterprise wallet infrastructure:
-- MPC wallets with Fireblocks-backed security
-- Token transfer APIs with metadata for audit trails
+## The Integration
+
+**Crossmint** provides enterprise wallet infrastructure:
+- Smart wallets with on-chain permissions
+- Token transfer APIs with audit metadata
 - Gas abstraction and multi-chain support
 
-**Together**: Complex AI decisions + Cryptographic verification + Enterprise-grade payments
+**zkML** provides cryptographic proof of ML policy execution:
+- Proves the exact model ran on exact inputs
+- Privacy-preserving (budget details stay hidden)
+- Unforgeable, mathematically verifiable
+
+**Together**: Crossmint's trusted payment infrastructure + zkML's ML verification = enterprise-grade agentic commerce
 
 ---
 
@@ -211,8 +220,8 @@ src/
 
 ## Summary
 
-**Crossmint** provides the enterprise wallet infrastructure.
-**zkML** provides cryptographic proof of policy compliance.
-**Together**: Verifiable agentic commerce that CFOs can trust.
+**Crossmint** provides enterprise wallet infrastructure with on-chain spending controls.
+**zkML** extends verification to ML-based policies that can't run on-chain.
+**Together**: The full spectrum of policy enforcement — from simple limits to complex ML models.
 
-> Smart contracts check 1 factor. Our policy model checks 6. zkML proves all 6 were evaluated — and Crossmint executes the payment.
+> Crossmint enforces rule-based policies on-chain. zkML proves ML-based policies were evaluated correctly. Together, they enable enterprise-grade agentic commerce.
