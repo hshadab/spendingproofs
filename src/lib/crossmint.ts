@@ -64,6 +64,8 @@ export interface TransferResult {
 export async function createWallet(
   userId: string = 'zkml-demo-agent'
 ): Promise<CrossmintWallet> {
+  const chain = process.env.NEXT_PUBLIC_CROSSMINT_CHAIN || 'base-sepolia';
+
   const response = await fetch(`${CROSSMINT_API_URL}/${API_VERSION}/wallets`, {
     method: 'POST',
     headers: {
@@ -72,7 +74,7 @@ export async function createWallet(
     },
     body: JSON.stringify({
       chainType: 'evm',
-      type: 'mpc',
+      type: 'smart',
       linkedUser: `userId:${userId}`,
     }),
   });
@@ -86,7 +88,7 @@ export async function createWallet(
   return {
     address: data.address,
     type: data.type,
-    chain: 'evm',
+    chain: data.config?.chain || chain,
     linkedUser: data.linkedUser,
     createdAt: data.createdAt,
   };
