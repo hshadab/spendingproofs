@@ -94,21 +94,9 @@ export async function createWallet(
   };
 }
 
-/**
- * Get the demo wallet address from private key
- */
-async function getDemoWalletAddress(): Promise<string | null> {
-  const privateKey = process.env.DEMO_WALLET_PRIVATE_KEY;
-  if (!privateKey) return null;
-
-  try {
-    const { privateKeyToAccount } = await import('viem/accounts');
-    const account = privateKeyToAccount(privateKey as `0x${string}`);
-    return account.address;
-  } catch {
-    return null;
-  }
-}
+// Demo wallet address (derived from DEMO_WALLET_PRIVATE_KEY)
+// This avoids dynamic imports which can cause issues in Next.js
+const DEMO_WALLET_ADDRESS = process.env.NEXT_PUBLIC_DEMO_WALLET_ADDRESS || '0x0e9AFe2499211c3E35e570968d1047Fcf7488c60';
 
 /**
  * Get or create wallet for the demo agent
@@ -119,18 +107,15 @@ export async function getOrCreateAgentWallet(): Promise<CrossmintWallet> {
   const chain = process.env.NEXT_PUBLIC_CROSSMINT_CHAIN || 'base-sepolia';
   const isTestnet = chain.includes('sepolia') || chain.includes('testnet') || chain.includes('amoy');
 
-  if (isTestnet) {
-    // For testnets, use the demo wallet (direct transfers)
-    const demoAddress = await getDemoWalletAddress();
-    if (demoAddress) {
-      return {
-        address: demoAddress,
-        type: 'demo',
-        chain,
-        linkedUser: 'demo-wallet',
-        createdAt: new Date().toISOString(),
-      };
-    }
+  // For testnets, use the demo wallet (direct transfers)
+  if (isTestnet && process.env.DEMO_WALLET_PRIVATE_KEY) {
+    return {
+      address: DEMO_WALLET_ADDRESS,
+      type: 'demo',
+      chain,
+      linkedUser: 'demo-wallet',
+      createdAt: new Date().toISOString(),
+    };
   }
 
   // For mainnets or fallback, use Crossmint smart wallet
