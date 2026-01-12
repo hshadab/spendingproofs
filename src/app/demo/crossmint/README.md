@@ -14,7 +14,7 @@ These work excellently for rule-based policies like `require(amount <= limit)`.
 
 ## Extending to ML-Based Policies
 
-Some enterprise scenarios require ML inference that can't run on-chain:
+**Some spending decisions need more than simple rules.** "Should we approve this vendor?" depends on risk profile, past performance, budget utilization, and compliance status — evaluated together:
 - Vendor risk scoring models
 - Historical performance analysis
 - Multi-factor approval matrices

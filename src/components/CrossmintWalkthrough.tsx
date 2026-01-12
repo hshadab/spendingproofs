@@ -110,7 +110,7 @@ const WORKFLOW_STEPS: WalkthroughStep[] = [
     id: 'intro-1',
     phase: 'intro',
     title: 'Crossmint + zkML',
-    description: 'Crossmint handles rule-based policies on-chain (limits, permissions, multi-sig). zkML adds verification for ML-based policies that require off-chain computation — proving the model ran correctly without re-executing it on-chain.',
+    description: 'Crossmint handles rule-based policies on-chain (limits, permissions, multi-sig). Some decisions need more context — is this vendor risky? zkML verifies those ML-based evaluations.',
     crossmintNote: 'On-chain controls for rules. zkML proofs for ML-based policies.',
     duration: 6000,
     businessAnnotation: {
@@ -125,7 +125,7 @@ const WORKFLOW_STEPS: WalkthroughStep[] = [
     id: 'intro-2',
     phase: 'intro',
     title: 'Why zkML for ML Policies',
-    description: 'Some enterprise policies require ML inference — vendor risk scoring, historical analysis, dynamic compliance. ML can\'t run on-chain (EVM gas limits). zkML proves the model ran correctly off-chain.',
+    description: '"Is this vendor risky?" isn\'t a yes/no rule — it\'s a model weighing multiple signals. ML can\'t run on-chain. zkML proves it ran correctly off-chain.',
     crossmintNote: 'Cryptographic proof of correct ML execution.',
     duration: 6000,
     businessAnnotation: {
@@ -925,7 +925,7 @@ export function CrossmintWalkthrough({
                 </div>
               </div>
               <div className="mt-3 pt-3 border-t border-gray-700/50 text-[10px] text-gray-400">
-                ML can&apos;t run on-chain (EVM gas limits). zkML proves the model ran correctly off-chain.
+                Complex decisions need ML. ML can&apos;t run on-chain. zkML proves it ran correctly.
               </div>
             </div>
 

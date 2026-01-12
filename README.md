@@ -14,7 +14,7 @@ zkML infrastructure that proves AI agents followed their spending policies — e
 - Spending limits, multi-sig, role-based permissions
 - Programmable policies enforced at the smart contract level
 
-**Some enterprise policies require ML inference** that can't run on-chain:
+**Some spending decisions need more than simple rules.** "Should we approve this vendor?" depends on risk profile, past performance, budget utilization, and compliance status — evaluated together:
 - Vendor risk scoring models
 - Historical performance analysis
 - Multi-factor approval matrices
