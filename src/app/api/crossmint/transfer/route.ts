@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
       try {
         const wallet = await getOrCreateAgentWallet();
         const result = await smartTransfer(
-          `evm:${chain}:${wallet.address}`,
+          wallet.address,
           to,
           amount,
           chain,
