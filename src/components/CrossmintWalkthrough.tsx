@@ -110,12 +110,12 @@ const WORKFLOW_STEPS: WalkthroughStep[] = [
     id: 'intro-1',
     phase: 'intro',
     title: 'Crossmint + zkML',
-    description: 'Crossmint provides robust on-chain spending controls — limits, multi-sig, role-based permissions. These work great for rule-based policies. But some enterprise scenarios require ML inference: vendor risk scoring, historical analysis, dynamic compliance.',
-    crossmintNote: 'Crossmint enforces rule-based policies on-chain. zkML extends this to ML-based policies.',
+    description: 'Crossmint handles rule-based policies on-chain (limits, permissions, multi-sig). zkML adds verification for ML-based policies that require off-chain computation — proving the model ran correctly without re-executing it on-chain.',
+    crossmintNote: 'On-chain controls for rules. zkML proofs for ML-based policies.',
     duration: 6000,
     businessAnnotation: {
-      title: 'Extending On-Chain Controls',
-      takeaway: 'Crossmint handles rule-based policies. zkML proves ML-based policies were evaluated correctly.',
+      title: 'Complementary Verification',
+      takeaway: 'Crossmint enforces rules on-chain. zkML proves ML policies were evaluated correctly.',
       color: 'crossmint',
       metric: '6',
       metricLabel: 'ML factors verified',
@@ -125,12 +125,12 @@ const WORKFLOW_STEPS: WalkthroughStep[] = [
     id: 'intro-2',
     phase: 'intro',
     title: 'Why zkML for ML Policies',
-    description: 'ML models can\'t run on-chain — gas costs explode, EVM can\'t execute neural networks. zkML solves this: run the model off-chain, generate a cryptographic proof of correct execution, verify the proof before payment.',
-    crossmintNote: 'Prove the ML model ran correctly without re-running it on-chain.',
+    description: 'Some enterprise policies require ML inference — vendor risk scoring, historical analysis, dynamic compliance. ML can\'t run on-chain (EVM gas limits). zkML proves the model ran correctly off-chain.',
+    crossmintNote: 'Cryptographic proof of correct ML execution.',
     duration: 6000,
     businessAnnotation: {
-      title: 'Complementary Verification',
-      takeaway: 'On-chain controls for rules. zkML proofs for ML. Full policy coverage.',
+      title: 'Off-Chain ML, On-Chain Proof',
+      takeaway: 'Run complex models off-chain. Verify cryptographically. Full policy coverage.',
       color: 'zkml',
       metric: '100%',
       metricLabel: 'verifiable',
@@ -304,9 +304,8 @@ function AnnotationOverlay({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Step context */}
-        <div className="text-center mb-6">
-          <span className="text-xs text-gray-500 uppercase tracking-wider">Takeaway from</span>
-          <h3 className="text-lg text-gray-300 font-medium mt-1">{stepTitle}</h3>
+        <div className="text-center mb-4">
+          <h3 className="text-sm text-gray-400">{stepTitle}</h3>
         </div>
 
         {/* Metric - large and centered */}
@@ -894,7 +893,7 @@ export function CrossmintWalkthrough({
               Crossmint + zkML
             </h2>
             <p className="text-gray-400 max-w-2xl mb-4 text-sm">
-              Extending Crossmint&apos;s on-chain spending controls with zkML proofs for ML-based policies.
+              Crossmint handles rule-based policies on-chain. zkML adds verification for ML-based policies.
             </p>
 
             {/* Complementary Capabilities Section */}
@@ -920,13 +919,13 @@ export function CrossmintWalkthrough({
                     <span className="text-yellow-400 font-medium text-xs">zkML Proofs</span>
                   </div>
                   <code className="text-[10px] text-gray-300 bg-gray-800 px-2 py-1 rounded block whitespace-nowrap overflow-hidden">
-                    mlModel.evaluate(risk, history...)
+                    vendor risk, historical analysis
                   </code>
                   <p className="text-[9px] text-gray-500 mt-2">ML-based policy verification</p>
                 </div>
               </div>
               <div className="mt-3 pt-3 border-t border-gray-700/50 text-[10px] text-gray-400">
-                <span className="text-[#00D4AA] font-medium">Together:</span> Full policy coverage — from simple spending limits to complex ML-based vendor scoring and compliance checks.
+                ML can&apos;t run on-chain (EVM gas limits). zkML proves the model ran correctly off-chain.
               </div>
             </div>
 
