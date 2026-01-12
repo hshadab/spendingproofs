@@ -140,7 +140,7 @@ const WORKFLOW_STEPS: WalkthroughStep[] = [
     id: 'agent-1',
     phase: 'agent',
     title: 'Enterprise Procurement Agent',
-    description: 'An autonomous procurement agent with a Crossmint MPC Wallet as its treasury. CFO-configured policies: $50K monthly budget, $10K max per transaction, vendor risk thresholds, category budgets, and compliance requirements.',
+    description: 'An autonomous procurement agent with a dedicated treasury wallet. CFO-configured policies: $50K monthly budget, $10K max per transaction, vendor risk thresholds, category budgets, and compliance requirements.',
     crossmintNote: 'Wallet created via Crossmint Wallets API (POST /v1-alpha2/wallets) with type: evm-mpc-wallet',
     crossmintDocUrl: 'https://docs.crossmint.com/api-reference/wallets/create-wallet',
     crossmintDocLabel: 'Create Wallets API',
@@ -215,7 +215,7 @@ const WORKFLOW_STEPS: WalkthroughStep[] = [
     id: 'wallet-1',
     phase: 'wallet',
     title: 'Crossmint Proof Verification',
-    description: 'The Crossmint MPC Wallet receives the payment request with zkML proof attached. The JOLT-Atlas prover cryptographically verifies the proof before authorizing the transfer.',
+    description: 'The agent wallet receives the payment request with zkML proof attached. The proof is cryptographically verified before authorizing the transfer.',
     crossmintNote: 'Integration point: Before calling Crossmint Transfer API, verify zkML proof. Proof valid → proceed. Invalid → reject.',
     crossmintDocUrl: 'https://docs.crossmint.com/wallets/introduction',
     crossmintDocLabel: 'MPC Wallets Security',
@@ -1309,30 +1309,38 @@ export function CrossmintWalkthrough({
               <div className="p-4 border-b border-gray-800 bg-gradient-to-r from-[#00D4AA]/10 to-transparent flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="w-10 h-10 bg-[#00D4AA]/20 rounded-lg flex items-center justify-center">
-                      <Wallet className={`w-6 h-6 text-[#00D4AA] ${isPlaying ? 'animate-pulse' : ''}`} />
+                    <div className={`w-10 h-10 ${wallet.error ? 'bg-red-500/20' : 'bg-[#00D4AA]/20'} rounded-lg flex items-center justify-center`}>
+                      <Wallet className={`w-6 h-6 ${wallet.error ? 'text-red-400' : 'text-[#00D4AA]'} ${isPlaying ? 'animate-pulse' : ''}`} />
                     </div>
-                    {isPlaying && (
+                    {isPlaying && !wallet.error && (
                       <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#00D4AA] rounded-full animate-ping" />
                     )}
                   </div>
                   <div>
-                    <a href="https://docs.crossmint.com/wallets/wallets/mpc-wallets" target="_blank" rel="noopener noreferrer" className="group">
-                      <h4 className="font-semibold text-[#00D4AA] group-hover:underline flex items-center gap-1">
-                        Crossmint MPC Wallet
+                    <a href="https://docs.crossmint.com/wallets/introduction" target="_blank" rel="noopener noreferrer" className="group">
+                      <h4 className={`font-semibold ${wallet.error ? 'text-red-400' : 'text-[#00D4AA]'} group-hover:underline flex items-center gap-1`}>
+                        Agent Wallet
                         <ExternalLink className="w-3 h-3 opacity-50" />
                       </h4>
                     </a>
-                    <p className="text-xs text-gray-400">Fireblocks-backed Security</p>
+                    <p className="text-xs text-gray-400 font-mono">
+                      {wallet.loading ? 'Loading...' : wallet.address ? `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}` : 'Not connected'}
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs text-gray-400">
-                    {wallet.loading ? 'Loading...' : 'Enterprise Treasury'}
-                  </div>
-                  <div className="font-mono font-semibold">
-                    {wallet.loading ? '...' : `$${parseFloat(wallet.balanceUsdc || '0').toFixed(2)} USDC`}
-                  </div>
+                  {wallet.error ? (
+                    <div className="text-xs text-red-400">{wallet.error}</div>
+                  ) : (
+                    <>
+                      <div className="text-xs text-gray-400">
+                        {wallet.loading ? 'Loading...' : `Base Sepolia • ${wallet.chain || 'testnet'}`}
+                      </div>
+                      <div className="font-mono font-semibold">
+                        {wallet.loading ? '...' : `$${parseFloat(wallet.balanceUsdc || '0').toFixed(2)} USDC`}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -1483,19 +1491,17 @@ export function CrossmintWalkthrough({
                     <Wallet className={`w-5 h-5 text-[#00D4AA] ${isPlaying && !txHash ? 'animate-pulse' : ''}`} />
                   </div>
                   <div>
-                    <a href="https://docs.crossmint.com/wallets/wallets/mpc-wallets" target="_blank" rel="noopener noreferrer" className="text-xs text-gray-400 hover:text-[#00D4AA] flex items-center gap-1">
-                      From: Crossmint MPC Wallet <ExternalLink className="w-2.5 h-2.5" />
-                    </a>
-                    <div className="font-mono text-sm text-white truncate w-48">
-                      {wallet.address || '0xe2e8690bff...'}
+                    <div className="text-xs text-gray-400 flex items-center gap-1">
+                      From: Agent Wallet
+                    </div>
+                    <div className="font-mono text-sm text-white">
+                      {wallet.address ? `${wallet.address.slice(0, 10)}...${wallet.address.slice(-8)}` : 'Loading...'}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <a href="https://docs.crossmint.com/wallets/quickstarts/transfer-tokens-api" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00D4AA] flex items-center gap-1">
-                    Transfer API <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
-                  <span className="font-mono text-[#00D4AA]">$50,000 USDC</span>
+                  <span className="text-gray-400">Base Sepolia</span>
+                  <span className="font-mono text-[#00D4AA]">${parseFloat(wallet.balanceUsdc || '0').toFixed(2)} USDC</span>
                 </div>
               </div>
 
