@@ -278,8 +278,19 @@ export class StructuredLogger {
       }
     });
 
+    // Custom replacer to handle BigInt and Error objects
+    const replacer = (_key: string, value: unknown): unknown => {
+      if (typeof value === 'bigint') {
+        return value.toString();
+      }
+      if (value instanceof Error) {
+        return { message: value.message, name: value.name };
+      }
+      return value;
+    };
+
     const logFn = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
-    logFn(JSON.stringify(entry));
+    logFn(JSON.stringify(entry, replacer));
   }
 
   debug(message: string, context?: LogContext): void {
