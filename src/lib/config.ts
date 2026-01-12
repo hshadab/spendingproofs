@@ -58,7 +58,7 @@ export const API_CONFIG = {
     process.env.NEXT_PUBLIC_JOLT_ATLAS_URL ||
     'https://spendingproofs-prover.onrender.com',
 
-  /** Crossmint API URL (use production for sk_production_ keys) */
+  /** Crossmint API URL */
   crossmintApiUrl:
     process.env.CROSSMINT_API_URL || 'https://www.crossmint.com/api',
 

@@ -95,11 +95,45 @@ export async function createWallet(
 }
 
 /**
+ * Get the demo wallet address from private key
+ */
+async function getDemoWalletAddress(): Promise<string | null> {
+  const privateKey = process.env.DEMO_WALLET_PRIVATE_KEY;
+  if (!privateKey) return null;
+
+  try {
+    const { privateKeyToAccount } = await import('viem/accounts');
+    const account = privateKeyToAccount(privateKey as `0x${string}`);
+    return account.address;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Get or create wallet for the demo agent
- * Returns the existing wallet if it exists (idempotent by userId)
+ * For testnets: Uses demo wallet (we control the private key)
+ * For mainnets: Would use Crossmint smart wallet
  */
 export async function getOrCreateAgentWallet(): Promise<CrossmintWallet> {
-  // Crossmint API is idempotent - calling create with same userId returns existing wallet
+  const chain = process.env.NEXT_PUBLIC_CROSSMINT_CHAIN || 'base-sepolia';
+  const isTestnet = chain.includes('sepolia') || chain.includes('testnet') || chain.includes('amoy');
+
+  if (isTestnet) {
+    // For testnets, use the demo wallet (direct transfers)
+    const demoAddress = await getDemoWalletAddress();
+    if (demoAddress) {
+      return {
+        address: demoAddress,
+        type: 'demo',
+        chain,
+        linkedUser: 'demo-wallet',
+        createdAt: new Date().toISOString(),
+      };
+    }
+  }
+
+  // For mainnets or fallback, use Crossmint smart wallet
   return createWallet('zkml-demo-agent');
 }
 
@@ -138,8 +172,8 @@ export async function getWalletBalance(walletAddress: string): Promise<WalletBal
   try {
     // Base Sepolia RPC and USDC address
     const BASE_SEPOLIA_RPC = 'https://sepolia.base.org';
-    // Testnet USDC on Base Sepolia (from faucet)
-    const USDC_ADDRESS = '0x3e4ed2d6d6235f9d26707fd5d5af476fb9c91b0f';
+    // Circle's official USDC on Base Sepolia (used by Crossmint)
+    const USDC_ADDRESS = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
 
     // balanceOf(address) selector + padded address
     const paddedAddress = walletAddress.slice(2).toLowerCase().padStart(64, '0');
@@ -177,25 +211,41 @@ export async function getWalletBalance(walletAddress: string): Promise<WalletBal
   }
 }
 
+// Chain configurations for direct transfers
+const CHAIN_CONFIGS: Record<string, { id: number; name: string; rpc: string; usdc: string }> = {
+  'arc-testnet': {
+    id: 5042002,
+    name: 'Arc Testnet',
+    rpc: 'https://rpc.testnet.arc.network',
+    usdc: '0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213',
+  },
+  'base-sepolia': {
+    id: 84532,
+    name: 'Base Sepolia',
+    rpc: 'https://sepolia.base.org',
+    usdc: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // Circle's official USDC
+  },
+};
+
 /**
- * Transfer USDC on Arc testnet
- * Uses direct RPC since Crossmint staging doesn't support Arc transfers
+ * Transfer USDC via direct on-chain transfer
+ * Uses demo wallet for testnet transfers where Crossmint isn't supported
  */
 export async function transferUsdc(
   _fromWallet: string,
   toAddress: string,
   amountUsdc: number,
-  _chain: string = 'arc-testnet',
+  chain: string = 'arc-testnet',
   proofHash?: string
 ): Promise<TransferResult> {
-  // For Arc testnet, we use direct transfer via the demo wallet
-  // In production, Crossmint would handle this after verifying the proof
-  const ARC_RPC = 'https://rpc.testnet.arc.network';
-  const USDC_ADDRESS = '0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213';
-  const DEMO_PRIVATE_KEY = process.env.DEMO_WALLET_PRIVATE_KEY;
+  const chainConfig = CHAIN_CONFIGS[chain];
+  if (!chainConfig) {
+    throw new Error(`Unsupported chain for direct transfer: ${chain}`);
+  }
 
+  const DEMO_PRIVATE_KEY = process.env.DEMO_WALLET_PRIVATE_KEY;
   if (!DEMO_PRIVATE_KEY) {
-    throw new Error('DEMO_WALLET_PRIVATE_KEY not configured for Arc transfers');
+    throw new Error('DEMO_WALLET_PRIVATE_KEY not configured for direct transfers');
   }
 
   try {
@@ -203,18 +253,18 @@ export async function transferUsdc(
     const { createWalletClient, http, parseAbi } = await import('viem');
     const { privateKeyToAccount } = await import('viem/accounts');
 
-    const ARC_TESTNET = {
-      id: 5042002,
-      name: 'Arc Testnet',
+    const chainDef = {
+      id: chainConfig.id,
+      name: chainConfig.name,
       nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-      rpcUrls: { default: { http: [ARC_RPC] } },
+      rpcUrls: { default: { http: [chainConfig.rpc] } },
     };
 
     const account = privateKeyToAccount(DEMO_PRIVATE_KEY as `0x${string}`);
 
     const client = createWalletClient({
       account,
-      chain: ARC_TESTNET,
+      chain: chainDef,
       transport: http(),
     });
 
@@ -222,15 +272,16 @@ export async function transferUsdc(
     const amountWei = BigInt(Math.round(amountUsdc * 1_000_000));
 
     const hash = await client.writeContract({
-      address: USDC_ADDRESS,
+      address: chainConfig.usdc as `0x${string}`,
       abi: parseAbi(['function transfer(address to, uint256 amount) returns (bool)']),
       functionName: 'transfer',
       args: [toAddress as `0x${string}`, amountWei],
     });
 
-    logger.info('Transfer executed', {
+    logger.info('Direct transfer executed', {
       action: 'transfer',
       txHash: hash,
+      chain,
       proofHash: proofHash || 'none',
       amount: amountUsdc,
       recipient: toAddress,
@@ -240,13 +291,13 @@ export async function transferUsdc(
       id: hash,
       status: 'success',
       txHash: hash,
-      chain: 'arc-testnet',
+      chain,
       amount: amountUsdc.toString(),
       recipient: toAddress,
     };
   } catch (error) {
-    logger.error('Arc transfer error', { action: 'transfer', error });
-    throw new Error(`Arc transfer failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    logger.error('Direct transfer error', { action: 'transfer', chain, error });
+    throw new Error(`Direct transfer failed on ${chain}: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -405,9 +456,10 @@ export async function smartTransfer(
   chain: string = 'arc-testnet',
   proofHash?: string
 ): Promise<TransferResult & { method: 'crossmint' | 'direct' }> {
-  // Chains supported by Crossmint for transfers
+  // Chains supported by Crossmint smart wallet transfers (mainnet only)
+  // Testnets like base-sepolia are NOT supported for smart wallets in production
   const crossmintSupportedChains = [
-    'base-sepolia', 'polygon-amoy', 'base', 'polygon', 'arbitrum', 'optimism'
+    'base', 'polygon', 'arbitrum', 'optimism', 'avalanche', 'bsc', 'scroll', 'zora'
   ];
 
   if (crossmintSupportedChains.includes(chain) && INTEGRATION_MODE === 'crossmint') {
