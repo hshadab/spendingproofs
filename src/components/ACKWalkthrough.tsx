@@ -171,47 +171,63 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'proof-1',
     phase: 'proof',
-    title: 'Generating Spending Proof',
-    description: 'JOLT-Atlas compiles the spending policy into a SNARK circuit. The agent generates a ~48KB cryptographic proof that the policy was correctly evaluated.',
-    ackNote: 'Proof is bound to the agent DID - only this agent could have generated it.',
-    duration: 8000,
+    title: 'Policy Model Evaluation',
+    description: 'The spending policy ONNX model evaluates 6 factors: price ($0.01), budget ($100), vendor risk (15%), vendor history (92%), category budget, and compliance status.',
+    ackNote: 'This exact model execution will be proven - same inputs, same computation, same output.',
+    duration: 4000,
     annotation: {
-      title: 'Cryptographic Compliance',
-      takeaway: 'Not just "the agent says it checked" but mathematical proof it did.',
+      title: 'Deterministic Policy',
+      takeaway: 'The model is deterministic: given inputs X, it ALWAYS produces output Y. This is what we prove.',
       color: 'zkml',
-      metric: '~48KB',
-      metricLabel: 'proof size',
+      metric: '6',
+      metricLabel: 'policy factors',
     },
   },
   {
     id: 'proof-2',
     phase: 'proof',
-    title: 'Proof Verified',
-    description: 'The zkML proof confirms: correct policy model was used, all inputs were valid, decision followed policy rules. This is unforgeable.',
+    title: 'Generating SNARK Proof',
+    description: 'JOLT-Atlas runs the ONNX policy model inside a SNARK circuit, generating a ~48KB cryptographic proof that the exact model ran on the exact inputs.',
+    ackNote: 'Proof generation takes 4-12 seconds. The proof is unforgeable.',
+    duration: 8000,
+  },
+  {
+    id: 'proof-3',
+    phase: 'proof',
+    title: 'Local Proof Verification',
+    description: 'The proof is verified locally (off-chain) in <150ms. This verification gates the payment - no valid proof means no transfer.',
+    ackNote: 'Verification is instant. Payment is blocked until proof is confirmed valid.',
     duration: 3000,
+    annotation: {
+      title: 'Local Verification Gates Payment',
+      takeaway: 'Proof verified OFF-CHAIN before payment. On-chain attestation is optional (audit trail only).',
+      color: 'zkml',
+      metric: '<150ms',
+      metricLabel: 'verification',
+    },
   },
   {
     id: 'payment-1',
     phase: 'payment',
-    title: 'Executing Payment on Arc',
-    description: 'With identity established and policy verified, the agent executes payment on Arc Testnet. The proof hash is included for on-chain audit.',
-    ackNote: 'Arc provides fast finality and USDC-native gas for seamless agent payments.',
+    title: 'Payment Authorized',
+    description: 'Local proof verification passed. The agent is now authorized to execute the USDC transfer on Arc Testnet.',
+    ackNote: 'The proof hash will be included in the receipt for audit purposes.',
     docUrl: 'https://arc.network',
     docLabel: 'Arc Network',
     duration: 4000,
     annotation: {
-      title: 'Verified Execution',
-      takeaway: 'Payment only proceeds after identity and policy are cryptographically verified.',
+      title: 'Proof-Gated Payment',
+      takeaway: 'Payment only executes because local verification confirmed policy compliance.',
       color: 'arc',
-      metric: '<1s',
-      metricLabel: 'finality',
+      metric: '$0.01',
+      metricLabel: 'USDC transfer',
     },
   },
   {
     id: 'payment-2',
     phase: 'payment',
     title: 'Transaction Confirmed',
-    description: 'The USDC transfer is confirmed on Arc. Transaction hash provides permanent on-chain record linking to the verified spending proof.',
+    description: 'USDC transfer confirmed on Arc Testnet. On-chain attestation of proofHash is optional - for audit trail, not for gating.',
     duration: 3000,
   },
   {
@@ -995,7 +1011,53 @@ export function ACKWalkthrough() {
           {/* Proof Phase */}
           {currentStep.phase === 'proof' && (
             <div>
-              <h2 className="text-2xl font-bold mb-4 text-white">Generating zkML Proof</h2>
+              <h2 className="text-2xl font-bold mb-4 text-white">
+                {currentStep.id === 'proof-1' ? 'Policy Model Inputs' :
+                 currentStep.id === 'proof-2' ? 'Generating SNARK Proof' :
+                 'Local Proof Verification'}
+              </h2>
+
+              {/* Policy Model Inputs (shown first) */}
+              {currentStep.id === 'proof-1' && !spendingProof && (
+                <div className="bg-[#0d1117] border border-purple-500/30 rounded-xl p-4 max-w-xl mb-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Shield className="w-5 h-5 text-purple-400" />
+                    <span className="text-purple-400 font-semibold text-sm">ONNX Policy Model</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-3">
+                    These inputs are evaluated by the spending-model.onnx neural network:
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Price</span>
+                      <span className="text-white font-mono">$0.01</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Budget</span>
+                      <span className="text-white font-mono">$100</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Vendor Risk</span>
+                      <span className="text-green-400 font-mono">15%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Vendor History</span>
+                      <span className="text-green-400 font-mono">92%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Category Budget</span>
+                      <span className="text-white font-mono">$15</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Compliance</span>
+                      <span className="text-green-400 font-mono">true</span>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-700 text-xs text-gray-500">
+                    The SNARK will prove this exact model ran on these exact inputs.
+                  </div>
+                </div>
+              )}
 
               {/* Proof Progress */}
               {(proofState.status === 'running' || proofState.status === 'error') && (
@@ -1011,37 +1073,55 @@ export function ACKWalkthrough() {
 
               {/* Proof Result */}
               {spendingProof && (
-                <div className="bg-[#0d1117] border border-yellow-500/30 rounded-xl p-4 max-w-xl">
-                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-400" />
-                    <span className="text-green-400 font-semibold text-sm">Proof Generated</span>
+                <div className="space-y-4 max-w-xl">
+                  <div className="bg-[#0d1117] border border-yellow-500/30 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle2 className="w-5 h-5 text-green-400" />
+                      <span className="text-green-400 font-semibold text-sm">Proof Generated</span>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Model Output</span>
+                        <span className={`font-medium ${spendingProof.decision.shouldBuy ? 'text-green-400' : 'text-red-400'}`}>
+                          {spendingProof.decision.shouldBuy ? 'APPROVE' : 'REJECT'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Confidence</span>
+                        <span className="text-white">{(spendingProof.decision.confidence * 100).toFixed(1)}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Proof Hash</span>
+                        <span className="text-yellow-400 font-mono text-xs">
+                          {spendingProof.proofHash.slice(0, 14)}...
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Proof Size</span>
+                        <span className="text-white">{(spendingProof.proofSizeBytes / 1024).toFixed(1)} KB</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Generation Time</span>
+                        <span className="text-white">{(spendingProof.generationTimeMs / 1000).toFixed(1)}s</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Decision</span>
-                      <span className={`font-medium ${spendingProof.decision.shouldBuy ? 'text-green-400' : 'text-red-400'}`}>
-                        {spendingProof.decision.shouldBuy ? 'APPROVED' : 'REJECTED'}
-                      </span>
+
+                  {/* Local Verification Status */}
+                  {currentStep.id === 'proof-3' && (
+                    <div className="bg-[#0d1117] border border-green-500/30 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CheckCircle2 className="w-5 h-5 text-green-400" />
+                        <span className="text-green-400 font-semibold text-sm">Local Verification Passed</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mb-2">
+                        Proof verified off-chain in &lt;150ms. Payment is now authorized.
+                      </p>
+                      <div className="p-2 bg-green-500/10 border border-green-500/20 rounded text-xs text-green-400">
+                        This verification gates payment. On-chain attestation is optional (audit only).
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Confidence</span>
-                      <span className="text-white">{(spendingProof.decision.confidence * 100).toFixed(1)}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Proof Hash</span>
-                      <span className="text-yellow-400 font-mono text-xs">
-                        {spendingProof.proofHash.slice(0, 14)}...
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Size</span>
-                      <span className="text-white">{(spendingProof.proofSizeBytes / 1024).toFixed(1)} KB</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Generation Time</span>
-                      <span className="text-white">{(spendingProof.generationTimeMs / 1000).toFixed(1)}s</span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               )}
             </div>
