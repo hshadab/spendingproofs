@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import {
   useWriteContract,
   useWaitForTransactionReceipt,
@@ -32,16 +32,56 @@ const ERC20_ABI = [
   },
 ] as const;
 
+export interface GatedTransferResult {
+  success: boolean;
+  transfer?: {
+    txHash: string;
+    attestationTxHash?: string;
+    explorerUrl: string;
+    attestationExplorerUrl?: string;
+    to: string;
+    amount: number;
+    proofHash: string;
+    verificationHash: string;
+    verification: {
+      decision: boolean;
+      confidence: number;
+      timestamp: number;
+    };
+    note: string;
+  };
+  steps?: { step: string; status: string; txHash?: string; hash?: string }[];
+  error?: string;
+}
+
 export interface UseACKPaymentReturn {
-  // Execute payment (live mode)
+  // Execute payment (direct mode - user wallet)
   executeTransfer: (recipient: Address, amount: string) => void;
 
-  // State
+  // Execute gated payment (API mode - SpendingGateWallet)
+  // Attests verificationHash (not proofHash) - captures that verification passed
+  executeGatedTransfer: (
+    recipient: Address,
+    amount: string,
+    proofHash: string,
+    verification: {
+      decision: boolean;    // shouldBuy result
+      confidence: number;   // 0-1
+    },
+    agentDid?: string
+  ) => Promise<GatedTransferResult>;
+
+  // State (direct mode)
   isPending: boolean;
   isConfirming: boolean;
   isConfirmed: boolean;
   error: Error | null;
   txHash: `0x${string}` | undefined;
+
+  // State (gated mode)
+  gatedResult: GatedTransferResult | null;
+  isGatedPending: boolean;
+  gatedError: string | null;
 
   // Balance
   balance: bigint | undefined;
@@ -52,11 +92,23 @@ export interface UseACKPaymentReturn {
 }
 
 /**
- * Hook for executing real USDC payments on Arc Testnet
- * Used by ACK demo in Live Mode
+ * Hook for executing USDC payments on Arc Testnet
+ *
+ * Supports two modes:
+ * 1. Direct transfer (executeTransfer) - User signs tx from their wallet
+ * 2. Gated transfer (executeGatedTransfer) - API handles attestation + SpendingGateWallet transfer
+ *
+ * Option B Flow (Gated):
+ * 1. Submit proof to ProofAttestation contract (required)
+ * 2. Execute gatedTransfer via SpendingGateWallet (checks attestation on-chain)
  */
 export function useACKPayment(userAddress: Address | undefined): UseACKPaymentReturn {
-  // Write contract hook
+  // Gated transfer state
+  const [gatedResult, setGatedResult] = useState<GatedTransferResult | null>(null);
+  const [isGatedPending, setIsGatedPending] = useState(false);
+  const [gatedError, setGatedError] = useState<string | null>(null);
+
+  // Write contract hook (for direct mode)
   const {
     writeContract,
     data: txHash,
@@ -65,7 +117,7 @@ export function useACKPayment(userAddress: Address | undefined): UseACKPaymentRe
     reset: resetWrite,
   } = useWriteContract();
 
-  // Wait for transaction receipt
+  // Wait for transaction receipt (direct mode)
   const {
     isLoading: isConfirming,
     isSuccess: isConfirmed,
@@ -85,7 +137,7 @@ export function useACKPayment(userAddress: Address | undefined): UseACKPaymentRe
   const formattedBalance =
     balance !== undefined ? (Number(balance) / 1e6).toFixed(2) : '0.00';
 
-  // Execute transfer
+  // Execute direct transfer (user wallet)
   const executeTransfer = useCallback(
     (recipient: Address, amount: string) => {
       if (!userAddress) {
@@ -106,21 +158,88 @@ export function useACKPayment(userAddress: Address | undefined): UseACKPaymentRe
     [userAddress, writeContract]
   );
 
+  // Execute gated transfer via API (SpendingGateWallet)
+  // Attests verificationHash = keccak256(proofHash, decision, confidence, timestamp)
+  const executeGatedTransfer = useCallback(
+    async (
+      recipient: Address,
+      amount: string,
+      proofHash: string,
+      verification: { decision: boolean; confidence: number },
+      agentDid?: string
+    ): Promise<GatedTransferResult> => {
+      setIsGatedPending(true);
+      setGatedError(null);
+      setGatedResult(null);
+
+      try {
+        const response = await fetch('/api/ack/transfer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: recipient,
+            amount: parseFloat(amount),
+            proofHash,
+            // Verification result - this is what gets attested
+            decision: verification.decision,
+            confidence: verification.confidence,
+            verifiedAt: Math.floor(Date.now() / 1000),
+            agentDid,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          const errorMsg = data.error || 'Transfer failed';
+          setGatedError(errorMsg);
+          setGatedResult({ success: false, error: errorMsg, steps: data.steps });
+          return { success: false, error: errorMsg, steps: data.steps };
+        }
+
+        setGatedResult({ success: true, transfer: data.transfer, steps: data.steps });
+        return { success: true, transfer: data.transfer, steps: data.steps };
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+        setGatedError(errorMsg);
+        setGatedResult({ success: false, error: errorMsg });
+        return { success: false, error: errorMsg };
+      } finally {
+        setIsGatedPending(false);
+      }
+    },
+    []
+  );
+
   const reset = useCallback(() => {
     resetWrite();
+    setGatedResult(null);
+    setGatedError(null);
+    setIsGatedPending(false);
   }, [resetWrite]);
 
   const error = writeError || receiptError || null;
 
   return {
+    // Direct mode
     executeTransfer,
     isPending,
     isConfirming,
     isConfirmed,
     error,
     txHash,
+
+    // Gated mode
+    executeGatedTransfer,
+    gatedResult,
+    isGatedPending,
+    gatedError,
+
+    // Balance
     balance: balance as bigint | undefined,
     formattedBalance,
+
+    // Reset
     reset,
   };
 }

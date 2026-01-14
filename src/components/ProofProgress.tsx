@@ -140,16 +140,6 @@ export function ProofProgress({ status, progress, elapsedMs, steps }: ProofProgr
         ))}
       </div>
 
-      {/* Educational note */}
-      {status === 'running' && (
-        <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-          <p className="text-sm text-purple-700 text-purple-300">
-            <strong>Why this takes time:</strong> Zero-knowledge proofs require
-            cryptographic computation to prove model execution without revealing
-            private inputs. This is a real JOLT-Atlas SNARK proof.
-          </p>
-        </div>
-      )}
     </div>
   );
 }
