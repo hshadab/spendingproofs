@@ -62,8 +62,8 @@ export function ProofProgress({ status, progress, elapsedMs, steps }: ProofProgr
     <div className="bg-[#0d1117] rounded-xl border border-gray-800 border-gray-800 p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-white text-white">
-          {status === 'running' && 'Generating zkML Proof'}
-          {status === 'complete' && 'Proof Generated'}
+          {status === 'running' && 'Generating zkML Policy Proof'}
+          {status === 'complete' && 'zkML Policy Proof Generated'}
           {status === 'error' && 'Proof Generation Failed'}
         </h3>
         <div className="flex items-center gap-2 text-sm text-gray-500">

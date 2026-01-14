@@ -43,7 +43,7 @@ import type { SpendingProof } from '@/lib/types';
 const DEMO_WALLET_ADDRESS = '0x742d35Cc6634C0532925a3b844Bc9e7595f8fE00' as const;
 
 // Phase definitions
-const PHASES = ['intro', 'identity', 'proof', 'payment', 'receipt'] as const;
+const PHASES = ['intro', 'identity', 'proof', 'payment', 'receipt', 'complete'] as const;
 type Phase = typeof PHASES[number];
 
 // Phase colors
@@ -53,14 +53,16 @@ const PHASE_COLORS: Record<Phase, string> = {
   proof: 'from-yellow-500 to-orange-500',
   payment: 'from-green-500 to-emerald-500',
   receipt: 'from-cyan-500 to-blue-500',
+  complete: 'from-green-400 to-cyan-400',
 };
 
 const PHASE_LABELS: Record<Phase, string> = {
   intro: 'Introduction',
   identity: 'ACK-ID',
-  proof: 'zkML Proof',
+  proof: 'zkML Policy Proof',
   payment: 'Payment',
   receipt: 'Receipt',
+  complete: 'Complete',
 };
 
 // Business annotation
@@ -186,7 +188,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'proof-2',
     phase: 'proof',
-    title: 'Generating SNARK Proof',
+    title: 'Generating zkML Policy Proof',
     description: 'JOLT-Atlas runs the spending policy ONNX model inside a SNARK circuit, generating a ~48KB cryptographic proof that the exact model ran on the exact inputs.',
     ackNote: 'Proof generation takes 4-12 seconds. The proof is unforgeable.',
     duration: 8000,
@@ -209,14 +211,14 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'payment-1',
     phase: 'payment',
-    title: 'On-Chain Verification Attestation',
+    title: 'On-Chain Proof Verification Attestation',
     description: 'Submitting verificationHash to ProofAttestation contract. This attests that verification PASSED (not just that a proof exists). verificationHash = hash(proofHash + decision + confidence + timestamp).',
     ackNote: 'Live Mode: Real attestation tx. We attest the verification result, not just the proof.',
     docUrl: 'https://arc.network',
     docLabel: 'Arc Network',
     duration: 6000,
     annotation: {
-      title: 'Verification Attestation',
+      title: 'Proof Verification Attestation',
       takeaway: 'Attesting that verification PASSED. SpendingGateWallet checks this before releasing funds.',
       color: 'arc',
       metric: 'Required',
@@ -226,7 +228,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'payment-2',
     phase: 'payment',
-    title: 'Gated Transfer Executed',
+    title: 'Gated USDC Transfer Executed',
     description: 'SpendingGateWallet verified the attested verificationHash on-chain, then released $0.01 USDC. Full trustless flow: verification result triggers payment.',
     ackNote: 'Live Mode: 2 real transactions — verification attestation, then gated transfer.',
     duration: 6000,
@@ -241,7 +243,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'receipt-1',
     phase: 'receipt',
-    title: 'Issuing Payment Receipt',
+    title: 'Issuing USDC Payment Receipt',
     description: 'ACK-Pay issues a PaymentReceiptCredential - a W3C Verifiable Credential proving the payment was made by a verified agent following approved policy.',
     ackNote: 'Receipt links: Agent DID + Proof Hash + Tx Hash. Complete audit chain.',
     docUrl: 'https://github.com/agentcommercekit/ack',
@@ -258,9 +260,23 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'receipt-2',
     phase: 'receipt',
-    title: 'Complete: Full Audit Trail',
+    title: 'Receipt Issued',
+    description: 'PaymentReceiptCredential issued successfully. The receipt links agent identity, spending policy proof, and transaction hash for complete auditability.',
+    duration: 4000,
+  },
+  {
+    id: 'complete-1',
+    phase: 'complete',
+    title: 'Verifiable Agent Commerce Complete',
     description: 'The agent now has a complete, cryptographically verifiable audit trail: ACK-ID identity, zkML policy proof, Arc transaction, and ACK-Pay receipt.',
-    duration: 5000,
+    duration: 8000,
+    annotation: {
+      title: 'Full Stack Verification',
+      takeaway: 'Identity + Policy Proof + On-Chain Attestation + Receipt = Complete audit trail for AI agent commerce.',
+      color: 'combined',
+      metric: '4',
+      metricLabel: 'verification layers',
+    },
   },
 ];
 
@@ -391,12 +407,54 @@ export function ACKWalkthrough() {
     }
   }, [isSigningSuccess, credentialSignature, signingType, pendingIdentity, pendingReceipt, resetSigning]);
 
-  // Main playback effect
+  // Set up payment data when spendingProof becomes available (handles fast click-through)
   useEffect(() => {
-    if (!isPlaying) return;
-
     const step = WALKTHROUGH_STEPS[currentStepIndex];
-    const stepKey = `${step.id}-${isPlaying}`;
+    const isPaymentOrReceiptPhase = step.phase === 'payment' || step.phase === 'receipt';
+
+    // In demo mode, if we're past the proof phase and txHash isn't set, set it now
+    if (mode === 'demo' && isPaymentOrReceiptPhase && spendingProof && !txHash) {
+      // Set attestation data
+      const mockAttestationTxHash = `0x${Array.from({ length: 64 }, () =>
+        Math.floor(Math.random() * 16).toString(16)
+      ).join('')}`;
+      setAttestationTxHash(mockAttestationTxHash);
+
+      const mockVerificationHash = `0x${Array.from({ length: 64 }, () =>
+        Math.floor(Math.random() * 16).toString(16)
+      ).join('')}`;
+      setVerificationHash(mockVerificationHash);
+
+      // Set txHash
+      const mockTxHash = `0x${Array.from({ length: 64 }, () =>
+        Math.floor(Math.random() * 16).toString(16)
+      ).join('')}`;
+      setTxHash(mockTxHash);
+    }
+  }, [currentStepIndex, mode, spendingProof, txHash]);
+
+  // Create receipt when all prerequisites become available (handles late-arriving txHash)
+  useEffect(() => {
+    const step = WALKTHROUGH_STEPS[currentStepIndex];
+    if (step.phase === 'receipt' && !receipt && identity && spendingProof && txHash) {
+      const paymentReceipt = createPaymentReceipt({
+        txHash,
+        amount: '0.01',
+        recipient: '0x8ba1f109551bD432803012645Ac136ddd64DBA72',
+        proofHash: spendingProof.proofHash,
+        agentDid: identity.did,
+        ownerAddress: walletAddress,
+      });
+
+      // Use simulated receipt (no wallet signature required)
+      setReceipt(paymentReceipt);
+    }
+  }, [currentStepIndex, receipt, identity, spendingProof, txHash, walletAddress]);
+
+  // Main step effect - runs on step change regardless of play state
+  useEffect(() => {
+    const step = WALKTHROUGH_STEPS[currentStepIndex];
+    const stepKey = step.id;
     const alreadyProcessed = processedStepRef.current === stepKey;
 
     if (!alreadyProcessed) {
@@ -407,42 +465,16 @@ export function ACKWalkthrough() {
         // Create identity
         setAgentThoughts(['Generating DID from wallet address...']);
         setTimeout(() => {
-          if (isPlayingRef.current) {
-            const newIdentity = createAgentIdentity(walletAddress, 'Spending Agent');
-
-            if (mode === 'live' && isConnected && address) {
-              // Live Mode: Request wallet signature for credential
-              setPendingIdentity(newIdentity);
-              setSigningType('identity');
-              setAgentThoughts(prev => [...prev, `DID: ${formatDid(newIdentity.did)}`]);
-              setAgentThoughts(prev => [...prev, 'Requesting wallet signature...']);
-
-              const issuanceDate = getIsoTimestamp();
-              const expirationDate = getExpirationTimestamp();
-
-              signControllerCredential({
-                agentDid: newIdentity.did,
-                agentName: newIdentity.name,
-                controller: address,
-                issuanceDate,
-                expirationDate,
-              });
-            } else {
-              // Demo Mode: Use simulated credential
-              setIdentity(newIdentity);
-              setAgentThoughts(prev => [...prev, `DID: ${formatDid(newIdentity.did)}`]);
-            }
-          }
+          const newIdentity = createAgentIdentity(walletAddress, 'Spending Agent');
+          // Use simulated credential (no wallet signature required for smooth demo)
+          setIdentity(newIdentity);
+          setAgentThoughts(prev => [...prev, `DID: ${formatDid(newIdentity.did)}`]);
         }, 1500);
         setTimeout(() => {
-          if (isPlayingRef.current && mode === 'demo') {
-            setAgentThoughts(prev => [...prev, 'Issuing ControllerCredential...']);
-          }
+          setAgentThoughts(prev => [...prev, 'Issuing ControllerCredential...']);
         }, 2500);
         setTimeout(() => {
-          if (isPlayingRef.current && mode === 'demo') {
-            setAgentThoughts(prev => [...prev, 'Identity verified and ready.']);
-          }
+          setAgentThoughts(prev => [...prev, 'Identity verified and ready.']);
         }, 3500);
       }
 
@@ -490,77 +522,42 @@ export function ACKWalkthrough() {
           );
         } else {
           // Demo Mode: Simulate attestation + gated transfer
+          // Use short delays so clicking through works smoothly
           setTimeout(() => {
-            if (isPlayingRef.current) {
-              // Mock attestation tx
-              const mockAttestationTxHash = `0x${Array.from({ length: 64 }, () =>
-                Math.floor(Math.random() * 16).toString(16)
-              ).join('')}`;
-              setAttestationTxHash(mockAttestationTxHash);
-              // Mock verification hash
-              const mockVerificationHash = `0x${Array.from({ length: 64 }, () =>
-                Math.floor(Math.random() * 16).toString(16)
-              ).join('')}`;
-              setVerificationHash(mockVerificationHash);
-            }
-          }, 2000);
+            // Mock attestation tx
+            const mockAttestationTxHash = `0x${Array.from({ length: 64 }, () =>
+              Math.floor(Math.random() * 16).toString(16)
+            ).join('')}`;
+            setAttestationTxHash(mockAttestationTxHash);
+            // Mock verification hash
+            const mockVerificationHash = `0x${Array.from({ length: 64 }, () =>
+              Math.floor(Math.random() * 16).toString(16)
+            ).join('')}`;
+            setVerificationHash(mockVerificationHash);
+          }, 500);
           setTimeout(() => {
-            if (isPlayingRef.current) {
-              // Mock transfer tx (after attestation)
-              const mockTxHash = `0x${Array.from({ length: 64 }, () =>
-                Math.floor(Math.random() * 16).toString(16)
-              ).join('')}`;
-              setTxHash(mockTxHash);
-            }
-          }, 4000);
+            // Mock transfer tx (after attestation)
+            const mockTxHash = `0x${Array.from({ length: 64 }, () =>
+              Math.floor(Math.random() * 16).toString(16)
+            ).join('')}`;
+            setTxHash(mockTxHash);
+          }, 1000);
         }
       }
 
-      if (step.phase === 'receipt' && step.id === 'receipt-1' && identity && spendingProof && txHash) {
-        // Issue receipt
-        setTimeout(() => {
-          if (isPlayingRef.current) {
-            const paymentReceipt = createPaymentReceipt({
-              txHash,
-              amount: '0.01',
-              recipient: '0x8ba1f109551bD432803012645Ac136ddd64DBA72',
-              proofHash: spendingProof.proofHash,
-              agentDid: identity.did,
-              ownerAddress: walletAddress,
-            });
-
-            if (mode === 'live' && isConnected && address) {
-              // Live Mode: Request wallet signature for receipt
-              setPendingReceipt(paymentReceipt);
-              setSigningType('receipt');
-
-              const issuanceDate = getIsoTimestamp();
-
-              signPaymentReceipt({
-                agentDid: identity.did,
-                txHash: txHash as `0x${string}`,
-                amount: '0.01',
-                recipient: ADDRESSES.demoMerchant,
-                proofHash: spendingProof.proofHash as `0x${string}`,
-                issuanceDate,
-              });
-            } else {
-              // Demo Mode: Use simulated receipt
-              setReceipt(paymentReceipt);
-            }
-          }
-        }, 2000);
-      }
+      // Receipt creation is handled by the separate useEffect that watches for prerequisites
+      // This ensures receipt is created as soon as all data is available
     }
 
     // Timer for advancing - show annotation after a delay so user can read main content first
+    const stepAnnotation = step.annotation;
     timerRef.current = setTimeout(() => {
       if (isPlayingRef.current) {
-        if (step.annotation) {
+        if (stepAnnotation) {
           // Delay showing annotation by 2 seconds after step content is shown
           setTimeout(() => {
             if (isPlayingRef.current) {
-              setAnnotationData({ annotation: step.annotation, stepTitle: step.title });
+              setAnnotationData({ annotation: stepAnnotation, stepTitle: step.title });
               setShowingAnnotation(true);
 
               annotationTimerRef.current = setTimeout(() => {
@@ -646,6 +643,7 @@ export function ACKWalkthrough() {
       case 'proof': return <Zap className="w-4 h-4" />;
       case 'payment': return <CreditCard className="w-4 h-4" />;
       case 'receipt': return <Receipt className="w-4 h-4" />;
+      case 'complete': return <CheckCircle2 className="w-4 h-4" />;
     }
   };
 
@@ -709,7 +707,7 @@ export function ACKWalkthrough() {
                 Live
               </button>
             </div>
-            {mode === 'live' && <ConnectButton />}
+            {mode === 'live' && <ConnectButton showBalance={false} />}
 
             <div className="flex items-center gap-3 text-xs text-gray-400">
               <span>Step {currentStepIndex + 1}/{WALKTHROUGH_STEPS.length}</span>
@@ -944,7 +942,7 @@ export function ACKWalkthrough() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Zap className="w-5 h-5 text-yellow-400" />
-                      <span className="text-yellow-400 font-semibold">zkML Proof</span>
+                      <span className="text-yellow-400 font-semibold">zkML Policy Proof</span>
                     </div>
                     <span className="text-[9px] text-yellow-400/60 bg-yellow-500/10 px-1.5 py-0.5 rounded">Extends</span>
                   </div>
@@ -956,7 +954,7 @@ export function ACKWalkthrough() {
                     </div>
                     <div className="flex items-center gap-1 text-gray-500">
                       <CheckCircle2 className="w-3 h-3 text-yellow-400" />
-                      <span>SNARK Proof (~48KB)</span>
+                      <span>zkML Policy Proof (~48KB)</span>
                     </div>
                     <div className="flex items-center gap-1 text-gray-500">
                       <CheckCircle2 className="w-3 h-3 text-yellow-400" />
@@ -1020,16 +1018,6 @@ export function ACKWalkthrough() {
                 </div>
               </div>
 
-              {/* Signing Status (Live Mode) */}
-              {mode === 'live' && isSigningPending && signingType === 'identity' && (
-                <div className="bg-[#0d1117] border border-yellow-500/30 rounded-xl p-4 max-w-xl mb-4">
-                  <div className="flex items-center gap-2 text-yellow-400 text-sm">
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
-                    <span>Please sign the credential in your wallet...</span>
-                  </div>
-                </div>
-              )}
-
               {/* Identity Card */}
               {identity && (
                 <div className="bg-[#0d1117] border border-cyan-500/30 rounded-xl p-4 max-w-xl">
@@ -1080,7 +1068,7 @@ export function ACKWalkthrough() {
             <div>
               <h2 className="text-2xl font-bold mb-4 text-white">
                 {currentStep.id === 'proof-1' ? 'Spending Policy Inputs' :
-                 currentStep.id === 'proof-2' ? 'Generating SNARK Proof' :
+                 currentStep.id === 'proof-2' ? 'Generating zkML Policy Proof' :
                  'Local Proof Verification'}
               </h2>
 
@@ -1198,7 +1186,7 @@ export function ACKWalkthrough() {
           {currentStep.phase === 'payment' && (
             <div>
               <h2 className="text-2xl font-bold mb-4 text-white">
-                {currentStep.id === 'payment-1' ? 'Verification Attestation' : 'Gated Transfer'}
+                {currentStep.id === 'payment-1' ? 'Proof Verification Attestation' : 'Gated USDC Transfer'}
               </h2>
 
               {/* Live Mode: Show balance */}
@@ -1210,7 +1198,7 @@ export function ACKWalkthrough() {
                 </div>
               )}
 
-              {/* Step 1: Verification Attestation */}
+              {/* Step 1: Proof Verification Attestation */}
               {currentStep.id === 'payment-1' && (
                 <div className="space-y-4 max-w-xl">
                   {/* What's being attested */}
@@ -1278,7 +1266,7 @@ export function ACKWalkthrough() {
                 </div>
               )}
 
-              {/* Step 2: Gated Transfer */}
+              {/* Step 2: Gated USDC Transfer */}
               {currentStep.id === 'payment-2' && (
                 <div className="space-y-4 max-w-xl">
                   {/* Attestation summary */}
@@ -1298,7 +1286,7 @@ export function ACKWalkthrough() {
                     <div className="bg-[#0d1117] border border-green-500/30 rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-3">
                         <CreditCard className="w-5 h-5 text-green-400" />
-                        <span className="text-green-400 font-semibold text-sm">Executing Gated Transfer</span>
+                        <span className="text-green-400 font-semibold text-sm">Executing Gated USDC Transfer</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-400 text-sm">
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
@@ -1312,7 +1300,7 @@ export function ACKWalkthrough() {
                     <div className="bg-[#0d1117] border border-green-500/30 rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-3">
                         <CheckCircle2 className="w-5 h-5 text-green-400" />
-                        <span className="text-green-400 font-semibold text-sm">Gated Transfer Complete</span>
+                        <span className="text-green-400 font-semibold text-sm">Gated USDC Transfer Complete</span>
                         {mode === 'live' && (
                           <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full ml-2">
                             Real USDC
@@ -1358,27 +1346,53 @@ export function ACKWalkthrough() {
           {/* Receipt Phase */}
           {currentStep.phase === 'receipt' && (
             <div>
-              <h2 className="text-2xl font-bold mb-4 text-white">Payment Receipt</h2>
+              <h2 className="text-2xl font-bold mb-4 text-white">USDC Payment Receipt</h2>
 
-              {/* Signing Status (Live Mode) */}
-              {mode === 'live' && isSigningPending && signingType === 'receipt' && (
-                <div className="bg-[#0d1117] border border-yellow-500/30 rounded-xl p-4 max-w-xl mb-4">
-                  <div className="flex items-center gap-2 text-yellow-400 text-sm">
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
-                    <span>Please sign the receipt in your wallet...</span>
+              {/* Show payment summary while receipt is being created */}
+              {!receipt && (
+                <div className="space-y-4 max-w-xl">
+                  {/* Payment Summary */}
+                  <div className="bg-[#0d1117] border border-green-500/30 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle2 className="w-5 h-5 text-green-400" />
+                      <span className="text-green-400 font-semibold text-sm">Payment Complete</span>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Amount</span>
+                        <span className="text-white font-medium">$0.01 USDC</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Network</span>
+                        <span className="text-purple-400">Arc Testnet</span>
+                      </div>
+                      {txHash && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-400">Transaction</span>
+                          <a
+                            href={getExplorerTxUrl(txHash)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-cyan-400 font-mono text-xs flex items-center gap-1 hover:underline"
+                          >
+                            {txHash.slice(0, 10)}...{txHash.slice(-6)}
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
 
-              {!receipt && !isSigningPending && (
-                <div className="bg-[#0d1117] border border-cyan-500/30 rounded-xl p-4 max-w-xl">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Receipt className="w-5 h-5 text-cyan-400" />
-                    <span className="text-cyan-400 font-semibold text-sm">Issuing Receipt</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-400 text-sm">
-                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-                    <span>Creating PaymentReceiptCredential...</span>
+                  {/* Receipt Generation Status */}
+                  <div className="bg-[#0d1117] border border-cyan-500/30 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Receipt className="w-5 h-5 text-cyan-400" />
+                      <span className="text-cyan-400 font-semibold text-sm">Issuing Receipt</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+                      <span>Creating PaymentReceiptCredential...</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1427,149 +1441,150 @@ export function ACKWalkthrough() {
                     </div>
                   </div>
 
-                  {/* Complete Summary - Expanded like Crossmint */}
-                  {currentStep.id === 'receipt-2' && (
-                    <div className="space-y-4">
-                      {/* Partner Badges */}
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 px-2 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
-                          <Package className="w-3 h-3 text-cyan-400" />
-                          <span className="text-cyan-400 font-medium text-xs">Catena ACK</span>
-                        </div>
-                        <span className="text-gray-600 text-xs">+</span>
-                        <div className="flex items-center gap-2 px-2 py-1 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                          <Zap className="w-3 h-3 text-yellow-400" />
-                          <span className="text-yellow-400 font-medium text-xs">Jolt-Atlas</span>
-                        </div>
-                        <span className="text-gray-600 text-xs">+</span>
-                        <div className="flex items-center gap-2 px-2 py-1 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-                          <Shield className="w-3 h-3 text-purple-400" />
-                          <span className="text-purple-400 font-medium text-xs">Arc Testnet</span>
-                        </div>
-                      </div>
-
-                      {/* Title */}
-                      <div>
-                        <h3 className="text-lg font-bold text-white mb-1">Verifiable Agent Commerce Complete</h3>
-                        <p className="text-gray-400 text-sm">
-                          Agent executed <span className="text-green-400">$0.01 USDC</span> transfer with cryptographic proof of spending policy compliance.
-                          Verification attested on-chain, <span className="text-purple-400">SpendingGateWallet</span> verified before releasing funds.
-                        </p>
-                      </div>
-
-                      {/* Stats Grid */}
-                      <div className="grid grid-cols-4 gap-2">
-                        <div className="p-2 bg-[#0d1117] border border-green-500/30 rounded-xl text-center">
-                          <div className="text-lg font-bold text-green-400">$0.01</div>
-                          <div className="text-[10px] text-gray-400">Transfer Value</div>
-                        </div>
-                        <div className="p-2 bg-[#0d1117] border border-yellow-500/30 rounded-xl text-center">
-                          <div className="text-lg font-bold text-yellow-400">6</div>
-                          <div className="text-[10px] text-gray-400">Spending Factors</div>
-                        </div>
-                        <div className="p-2 bg-[#0d1117] border border-cyan-500/30 rounded-xl text-center">
-                          <div className="text-lg font-bold text-cyan-400">~48KB</div>
-                          <div className="text-[10px] text-gray-400">SNARK Proof</div>
-                        </div>
-                        <div className="p-2 bg-[#0d1117] border border-purple-500/30 rounded-xl text-center">
-                          <div className="text-lg font-bold text-purple-400">2</div>
-                          <div className="text-[10px] text-gray-400">On-Chain Txs</div>
-                        </div>
-                      </div>
-
-                      {/* What Happened */}
-                      <div className="bg-[#0d1117] border border-gray-700 rounded-xl p-4">
-                        <div className="flex items-center gap-2 mb-3">
-                          <CheckCircle2 className="w-4 h-4 text-green-400" />
-                          <span className="font-semibold text-white text-sm">What Happened</span>
-                        </div>
-                        <div className="space-y-2 text-xs">
-                          <div className="flex items-start gap-3 p-2 bg-cyan-900/20 rounded-lg border border-cyan-500/30">
-                            <User className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
-                            <div>
-                              <span className="text-cyan-400 font-medium">1. ACK-ID: Verifiable agent identity established</span>
-                              <p className="text-gray-400 mt-0.5">W3C DID + ControllerCredential signed by owner wallet.</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-3 p-2 bg-yellow-900/20 rounded-lg border border-yellow-500/30">
-                            <Zap className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
-                            <div>
-                              <span className="text-yellow-400 font-medium">2. zkML: Spending policy cryptographically verified</span>
-                              <p className="text-gray-400 mt-0.5">SNARK proves policy checked vendor risk, budget, and compliance correctly.</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-3 p-2 bg-purple-900/20 rounded-lg border border-purple-500/30">
-                            <Shield className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                            <div>
-                              <span className="text-purple-400 font-medium">3. On-chain: Verification result attested to Arc</span>
-                              <p className="text-gray-400 mt-0.5">verificationHash submitted to ProofAttestation contract.</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-3 p-2 bg-green-900/20 rounded-lg border border-green-500/30">
-                            <CreditCard className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                            <div>
-                              <span className="text-green-400 font-medium">4. ACK-Pay: Gated transfer executed, receipt issued</span>
-                              <p className="text-gray-400 mt-0.5">SpendingGateWallet verified attestation, then released USDC.</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* What This Demonstrates */}
-                      <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/30 rounded-xl p-4">
-                        <div className="text-sm font-medium text-cyan-400 mb-2">What This Demonstrates</div>
-                        <p className="text-gray-300 text-xs">
-                          An AI agent executed a transfer with <span className="text-cyan-400">verifiable identity</span> (ACK-ID),
-                          <span className="text-yellow-400"> cryptographic proof of spending policy compliance</span> (zkML),
-                          <span className="text-purple-400"> on-chain attestation</span>, and an
-                          <span className="text-green-400"> auditable receipt</span> (ACK-Pay).
-                        </p>
-                      </div>
-
-                      {/* Links */}
-                      <div className="bg-[#0d1117] border border-gray-700 rounded-xl p-3">
-                        <div className="flex flex-wrap items-center gap-2 text-[10px]">
-                          <span className="text-gray-500">Docs:</span>
-                          <a
-                            href="https://catenalabs.com/projects/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-2 py-1 bg-cyan-500/10 text-cyan-400 rounded border border-cyan-500/30 hover:border-cyan-400 transition-colors flex items-center gap-1"
-                          >
-                            Catena ACK <ExternalLink className="w-2.5 h-2.5" />
-                          </a>
-                          <a
-                            href="https://github.com/ICME-Lab/jolt-atlas"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-2 py-1 bg-yellow-500/10 text-yellow-400 rounded border border-yellow-500/30 hover:border-yellow-400 transition-colors flex items-center gap-1"
-                          >
-                            JOLT-Atlas <ExternalLink className="w-2.5 h-2.5" />
-                          </a>
-                          <span className="text-gray-700">|</span>
-                          <span className="text-gray-500">Contracts:</span>
-                          <a
-                            href="https://testnet.arcscan.app/address/0xBE9a5DF7C551324CB872584C6E5bF56799787952"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-2 py-1 bg-purple-500/10 text-purple-400 rounded border border-purple-500/30 hover:border-purple-400 transition-colors flex items-center gap-1"
-                          >
-                            ProofAttestation <ExternalLink className="w-2.5 h-2.5" />
-                          </a>
-                          <a
-                            href="https://testnet.arcscan.app/address/0x6A47D13593c00359a1c5Fc6f9716926aF184d138"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-2 py-1 bg-green-500/10 text-green-400 rounded border border-green-500/30 hover:border-green-400 transition-colors flex items-center gap-1"
-                          >
-                            SpendingGateWallet <ExternalLink className="w-2.5 h-2.5" />
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Complete Phase */}
+          {currentStep.phase === 'complete' && (
+            <div className="space-y-4 max-w-2xl">
+              {/* Partner Badges */}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 px-2 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                  <Package className="w-3 h-3 text-cyan-400" />
+                  <span className="text-cyan-400 font-medium text-xs">Catena ACK</span>
+                </div>
+                <span className="text-gray-600 text-xs">+</span>
+                <div className="flex items-center gap-2 px-2 py-1 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                  <Zap className="w-3 h-3 text-yellow-400" />
+                  <span className="text-yellow-400 font-medium text-xs">Jolt-Atlas</span>
+                </div>
+                <span className="text-gray-600 text-xs">+</span>
+                <div className="flex items-center gap-2 px-2 py-1 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                  <Shield className="w-3 h-3 text-purple-400" />
+                  <span className="text-purple-400 font-medium text-xs">Arc Testnet</span>
+                </div>
+              </div>
+
+              {/* Title */}
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-2">Verifiable Agent Commerce Complete</h2>
+                <p className="text-gray-400 text-sm">
+                  Agent executed <span className="text-green-400">$0.01 USDC</span> transfer with cryptographic proof of spending policy compliance.
+                  Verification attested on-chain, <span className="text-purple-400">SpendingGateWallet</span> verified before releasing funds.
+                </p>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-4 gap-2">
+                <div className="p-3 bg-[#0d1117] border border-green-500/30 rounded-xl text-center">
+                  <div className="text-xl font-bold text-green-400">$0.01</div>
+                  <div className="text-[10px] text-gray-400">Transfer Value</div>
+                </div>
+                <div className="p-3 bg-[#0d1117] border border-yellow-500/30 rounded-xl text-center">
+                  <div className="text-xl font-bold text-yellow-400">6</div>
+                  <div className="text-[10px] text-gray-400">Spending Factors</div>
+                </div>
+                <div className="p-3 bg-[#0d1117] border border-cyan-500/30 rounded-xl text-center">
+                  <div className="text-xl font-bold text-cyan-400">~48KB</div>
+                  <div className="text-[10px] text-gray-400">zkML Policy Proof</div>
+                </div>
+                <div className="p-3 bg-[#0d1117] border border-purple-500/30 rounded-xl text-center">
+                  <div className="text-xl font-bold text-purple-400">2</div>
+                  <div className="text-[10px] text-gray-400">On-Chain Txs</div>
+                </div>
+              </div>
+
+              {/* What Happened */}
+              <div className="bg-[#0d1117] border border-gray-700 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-400" />
+                  <span className="font-semibold text-white">What Happened</span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-3 p-2 bg-cyan-900/20 rounded-lg border border-cyan-500/30">
+                    <User className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-cyan-400 font-medium">1. ACK-ID: Verifiable agent identity established</span>
+                      <p className="text-gray-400 mt-0.5 text-xs">W3C DID + ControllerCredential signed by owner wallet.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-2 bg-yellow-900/20 rounded-lg border border-yellow-500/30">
+                    <Zap className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-yellow-400 font-medium">2. zkML: Spending policy cryptographically verified</span>
+                      <p className="text-gray-400 mt-0.5 text-xs">zkML proof verifies policy checked vendor risk, budget, and compliance correctly.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-2 bg-purple-900/20 rounded-lg border border-purple-500/30">
+                    <Shield className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-purple-400 font-medium">3. On-chain: Verification result attested to Arc</span>
+                      <p className="text-gray-400 mt-0.5 text-xs">verificationHash submitted to ProofAttestation contract.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-2 bg-green-900/20 rounded-lg border border-green-500/30">
+                    <CreditCard className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-green-400 font-medium">4. ACK-Pay: Gated transfer executed, receipt issued</span>
+                      <p className="text-gray-400 mt-0.5 text-xs">SpendingGateWallet verified attestation, then released USDC.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* What This Demonstrates */}
+              <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/30 rounded-xl p-4">
+                <div className="text-sm font-medium text-cyan-400 mb-2">What This Demonstrates</div>
+                <p className="text-gray-300 text-sm">
+                  An AI agent executed a transfer with <span className="text-cyan-400">verifiable identity</span> (ACK-ID),
+                  <span className="text-yellow-400"> cryptographic proof of spending policy compliance</span> (zkML),
+                  <span className="text-purple-400"> on-chain attestation</span>, and an
+                  <span className="text-green-400"> auditable receipt</span> (ACK-Pay).
+                </p>
+              </div>
+
+              {/* Links */}
+              <div className="bg-[#0d1117] border border-gray-700 rounded-xl p-3">
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="text-gray-500">Docs:</span>
+                  <a
+                    href="https://catenalabs.com/projects/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2 py-1 bg-cyan-500/10 text-cyan-400 rounded border border-cyan-500/30 hover:border-cyan-400 transition-colors flex items-center gap-1"
+                  >
+                    Catena ACK <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                  <a
+                    href="https://github.com/ICME-Lab/jolt-atlas"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2 py-1 bg-yellow-500/10 text-yellow-400 rounded border border-yellow-500/30 hover:border-yellow-400 transition-colors flex items-center gap-1"
+                  >
+                    JOLT-Atlas <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                  <span className="text-gray-700">|</span>
+                  <span className="text-gray-500">Contracts:</span>
+                  <a
+                    href="https://testnet.arcscan.app/address/0xBE9a5DF7C551324CB872584C6E5bF56799787952"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2 py-1 bg-purple-500/10 text-purple-400 rounded border border-purple-500/30 hover:border-purple-400 transition-colors flex items-center gap-1"
+                  >
+                    ProofAttestation <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                  <a
+                    href="https://testnet.arcscan.app/address/0x6A47D13593c00359a1c5Fc6f9716926aF184d138"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2 py-1 bg-green-500/10 text-green-400 rounded border border-green-500/30 hover:border-green-400 transition-colors flex items-center gap-1"
+                  >
+                    SpendingGateWallet <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                </div>
+              </div>
             </div>
           )}
         </div>

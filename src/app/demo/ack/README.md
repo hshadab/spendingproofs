@@ -41,9 +41,9 @@ zkML generates a cryptographic proof (SNARK) that the spending policy model was 
 | zkML Component | What It Does |
 |----------------|--------------|
 | **Spending Policy Model** | ONNX neural network evaluating 6 factors |
-| **SNARK Proof** | Cryptographic proof policy ran correctly (~48KB) |
-| **On-Chain Attestation** | Verification result recorded on Arc |
-| **Gated Transfer** | SpendingGateWallet releases funds only if attested |
+| **zkML Policy Proof** | Cryptographic proof policy ran correctly (~48KB) |
+| **On-Chain Attestation** | Proof verification result recorded on Arc |
+| **Gated USDC Transfer** | SpendingGateWallet releases funds only if attested |
 
 ## Together: Complete Verification Stack
 
@@ -72,13 +72,13 @@ zkML generates a cryptographic proof (SNARK) that the spending policy model was 
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  3. On-Chain: Verification Attestation                          │
+│  3. On-Chain: Proof Verification Attestation                    │
 │     verificationHash attested to ProofAttestation contract      │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  4. ACK-Pay: Gated Transfer + Receipt                           │
+│  4. Gated USDC Transfer + USDC Payment Receipt                  │
 │     SpendingGateWallet verifies attestation, releases funds     │
 │     PaymentReceiptCredential issued with proof linkage          │
 └─────────────────────────────────────────────────────────────────┘
@@ -94,17 +94,19 @@ zkML generates a cryptographic proof (SNARK) that the spending policy model was 
 |---------|-----------|-----------|
 | Wallet Connection | Simulated address | Real wallet (RainbowKit) |
 | Identity Credential | Local generation | **EIP-712 wallet signature** |
-| zkML Proof | **Real** (JOLT-Atlas) | **Real** (JOLT-Atlas) |
-| Verification Attestation | Mock tx hash | **Real on-chain tx** |
-| Gated Transfer | Mock tx hash | **Real SpendingGateWallet tx** |
-| Payment Receipt | Local generation | **EIP-712 wallet signature** |
+| zkML Policy Proof | **Real** (JOLT-Atlas) | **Real** (JOLT-Atlas) |
+| Proof Verification Attestation | Mock tx hash | **Real on-chain tx** |
+| Gated USDC Transfer | Mock tx hash | **Real SpendingGateWallet tx** |
+| USDC Payment Receipt | Local generation | **EIP-712 wallet signature** |
 
-### The 4-Step Flow
+### The 6-Phase Flow
 
-1. **ACK-ID** → Verifiable agent identity established
-2. **zkML** → Spending policy cryptographically verified
-3. **On-Chain** → Verification result attested to Arc
-4. **ACK-Pay** → Gated transfer executed, receipt issued
+1. **Introduction** → Overview of ACK + zkML integration
+2. **ACK-ID** → Verifiable agent identity established
+3. **zkML Policy Proof** → Spending policy cryptographically verified
+4. **Payment** → Proof verification attested, gated USDC transfer executed
+5. **Receipt** → USDC payment receipt issued
+6. **Complete** → Full audit trail summary
 
 ---
 
@@ -131,7 +133,7 @@ interface SpendingPolicyDecision {
 }
 ```
 
-### zkML Proof
+### zkML Policy Proof
 
 | Metric | Value |
 |--------|-------|
@@ -215,24 +217,24 @@ src/
 3. **Toggle to Live Mode** in the demo
 4. **Run the demo**:
    - ControllerCredential signed by your wallet
-   - zkML proof generated (real JOLT-Atlas)
-   - Verification attested on-chain (real tx)
-   - Gated transfer via SpendingGateWallet (real tx)
-   - PaymentReceiptCredential signed by your wallet
+   - zkML policy proof generated (real JOLT-Atlas)
+   - Proof verification attested on-chain (real tx)
+   - Gated USDC transfer via SpendingGateWallet (real tx)
+   - USDC PaymentReceiptCredential signed by your wallet
 
 ---
 
 ## What's Real vs Simulated
 
 ### Always Real
-- zkML proof generation (JOLT-Atlas prover)
+- zkML policy proof generation (JOLT-Atlas prover)
 - Spending policy model evaluation
 - W3C credential structure
 
 ### Real in Live Mode
 - Wallet connection (RainbowKit)
 - EIP-712 credential signatures
-- **On-chain verification attestation** (ProofAttestation contract)
+- **On-chain proof verification attestation** (ProofAttestation contract)
 - **Gated USDC transfer** (SpendingGateWallet contract)
 
 ### Always Simulated
