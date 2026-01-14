@@ -1,31 +1,44 @@
-# Agent Commerce Kit (ACK) + zkML Demo
+# Catena ACK + zkML Demo
 
-**Verifiable Agent Commerce: Catena ACK + zkML proofs for complete audit trails**
+**Extending [Catena Labs ACK](https://catenalabs.com/projects/) with zkML Policy Verification**
 
-> This demo integrates [Agent Commerce Kit](https://agentcommercekit.com) from Catena Labs with
-> zkML spending proofs to provide cryptographically verifiable identity, policy compliance, and payment receipts for AI agents.
+> [Agent Commerce Kit (ACK)](https://agentcommercekit.com) from [Catena Labs](https://catenalabs.com/projects/) provides
+> the infrastructure layer for AI agent commerce: verifiable identity and payment receipts using W3C standards.
+> This demo shows how **zkML extends ACK** with cryptographic proof of spending policy compliance.
 
-## Overview
+## What Catena ACK Provides
 
-This demo showcases how AI agents can have a complete, cryptographically verifiable commerce stack:
+ACK is an open-source framework from Catena Labs that solves two critical problems:
 
-| Component | Technology | What It Proves |
-|-----------|------------|----------------|
-| **Identity** | ACK-ID (W3C DIDs) | Who is this agent? Who owns it? |
+| ACK Component | What It Does | Standard |
+|---------------|--------------|----------|
+| **ACK-ID** | Verifiable agent identity | W3C DIDs |
+| **ACK-Pay** | Verifiable payment receipts | W3C Verifiable Credentials |
+
+ACK answers: **"Who is this agent?"** and **"What payments were made?"**
+
+## What zkML Adds
+
+zkML extends ACK with cryptographic proof of **policy compliance**:
+
+| zkML Component | What It Does | Technology |
+|----------------|--------------|------------|
+| **Policy Model** | Deterministic spending policy | ONNX neural network |
+| **SNARK Proof** | Proves policy was correctly evaluated | JOLT-Atlas (~48KB) |
+| **Local Verification** | Gates payment on valid proof | Off-chain, <150ms |
+
+zkML answers: **"Did the agent follow its spending rules?"**
+
+## Together: Complete Verification
+
+| Layer | Provider | Question Answered |
+|-------|----------|-------------------|
+| **Identity** | Catena ACK-ID | Who is this agent? Who owns it? |
 | **Policy** | zkML (JOLT-Atlas) | Did the agent follow spending rules? |
-| **Payment** | Arc Testnet USDC | On-chain transaction record |
-| **Receipt** | ACK-Pay (W3C VCs) | Verifiable proof of payment |
+| **Payment** | Arc Testnet | On-chain transaction record |
+| **Receipt** | Catena ACK-Pay | Verifiable proof of payment |
 
-### The Problem
-
-AI agents making autonomous purchases need more than just payment capability:
-- **Identity**: Who is this agent? Who's responsible for it?
-- **Compliance**: Did it actually follow its spending policy?
-- **Audit Trail**: Cryptographic receipts, not just log files
-
-### The Solution
-
-**ACK + zkML** provides three layers of verification:
+## How zkML Extends ACK
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -190,30 +203,35 @@ src/
 
 ---
 
-## Agent Commerce Kit
+## About Catena Labs ACK
 
-[Agent Commerce Kit](https://agentcommercekit.com) is an open-source framework from Catena Labs for AI agent commerce:
+[Agent Commerce Kit (ACK)](https://agentcommercekit.com) is an open-source framework from [Catena Labs](https://catenalabs.com/projects/) providing the infrastructure layer for AI agent commerce:
 
 - **ACK-ID**: Verifiable agent identity using W3C DIDs
 - **ACK-Pay**: Payment receipts using W3C Verifiable Credentials
-- **ACK-Trust**: Agent reputation (not used in this demo)
+- **ACK-Trust**: Agent reputation and trust scores
 
-### Why ACK + zkML?
+ACK provides the foundational identity and receipt infrastructure. zkML adds a complementary layer for policy verification.
 
-| ACK Provides | zkML Adds |
-|--------------|-----------|
-| Who is the agent? | Did it follow policy? |
-| Who owns it? | Cryptographic proof of compliance |
-| Payment receipts | Proof that receipt is valid |
+### How They Work Together
 
-Together: **Complete audit trail for autonomous agent spending.**
+| Catena ACK Provides | zkML Extends With |
+|---------------------|-------------------|
+| Agent identity (DID) | — |
+| Owner verification (ControllerCredential) | — |
+| — | Policy model execution proof |
+| — | Local verification before payment |
+| Payment receipts (PaymentReceiptCredential) | Proof hash linkage |
+
+**Result**: Complete audit trail with cryptographic guarantees at every layer.
 
 ---
 
 ## Related Resources
 
-- [Agent Commerce Kit](https://agentcommercekit.com) - Catena Labs
-- [ACK GitHub](https://github.com/agentcommercekit/ack) - Open source
+- [Catena Labs](https://catenalabs.com/projects/) - Creator of Agent Commerce Kit
+- [Agent Commerce Kit](https://agentcommercekit.com) - ACK documentation
+- [ACK GitHub](https://github.com/agentcommercekit/ack) - Open source repository
 - [JOLT-Atlas](https://github.com/ICME-Lab/jolt-atlas) - zkML prover
 - [Arc Network](https://arc.network) - Testnet
 - [Circle USDC Faucet](https://faucet.circle.com) - Get testnet tokens

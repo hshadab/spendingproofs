@@ -114,15 +114,15 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'intro-1',
     phase: 'intro',
-    title: 'Agent Commerce Kit + zkML',
-    description: 'ACK provides verifiable identity (ACK-ID) and payment receipts (ACK-Pay) for AI agents. Combined with zkML spending proofs, agents get a complete audit trail.',
-    ackNote: 'Open-source framework from Catena Labs for AI agent commerce.',
-    docUrl: 'https://agentcommercekit.com',
-    docLabel: 'ACK Documentation',
+    title: 'Catena ACK + zkML',
+    description: 'Agent Commerce Kit (ACK) from Catena Labs provides verifiable identity and payment receipts using W3C standards. zkML extends ACK with cryptographic proof of policy compliance.',
+    ackNote: 'ACK is open-source from Catena Labs - the infrastructure layer for AI agent commerce.',
+    docUrl: 'https://catenalabs.com/projects/',
+    docLabel: 'Catena Labs',
     duration: 5000,
     annotation: {
-      title: 'Complete Audit Trail',
-      takeaway: 'Identity + Policy Proof + Payment Receipt = Full accountability for autonomous agents.',
+      title: 'ACK + zkML',
+      takeaway: 'ACK handles identity & receipts. zkML adds policy verification. Together: complete audit trail.',
       color: 'combined',
       metric: '3',
       metricLabel: 'verification layers',
@@ -131,13 +131,13 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'intro-2',
     phase: 'intro',
-    title: 'Why This Matters',
-    description: 'AI agents making autonomous purchases need: 1) Verifiable identity (who is this agent?), 2) Policy compliance proof (did it follow rules?), 3) Payment receipts (audit trail).',
-    ackNote: 'W3C standards: DIDs for identity, Verifiable Credentials for receipts.',
+    title: 'Complementary Capabilities',
+    description: 'ACK provides: Agent identity (ACK-ID) and payment receipts (ACK-Pay). zkML adds: Cryptographic proof that the agent\'s spending policy was correctly evaluated before payment.',
+    ackNote: 'ACK uses W3C DIDs and Verifiable Credentials. zkML uses SNARK proofs.',
     duration: 5000,
     annotation: {
-      title: 'Trust Without Custody',
-      takeaway: 'Delegate spending to agents with cryptographic guarantees, not blind trust.',
+      title: 'What Each Provides',
+      takeaway: 'ACK: "Who paid? What receipt?" zkML: "Was the policy followed correctly?"',
       color: 'ack',
       metric: 'W3C',
       metricLabel: 'standards',
@@ -819,10 +819,10 @@ export function ACKWalkthrough() {
           {/* Footer */}
           <div className="px-4 py-2 border-t border-gray-800">
             <div className="flex items-center justify-between text-[10px] text-gray-500">
-              <a href="https://agentcommercekit.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-cyan-400 transition-colors">
-                Catena Labs <ExternalLink className="w-2.5 h-2.5" />
+              <a href="https://catenalabs.com/projects/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-cyan-400 transition-colors">
+                Catena Labs ACK <ExternalLink className="w-2.5 h-2.5" />
               </a>
-              <span>Powered by zkML</span>
+              <span>Extended with zkML</span>
             </div>
           </div>
         </div>
@@ -852,15 +852,19 @@ export function ACKWalkthrough() {
 
               <h2 className="text-2xl font-bold mb-2 text-white">Verifiable Agent Commerce</h2>
               <p className="text-gray-400 max-w-2xl mb-6 text-sm">
-                Complete audit trail for autonomous AI agent spending: identity, policy verification, and payment receipts.
+                <a href="https://catenalabs.com/projects/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Catena Labs ACK</a> provides
+                agent identity and payment receipts. zkML extends ACK with cryptographic proof of policy compliance.
               </p>
 
               {/* Three Pillars */}
               <div className="grid grid-cols-3 gap-4 max-w-3xl">
                 <div className="bg-[#0d1117] border border-cyan-500/30 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <User className="w-5 h-5 text-cyan-400" />
-                    <span className="text-cyan-400 font-semibold">ACK-ID</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <User className="w-5 h-5 text-cyan-400" />
+                      <span className="text-cyan-400 font-semibold">ACK-ID</span>
+                    </div>
+                    <span className="text-[9px] text-cyan-400/60 bg-cyan-500/10 px-1.5 py-0.5 rounded">Catena</span>
                   </div>
                   <p className="text-xs text-gray-400 mb-3">Verifiable agent identity using W3C DIDs</p>
                   <div className="space-y-1.5 text-[10px]">
@@ -880,11 +884,14 @@ export function ACKWalkthrough() {
                 </div>
 
                 <div className="bg-[#0d1117] border border-yellow-500/30 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Zap className="w-5 h-5 text-yellow-400" />
-                    <span className="text-yellow-400 font-semibold">zkML Proof</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-yellow-400" />
+                      <span className="text-yellow-400 font-semibold">zkML Proof</span>
+                    </div>
+                    <span className="text-[9px] text-yellow-400/60 bg-yellow-500/10 px-1.5 py-0.5 rounded">Extends</span>
                   </div>
-                  <p className="text-xs text-gray-400 mb-3">Cryptographic policy compliance verification</p>
+                  <p className="text-xs text-gray-400 mb-3">Cryptographic proof of policy compliance</p>
                   <div className="space-y-1.5 text-[10px]">
                     <div className="flex items-center gap-1 text-gray-500">
                       <CheckCircle2 className="w-3 h-3 text-yellow-400" />
@@ -902,9 +909,12 @@ export function ACKWalkthrough() {
                 </div>
 
                 <div className="bg-[#0d1117] border border-green-500/30 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Receipt className="w-5 h-5 text-green-400" />
-                    <span className="text-green-400 font-semibold">ACK-Pay</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Receipt className="w-5 h-5 text-green-400" />
+                      <span className="text-green-400 font-semibold">ACK-Pay</span>
+                    </div>
+                    <span className="text-[9px] text-green-400/60 bg-green-500/10 px-1.5 py-0.5 rounded">Catena</span>
                   </div>
                   <p className="text-xs text-gray-400 mb-3">Verifiable payment receipts for audit</p>
                   <div className="space-y-1.5 text-[10px]">

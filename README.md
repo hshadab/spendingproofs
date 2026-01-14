@@ -143,7 +143,7 @@ cd contracts && forge test
 | **Crossmint** | [Crossmint](https://crossmint.com) | Enterprise MPC wallets + zkML policy proofs | [README](./src/app/demo/crossmint/README.md) |
 | **Morpho** | [Morpho Blue](https://morpho.org) | DeFi vault management with policy-gated operations | [README](./src/app/demo/morpho/README.md) |
 | **OpenMind** | [OpenMind](https://openmind.org) | Autonomous robot payments via x402 protocol | [README](./src/app/demo/openmind/README.md) |
-| **ACK** | [Catena Labs](https://agentcommercekit.com) | Agent Commerce Kit identity + receipts + zkML | [README](./src/app/demo/ack/README.md) |
+| **ACK** | [Catena Labs](https://catenalabs.com/projects/) | Extends ACK identity + receipts with zkML policy proofs | [README](./src/app/demo/ack/README.md) |
 
 ## Documentation
 
