@@ -6,7 +6,7 @@
 
 ## For Catena Labs
 
-This demo explores how **zkML spending policy proofs** could extend ACK's capabilities — adding cryptographic verification of agent decision-making to ACK's existing identity and receipt infrastructure.
+This demo explores how **zkML spending policy proofs** powered by [JOLT-Atlas](https://github.com/ICME-Lab/jolt-atlas) could extend ACK's capabilities — adding cryptographic verification of agent decision-making to ACK's existing identity and receipt infrastructure.
 
 ### The Opportunity
 
