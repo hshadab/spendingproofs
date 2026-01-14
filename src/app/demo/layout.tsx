@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowLeft, Shield, Play, CreditCard, AlertTriangle, Wallet, TrendingUp, Bot } from 'lucide-react';
+import { ArrowLeft, Shield, Play, CreditCard, AlertTriangle, Wallet, TrendingUp, Bot, Package } from 'lucide-react';
 
 const DEMO_LINKS = [
   { href: '/demo/playground', label: 'Playground', icon: Play, color: 'purple' },
@@ -11,6 +11,7 @@ const DEMO_LINKS = [
   { href: '/demo/crossmint', label: 'Crossmint', icon: Wallet, color: 'emerald' },
   { href: '/demo/morpho', label: 'Morpho', icon: TrendingUp, color: 'blue' },
   { href: '/demo/openmind', label: 'OpenMind', icon: Bot, color: 'cyan' },
+  { href: '/demo/ack', label: 'ACK', icon: Package, color: 'pink' },
 ];
 
 export default function DemoLayout({

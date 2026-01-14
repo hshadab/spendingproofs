@@ -14,6 +14,7 @@
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.2.0",
     "@tanstack/react-query": "^5.60.0",
+    "agentcommercekit": "^0.10.0",
     "autoprefixer": "^10.4.23",
     "framer-motion": "^12.24.12",
     "lucide-react": "^0.562.0",
