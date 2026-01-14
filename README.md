@@ -126,11 +126,30 @@ npm run dev
 cd contracts && forge test
 ```
 
+## Demos
+
+### Core Demos
+
+| Demo | Description | Link |
+|------|-------------|------|
+| **Playground** | Interactive policy configuration and proof generation | [/demo/playground](https://spendingproofs.com/demo/playground) |
+| **Payment** | End-to-end payment flow with proof verification | [/demo/payment](https://spendingproofs.com/demo/payment) |
+| **Tamper** | Demonstrates tamper detection when inputs are modified | [/demo/tamper](https://spendingproofs.com/demo/tamper) |
+
+### Enterprise Demos
+
+| Demo | Partner | Description | Documentation |
+|------|---------|-------------|---------------|
+| **Crossmint** | [Crossmint](https://crossmint.com) | Enterprise MPC wallets + zkML policy proofs | [README](./src/app/demo/crossmint/README.md) |
+| **Morpho** | [Morpho Blue](https://morpho.org) | DeFi vault management with policy-gated operations | [README](./src/app/demo/morpho/README.md) |
+| **OpenMind** | [OpenMind](https://openmind.org) | Autonomous robot payments via x402 protocol | [README](./src/app/demo/openmind/README.md) |
+| **ACK** | [Catena Labs](https://agentcommercekit.com) | Agent Commerce Kit identity + receipts + zkML | [README](./src/app/demo/ack/README.md) |
+
 ## Documentation
 
-- **[Crossmint Demo](./src/app/demo/crossmint/README.md)** - Enterprise procurement with Crossmint wallets
 - **[SDK Reference](./docs/sdk-reference.md)** - Full API documentation
-- **[Arc Integration](./docs/arc-integration.md)** - Integration patterns
+- **[Architecture](./docs/ARCHITECTURE.md)** - System design
+- **[API Reference](./docs/API.md)** - API endpoints
 
 ## Links
 
