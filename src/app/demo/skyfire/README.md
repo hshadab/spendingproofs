@@ -1,67 +1,22 @@
 # Extending Skyfire with zkML Spending Policy Verification
 
-**A demonstration of how zkML can complement Skyfire's agent identity and payment infrastructure**
+**zkML spending policy proofs** powered by [JOLT-Atlas](https://github.com/ICME-Lab/jolt-atlas) — adding cryptographic verification of agent decision-making to Skyfire's identity and payment infrastructure.
 
 ---
 
-## For Skyfire
+## Overview
 
-This demo explores how **zkML spending policy proofs** powered by [JOLT-Atlas](https://github.com/ICME-Lab/jolt-atlas) could extend Skyfire's capabilities — adding cryptographic verification of agent decision-making to Skyfire's already robust identity and payment infrastructure.
-
-### What Skyfire Provides
-
-Skyfire already delivers powerful agent commerce capabilities:
+Skyfire provides:
 - **KYA (Know Your Agent)** — Verified agent identity via JWT tokens
-- **PAY Tokens** — Secure payment authorization with merchant binding
-- **Agent Registry** — Trusted directory of verified agents and services
-- **Payment Rails** — Seamless agent-to-agent and agent-to-service payments
+- **PAY Tokens** — Payment authorization with merchant binding
+- **Agent Registry** — Directory of verified agents and services
 
-### What zkML Adds
-
-zkML extends Skyfire by answering a third question enterprises are asking:
-- **"Did the agent follow its spending policy?"** → Cryptographic proof
-
-This complements Skyfire's identity layer with **provable policy compliance** — not logs or agent self-attestations, but mathematical proof.
+This demo adds a verification layer:
+- **"Did the agent follow its spending policy?"** → Cryptographic proof (not logs, not attestations from the agent itself)
 
 ---
 
-## Why This Matters
-
-As AI agents gain spending authority through platforms like Skyfire, enterprises want additional verification layers for high-value or regulated transactions. zkML provides this without changing Skyfire's core architecture.
-
-### The Complete Picture
-
-| Layer | Skyfire Provides | zkML Extends |
-|-------|------------------|--------------|
-| **Identity** | KYA tokens — verified agent identity | Binds proofs to verified agent ID |
-| **Authorization** | PAY tokens — payment permissions | Adds policy compliance verification |
-| **Audit Trail** | Transaction records | On-chain proof attestations |
-| **Enforcement** | Service-level controls | Smart contract proof gates |
-
----
-
-## What This Demo Shows
-
-### Skyfire Components Used
-
-| Component | How We Use It |
-|-----------|---------------|
-| **KYA Tokens** | Agent identity verification via `POST /api/v1/tokens` |
-| **KYA+PAY Tokens** | Combined identity and payment authorization |
-| **Agent Registry** | Service discovery via Skyfire directory |
-| **JWT Claims** | Agent ID, issuer, expiration extracted and displayed |
-
-### What zkML Adds
-
-| Component | What It Does |
-|-----------|--------------|
-| **Spending Policy Model** | ONNX neural network evaluating vendor risk, budget, compliance |
-| **zkML Policy Proof** | ~48KB SNARK proving policy evaluated correctly |
-| **Proof-Agent Binding** | `verificationHash = hash(proofHash, agentId, decision, confidence, timestamp)` |
-| **On-Chain Attestation** | Verification result recorded immutably on Arc testnet |
-| **SpendingGateWallet** | Smart contract enforcing "no attestation = no funds" |
-
-### The Complete Flow
+## Architecture
 
 ```
 Skyfire KYA              zkML Proof                Arc Attestation
@@ -83,48 +38,23 @@ Skyfire KYA              zkML Proof                Arc Attestation
                     └──────────────┘
 ```
 
----
+### Flow
 
-## Integration Architecture
-
-### How zkML Extends Skyfire
-
-1. **Identity Layer** — Skyfire KYA establishes verified agent identity (unchanged)
-2. **Policy Layer** — zkML proves spending policy was correctly evaluated (new)
-3. **Binding Layer** — `verificationHash` cryptographically links proof to Skyfire agent ID (new)
-4. **Attestation Layer** — On-chain record of verification for audit (new)
-5. **Payment Layer** — Skyfire PAY authorizes transfer with proof linkage (extended)
-
-### Value for the Skyfire Ecosystem
-
-| Skyfire Today | Skyfire + zkML |
-|---------------|----------------|
-| Proves agent identity (KYA) | Proves agent identity (KYA) |
-| Authorizes payments (PAY) | Authorizes payments (PAY) |
-| Transaction records | Transaction records |
-| — | **Proves policy was followed** |
-| — | **On-chain enforcement option** |
-| Audit: who + what | Audit: who + what + **verified how** |
-
-### Enterprise Use Cases
-
-- **Financial Services**: Prove AI trading agents followed risk policies before Skyfire payment
-- **Procurement**: Verify purchasing agents checked vendor compliance via zkML, pay via Skyfire
-- **Treasury**: Confirm agents stayed within budget allocations with cryptographic proof
-- **Compliance**: Auditable verification trail for regulators (Skyfire identity + zkML policy)
+1. **Identity** — Skyfire KYA establishes verified agent identity
+2. **Policy Evaluation** — Agent runs spending policy model (vendor risk, budget, compliance)
+3. **Proof Generation** — JOLT-Atlas generates ~48KB SNARK proving correct evaluation
+4. **Binding** — `verificationHash = keccak256(proofHash, agentId, decision, confidence, timestamp)`
+5. **Attestation** — Record verification on-chain (Arc testnet)
+6. **Payment** — Skyfire PAY token authorizes transfer; smart contract checks attestation
 
 ---
 
-## Technical Implementation
+## Skyfire API Usage
 
-### Skyfire Integration
+### KYA+PAY Token Creation
 
 ```typescript
-// Create Skyfire agent with KYA identity
-const agent = await createAgent('zkML Demo Agent');
-
-// Generate KYA+PAY token for payment
-const token = await fetch('/api/v1/tokens', {
+const token = await fetch('https://api-sandbox.skyfire.xyz/api/v1/tokens', {
   method: 'POST',
   headers: { 'skyfire-api-key': apiKey },
   body: JSON.stringify({
@@ -137,27 +67,21 @@ const token = await fetch('/api/v1/tokens', {
 });
 ```
 
-### zkML Proof Binding
+### Proof-Identity Binding
 
 ```typescript
-// Bind zkML proof to Skyfire agent identity
+// Cryptographically bind zkML proof to Skyfire agent ID
 const verificationHash = keccak256(encodeAbiParameters(
   parseAbiParameters('bytes32, string, bool, uint256, uint256'),
   [proofHash, agentId, decision, confidence, timestamp]
 ));
-
-// Include in PAY token metadata
-const payToken = await generatePayToken({
-  agentId: agent.id,
-  amount,
-  proofHash,           // zkML proof reference
-  verificationHash,    // Cryptographic binding
-});
 ```
 
-### Spending Policy Model
+---
 
-The demo uses a simple 6-factor spending policy:
+## Spending Policy Model
+
+6-factor policy evaluation:
 
 ```typescript
 interface SpendingPolicyInput {
@@ -169,10 +93,14 @@ interface SpendingPolicyInput {
   complianceStatus: boolean;   // Vendor compliance verified
 }
 
-// Model outputs APPROVE/REJECT with confidence score
+// Output: APPROVE/REJECT with confidence score
 ```
 
-### Performance Metrics
+The model runs off-chain. JOLT-Atlas generates a SNARK proving it ran correctly on the given inputs.
+
+---
+
+## Performance
 
 | Metric | Value |
 |--------|-------|
@@ -184,50 +112,37 @@ interface SpendingPolicyInput {
 
 ---
 
-## Demo Modes
-
-### Demo Mode (No API Key Required)
-- Simulated Skyfire tokens (realistic JWT format)
-- Real zkML proof generation (JOLT-Atlas)
-- Mock transaction hashes
-- Full flow demonstration
-
-### Live Mode (Real Skyfire API)
-- Real Skyfire KYA token generation
-- Real Skyfire PAY token creation
-- Real on-chain attestation tx
-- Real gated USDC transfer on Arc testnet
-- Decoded JWT claims displayed
-
----
-
 ## Running the Demo
 
-### Quick Start (Demo Mode)
-1. Visit the demo page
-2. Click "Start Demo" or step through manually
-3. Watch the 5-phase flow execute
+### Demo Mode (No API Key)
+```bash
+npm run dev
+# Visit /demo/skyfire
+```
+- Simulated Skyfire tokens (realistic JWT format)
+- Real zkML proof generation
+- Mock transactions
 
-### Live Mode (Real Transactions)
-1. Configure Skyfire API key in `.env.local`:
-   ```bash
-   SKYFIRE_API_KEY=your-api-key
-   SKYFIRE_API_URL=https://api-sandbox.skyfire.xyz
-   NEXT_PUBLIC_SKYFIRE_ENABLED=true
-   ```
-2. Connect wallet to Arc Testnet (Chain ID: 5042002)
-3. Get testnet USDC from [faucet.circle.com](https://faucet.circle.com)
-4. Run the demo with real Skyfire API calls
+### Live Mode
+```bash
+# .env.local
+SKYFIRE_API_KEY=your-api-key
+SKYFIRE_API_URL=https://api-sandbox.skyfire.xyz
+NEXT_PUBLIC_SKYFIRE_ENABLED=true
+```
+- Real Skyfire API calls
+- Real on-chain attestations (Arc testnet)
+- Real USDC transfers via SpendingGateWallet
 
 ---
 
 ## Contracts (Arc Testnet)
 
-| Contract | Address | Purpose |
-|----------|---------|---------|
-| USDC | `0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213` | Token transfers |
-| ProofAttestation | `0xBE9a5DF7C551324CB872584C6E5bF56799787952` | Verification attestations |
-| SpendingGateWallet | `0x6A47D13593c00359a1c5Fc6f9716926aF184d138` | Gated transfers |
+| Contract | Address |
+|----------|---------|
+| USDC | `0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213` |
+| ProofAttestation | `0xBE9a5DF7C551324CB872584C6E5bF56799787952` |
+| SpendingGateWallet | `0x6A47D13593c00359a1c5Fc6f9716926aF184d138` |
 
 ---
 
@@ -237,30 +152,29 @@ interface SpendingPolicyInput {
 src/
 ├── lib/skyfire/
 │   ├── client.ts        # Skyfire API client
-│   ├── config.ts        # API configuration
+│   ├── config.ts        # Configuration
 │   └── types.ts         # TypeScript interfaces
 ├── app/api/skyfire/
-│   ├── agent/route.ts   # Agent creation endpoint
-│   ├── pay-token/route.ts  # PAY token generation
-│   └── transfer/route.ts   # Complete verified transfer
-├── components/skyfire/
-│   └── SkyfireWalkthrough.tsx  # Main demo component
-└── lib/arc.ts           # Arc contract integration
+│   ├── agent/route.ts   # POST - Create agent with KYA
+│   ├── pay-token/route.ts  # POST - Generate PAY token
+│   └── transfer/route.ts   # POST - Execute verified transfer
+└── components/skyfire/
+    └── SkyfireWalkthrough.tsx
 ```
 
 ---
 
 ## API Endpoints
 
-### Internal API (This Demo)
+### This Demo
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/skyfire/agent` | POST | Create Skyfire agent with KYA token |
+| `/api/skyfire/agent` | POST | Create agent, generate KYA token |
 | `/api/skyfire/pay-token` | POST | Generate PAY token with proof binding |
-| `/api/skyfire/transfer` | POST | Execute complete verified transfer |
+| `/api/skyfire/transfer` | POST | Full flow: KYA → proof → attestation → transfer |
 
-### Skyfire API Used
+### Skyfire API
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -270,34 +184,26 @@ src/
 
 ---
 
-## Discussion Points
+## Potential Extensions
 
-### Potential Integration Paths
+Ideas for native Skyfire integration:
 
-1. **PAY Token Extension**: Add optional `proofHash` and `verificationHash` fields to PAY tokens
-2. **Policy Verification Service**: Skyfire-hosted zkML verification before payment authorization
-3. **Agent Policy Registry**: Allow agents to publish their spending policies
-4. **Compliance API**: Query zkML verification status for audit purposes
-
-### What We'd Love to Explore
-
-- Feedback on the KYA + zkML binding pattern
-- Interest in native policy verification support in Skyfire
-- Potential for zkML as an optional Skyfire extension for regulated industries
+1. **PAY Token Fields** — Optional `proofHash` and `verificationHash` in token payload
+2. **Verification Service** — Skyfire-hosted zkML verification before payment authorization
+3. **Policy Registry** — Agents publish spending policies; Skyfire validates proofs match
+4. **Compliance API** — Query verification status for audit
 
 ---
 
 ## Resources
 
-- [Skyfire Documentation](https://docs.skyfire.xyz) — API Reference
-- [Skyfire Sandbox](https://app-sandbox.skyfire.xyz) — Test Dashboard
-- [JOLT-Atlas](https://github.com/ICME-Lab/jolt-atlas) — zkML Prover
-- [Arc Network](https://arc.network) — Testnet for attestations
+- [Skyfire Docs](https://docs.skyfire.xyz)
+- [Skyfire Sandbox](https://app-sandbox.skyfire.xyz)
+- [JOLT-Atlas](https://github.com/ICME-Lab/jolt-atlas)
+- [Arc Testnet](https://testnet.arcscan.app)
 
 ---
 
-## Contact
+## License
 
-Interested in discussing zkML + Skyfire integration? We'd love to connect.
-
-**This demo is part of the [Spending Proofs](https://github.com/hshadab/spendingproofs) project** — exploring verifiable AI agent spending policies.
+MIT — Part of the [Spending Proofs](https://github.com/hshadab/spendingproofs) project.
