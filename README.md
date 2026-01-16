@@ -144,6 +144,7 @@ cd contracts && forge test
 | **Morpho** | [Morpho Blue](https://morpho.org) | DeFi vault management with policy-gated operations | [README](./src/app/demo/morpho/README.md) |
 | **OpenMind** | [OpenMind](https://openmind.org) | Autonomous robot payments via x402 protocol | [README](./src/app/demo/openmind/README.md) |
 | **ACK** | [Catena Labs](https://catenalabs.com/projects/) | Extends ACK identity + receipts with zkML policy proofs | [README](./src/app/demo/ack/README.md) |
+| **Skyfire** | [Skyfire](https://skyfire.xyz) | Extends Skyfire KYA identity with zkML spending policy verification | [README](./src/app/demo/skyfire/README.md) |
 
 ## Documentation
 
@@ -154,6 +155,7 @@ cd contracts && forge test
 ## Links
 
 - [Crossmint](https://crossmint.com) - Enterprise wallet infrastructure
+- [Skyfire](https://skyfire.xyz) - Agent identity (KYA) and payments
 - [JOLT-Atlas](https://github.com/ICME-Lab/jolt-atlas) - zkML proof generation
 - [Base Sepolia](https://sepolia.basescan.org) - Testnet explorer
 
