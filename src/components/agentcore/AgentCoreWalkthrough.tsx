@@ -25,6 +25,10 @@ import {
   FileCheck,
   Scale,
   Sparkles,
+  Building2,
+  Eye,
+  Lock,
+  Unlock,
 } from 'lucide-react';
 import { useProofGeneration } from '@/hooks/useProofGeneration';
 import { useAgentCorePayment } from '@/hooks/useAgentCorePayment';
@@ -37,6 +41,7 @@ import {
 } from '@/lib/spendingModel';
 import { ProofProgress } from '../ProofProgress';
 import { AgentCoreAnnotationOverlay, type BusinessAnnotation } from './AgentCoreAnnotationOverlay';
+import { CFOAuditView } from './CFOAuditView';
 
 // Gateway configuration
 const GATEWAY_CONFIG = {
@@ -352,6 +357,7 @@ export function AgentCoreWalkthrough() {
   // UI state
   const [copied, setCopied] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showAuditView, setShowAuditView] = useState(false);
 
   // Refs
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -1467,6 +1473,58 @@ export function AgentCoreWalkthrough() {
                 </div>
               </div>
 
+              {/* Delegated Autonomous Authority - Key zkML Value */}
+              <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/30 rounded-xl p-4 max-w-2xl mb-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-indigo-400" />
+                    <span className="text-sm font-medium text-indigo-400">Delegated Autonomous Authority</span>
+                  </div>
+                  <button
+                    onClick={() => setShowAuditView(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/20 text-indigo-400 rounded-lg text-xs hover:bg-indigo-500/30 transition-colors border border-indigo-500/30"
+                  >
+                    <Eye className="w-3 h-3" />
+                    CFO Audit View
+                  </button>
+                </div>
+
+                <p className="text-gray-300 text-xs mb-3">
+                  CFO Sarah Chen delegated <span className="text-indigo-400 font-bold">$100K/month</span> autonomous spending authority to this agent.
+                  Every transaction includes a zkML proof verifiable by anyone, forever.
+                </p>
+
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="p-2 bg-gray-900/50 rounded-lg">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Lock className="w-3 h-3 text-red-400" />
+                      <span className="text-[10px] text-red-400 font-medium">Don&apos;t Need to Trust</span>
+                    </div>
+                    <ul className="text-[10px] text-gray-400 space-y-0.5">
+                      <li>• AWS CloudWatch logs</li>
+                      <li>• Agent operator claims</li>
+                      <li>• Cedar policy logs</li>
+                    </ul>
+                  </div>
+                  <div className="p-2 bg-gray-900/50 rounded-lg">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Unlock className="w-3 h-3 text-green-400" />
+                      <span className="text-[10px] text-green-400 font-medium">Can Verify Independently</span>
+                    </div>
+                    <ul className="text-[10px] text-gray-400 space-y-0.5">
+                      <li>• zkML proof (math guarantee)</li>
+                      <li>• On-chain attestation</li>
+                      <li>• Transaction history</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="text-[10px] text-gray-400 border-t border-gray-700/50 pt-3">
+                  <span className="text-indigo-400 font-medium">Why this matters:</span> Cedar policies handle simple rules (amount &lt; $15K).
+                  But proving the 8-factor ML risk model was evaluated correctly? That requires zkML — and it&apos;s verifiable by any auditor, forever.
+                </div>
+              </div>
+
               {/* What This Demonstrates */}
               <div className="bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border border-orange-500/30 rounded-xl p-4 max-w-2xl mb-4">
                 <div className="text-sm font-medium text-orange-400 mb-2">What This Demonstrates</div>
@@ -1566,6 +1624,21 @@ export function AgentCoreWalkthrough() {
           )}
         </div>
       </div>
+
+      {/* CFO Audit View Modal */}
+      {showAuditView && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0a0a0a] border border-gray-700 rounded-2xl max-w-4xl max-h-[90vh] overflow-y-auto w-full">
+            <div className="p-6">
+              <CFOAuditView
+                proofHash={proofHash}
+                txHash={txHash}
+                onClose={() => setShowAuditView(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
