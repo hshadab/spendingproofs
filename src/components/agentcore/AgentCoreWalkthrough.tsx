@@ -962,30 +962,53 @@ export function AgentCoreWalkthrough() {
           {currentStep.phase === 'intro' && (
             <div className="space-y-4">
               <div className="bg-[#0d1117] border border-gray-700 rounded-xl p-6">
-                <h3 className="text-lg font-bold text-white mb-3">How It Works</h3>
+                <h3 className="text-lg font-bold text-white mb-3">Cedar Policies + zkML Proofs</h3>
                 <p className="text-gray-400 text-sm mb-4">
-                  AWS Bedrock AgentCore Gateway exposes the Spending Proofs prover as MCP-compatible tools.
-                  Any AgentCore-hosted AI agent can generate zkML proofs via the MCP protocol.
+                  <span className="text-orange-400">AgentCore Policy (Cedar)</span> handles simple rules like{' '}
+                  <code className="text-xs bg-gray-800 px-1 rounded">amount &lt; $15K</code>.
+                  But proving an 8-factor ML risk model was evaluated correctly? That requires{' '}
+                  <span className="text-yellow-400">zkML</span> — and it&apos;s verifiable by any auditor, forever.
                 </p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-gray-800/50 rounded-lg">
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="p-3 bg-orange-500/5 border border-orange-500/20 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
-                      <Cpu className="w-4 h-4 text-orange-400" />
-                      <span className="text-orange-400 font-medium text-sm">Gateway</span>
+                      <Shield className="w-4 h-4 text-orange-400" />
+                      <span className="text-orange-400 font-medium text-sm">Cedar Policy</span>
                     </div>
-                    <p className="text-xs text-gray-400">
-                      Translates MCP protocol to REST API, handles SigV4 auth.
+                    <p className="text-xs text-gray-400 mb-2">
+                      Deterministic rules enforced at gateway:
                     </p>
+                    <ul className="text-xs text-gray-500 space-y-1">
+                      <li>• amount &lt; maxLimit</li>
+                      <li>• role == &quot;infra-agent&quot;</li>
+                      <li>• category in allowedList</li>
+                    </ul>
                   </div>
-                  <div className="p-3 bg-gray-800/50 rounded-lg">
+                  <div className="p-3 bg-yellow-500/5 border border-yellow-500/20 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <Zap className="w-4 h-4 text-yellow-400" />
-                      <span className="text-yellow-400 font-medium text-sm">Tools</span>
+                      <span className="text-yellow-400 font-medium text-sm">zkML Proof</span>
+                      <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/20 text-yellow-400 rounded">MUST-HAVE</span>
                     </div>
-                    <p className="text-xs text-gray-400">
-                      generateSpendingProof and getProverHealth via MCP.
+                    <p className="text-xs text-gray-400 mb-2">
+                      ML inference Cedar <span className="text-red-400">cannot</span> compute:
                     </p>
+                    <ul className="text-xs text-gray-500 space-y-1">
+                      <li>• Vendor risk scoring</li>
+                      <li>• Historical performance</li>
+                      <li>• Multi-factor approval</li>
+                    </ul>
                   </div>
+                </div>
+                <div className="p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Building2 className="w-4 h-4 text-indigo-400" />
+                    <span className="text-indigo-400 font-medium text-sm">Delegated Authority Demo</span>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    CFO delegates $100K/month autonomous spending. Every transaction includes a zkML proof
+                    verifiable by auditors without trusting AWS, the agent, or CloudWatch logs.
+                  </p>
                 </div>
               </div>
             </div>
@@ -994,10 +1017,36 @@ export function AgentCoreWalkthrough() {
           {/* Agent Scenario Phase */}
           {currentStep.phase === 'agent-scenario' && (
             <div className="space-y-4">
+              {/* Delegation Context */}
+              <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Building2 className="w-4 h-4 text-indigo-400" />
+                  <span className="text-indigo-400 font-medium text-sm">Delegated Authority</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div>
+                    <span className="text-gray-500">Delegated By:</span>
+                    <span className="text-white ml-1">CFO Sarah Chen</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Monthly Budget:</span>
+                    <span className="text-green-400 ml-1">$100,000</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Max Single:</span>
+                    <span className="text-yellow-400 ml-1">$15,000</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Agent Info */}
               <div className="bg-[#0d1117] border border-purple-500/30 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Bot className="w-5 h-5 text-purple-400" />
-                  <span className="text-purple-400 font-medium">Cloud Infrastructure Agent</span>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Bot className="w-5 h-5 text-purple-400" />
+                    <span className="text-purple-400 font-medium">Cloud Infrastructure Agent</span>
+                  </div>
+                  <span className="text-[10px] px-2 py-1 bg-purple-500/20 text-purple-400 rounded">Autonomous</span>
                 </div>
                 {demoInput && (
                   <div className="grid grid-cols-2 gap-3 text-sm">
@@ -1034,6 +1083,17 @@ export function AgentCoreWalkthrough() {
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Cedar vs zkML note */}
+              <div className="bg-gray-800/30 border border-gray-700 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <Info className="w-4 h-4 text-gray-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-gray-400">
+                    <span className="text-orange-400">Cedar</span> enforces: amount &lt; $15K ✓ &nbsp;|&nbsp;
+                    <span className="text-yellow-400">zkML</span> proves: 8-factor risk model evaluation ✓
+                  </p>
+                </div>
               </div>
             </div>
           )}
@@ -1097,11 +1157,42 @@ export function AgentCoreWalkthrough() {
           {/* Policy Evaluation Phase */}
           {currentStep.phase === 'policy-eval' && (
             <div className="space-y-4">
+              {/* Cedar Policy Check (Simulated) */}
+              <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-orange-400" />
+                    <span className="text-orange-400 font-medium text-sm">Cedar Policy Check</span>
+                  </div>
+                  <span className="text-[10px] px-2 py-1 bg-green-500/20 text-green-400 rounded">PASSED</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    <span className="text-gray-400">amount &lt; $15K</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    <span className="text-gray-400">role: infra-agent</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    <span className="text-gray-400">category: allowed</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ML Policy Evaluation (What Cedar CAN'T do) */}
               {modelDecision && (
-                <div className="bg-[#0d1117] border border-indigo-500/30 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Scale className="w-5 h-5 text-indigo-400" />
-                    <span className="text-indigo-400 font-medium">Policy Evaluation Result</span>
+                <div className="bg-[#0d1117] border border-yellow-500/30 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Scale className="w-5 h-5 text-yellow-400" />
+                      <span className="text-yellow-400 font-medium">ML Policy Evaluation</span>
+                    </div>
+                    <span className="text-[9px] px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded">
+                      Cedar CANNOT compute this
+                    </span>
                   </div>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="p-3 bg-gray-800/50 rounded-lg">
@@ -1117,6 +1208,7 @@ export function AgentCoreWalkthrough() {
                       </div>
                     </div>
                   </div>
+                  <div className="text-xs text-gray-500 mb-2">8-Factor Risk Model (requires zkML proof):</div>
                   <div className="space-y-1">
                     {modelDecision.reasons.slice(0, 5).map((reason, i) => (
                       <div key={i} className="flex items-center gap-2 text-xs">
@@ -1127,6 +1219,18 @@ export function AgentCoreWalkthrough() {
                   </div>
                 </div>
               )}
+
+              {/* Why zkML is required */}
+              <div className="bg-gray-800/30 border border-gray-700 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <Zap className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-gray-400">
+                    <span className="text-yellow-400 font-medium">Why zkML?</span> The ML model evaluates vendor risk,
+                    historical performance, and compliance — computations Cedar policies cannot perform.
+                    zkML proves the model ran correctly without revealing internal thresholds.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
@@ -1239,6 +1343,34 @@ export function AgentCoreWalkthrough() {
                   </div>
                 )}
               </div>
+
+              {/* Proof Guarantees */}
+              {proofVerified && (
+                <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <FileCheck className="w-4 h-4 text-indigo-400" />
+                    <span className="text-indigo-400 font-medium text-sm">What This Proof Guarantees</span>
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3 h-3 text-green-400" />
+                      <span className="text-gray-300">8-factor ML policy model was evaluated correctly</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3 h-3 text-green-400" />
+                      <span className="text-gray-300">Decision follows mathematically from inputs</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3 h-3 text-green-400" />
+                      <span className="text-gray-300">Verifiable by CFO/auditors without trusting agent</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Lock className="w-3 h-3 text-yellow-400" />
+                      <span className="text-gray-300">Internal thresholds remain private (zero-knowledge)</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
