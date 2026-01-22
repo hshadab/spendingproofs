@@ -649,3 +649,70 @@ export function createEnterpriseDemoInput(): SpendingModelInput {
     managerPreApproval: false,       // No pre-approval needed (within authority)
   };
 }
+
+/**
+ * AWS AgentCore Enterprise Spending Policy
+ * Higher limits for cloud infrastructure spending
+ */
+export const AGENTCORE_ENTERPRISE_POLICY: SpendingPolicy = {
+  dailyLimitUsdc: 100000,         // $100K/month (or daily depending on context)
+  maxSinglePurchaseUsdc: 15000,   // $15K max per purchase
+  minSuccessRate: 0.99,           // 99% uptime/success rate minimum
+  minBudgetBuffer: 5000,          // Keep $5K minimum in treasury
+  maxVendorRiskScore: 0.6,        // Reject vendors with >60% risk score
+  minVendorHistoryScore: 0.6,     // Require 60%+ historical performance
+  requireCompliance: true,        // Must pass compliance checks
+  minVendorOnboardingDays: 365,   // 1-year minimum relationship for auto-approval
+};
+
+/**
+ * Create AWS AgentCore demo input (Cloud Infrastructure Agent scenario)
+ *
+ * Scenario: Cloud Infrastructure Agent auto-scaling AWS compute
+ * - EC2 p4d.24xlarge GPU instances for ML training
+ * - $8,500 per instance, $100K monthly budget
+ * - 5-year AWS relationship
+ */
+export function createAgentCoreDemoInput(): SpendingModelInput {
+  return {
+    // Service Info
+    serviceUrl: 'https://console.aws.amazon.com/ec2/v2/home',
+    serviceName: 'AWS EC2 p4d.24xlarge',
+    serviceCategory: 'compute',
+    priceUsdc: 8500.00,              // $8,500 for GPU instance allocation
+
+    // Agent Financial State
+    budgetUsdc: 100000.00,           // $100K monthly budget
+    spentTodayUsdc: 34000.00,        // $34K spent this month (4 instances)
+    dailyLimitUsdc: 100000.00,       // Monthly limit (context: monthly budget cycle)
+
+    // Service Reputation
+    serviceSuccessRate: 0.9999,      // 99.99% AWS SLA
+    serviceTotalCalls: 60,           // 5 years of monthly usage
+
+    // Agent Behavior
+    purchasesInCategory: 8,          // 8 compute purchases this month
+    timeSinceLastPurchase: 86400,    // 1 day since last purchase
+
+    // === ENTERPRISE PROCUREMENT FIELDS ===
+
+    // Vendor Risk Assessment
+    vendorRiskScore: 0.08,           // AWS is extremely low risk (tier 1 cloud provider)
+    vendorId: 'aws-amazon',
+    vendorTier: 'preferred',         // Preferred vendor status
+
+    // Budget Category Management
+    budgetCategory: 'compute',
+    categoryBudgetUsdc: 75000.00,    // $75K for compute category
+    categorySpentUsdc: 34000.00,     // $34K already spent in category
+
+    // Historical Vendor Performance
+    historicalVendorScore: 0.96,     // Excellent 5-year track record
+    vendorOnboardingDays: 1825,      // 5-year relationship
+    vendorComplianceStatus: true,    // SOC2, HIPAA, FedRAMP compliant
+
+    // Approval Context
+    urgencyFlag: false,              // Normal ML training batch
+    managerPreApproval: true,        // Pre-approved for compute scaling
+  };
+}

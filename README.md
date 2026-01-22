@@ -145,6 +145,33 @@ cd contracts && forge test
 | **OpenMind** | [OpenMind](https://openmind.org) | Autonomous robot payments via x402 protocol | [README](./src/app/demo/openmind/README.md) |
 | **ACK** | [Catena Labs](https://catenalabs.com/projects/) | Extends ACK identity + receipts with zkML policy proofs | [README](./src/app/demo/ack/README.md) |
 | **Skyfire** | [Skyfire](https://skyfire.xyz) | Extends Skyfire KYA identity with zkML spending policy verification | [README](./src/app/demo/skyfire/README.md) |
+| **AgentCore** | [AWS Bedrock](https://aws.amazon.com/bedrock/) | MCP-compatible gateway for Bedrock AI agents | [README](./src/app/demo/agentcore/README.md) |
+
+## AWS AgentCore Integration
+
+Expose the prover as an MCP-compatible tool via AWS Bedrock AgentCore Gateway. Any AgentCore-hosted AI agent can generate zkML spending proofs and execute payments via x402 on Base Sepolia.
+
+```bash
+# Set up gateway
+cd infra/agentcore
+pip install boto3 bedrock-agentcore-starter-toolkit
+python setup_gateway.py
+
+# Generate proof via MCP
+aws bedrock-agentcore invoke-gateway \
+  --gateway-id <id> \
+  --mcp-request '{
+    "method": "tools/call",
+    "params": {
+      "name": "generateSpendingProof",
+      "arguments": { "inputs": [0.05, 1.0, 0.2, 0.5, 0.95, 100, 5, 3600] }
+    }
+  }'
+```
+
+**x402 Payment Protocol:** The AgentCore demo uses Coinbase's x402 protocol for USDC payments on Base Sepolia. Agents sign ERC-3009 TransferWithAuthorization for gasless, instant settlement.
+
+See [AgentCore README](./infra/agentcore/README.md) for full setup instructions.
 
 ## Documentation
 
@@ -156,6 +183,8 @@ cd contracts && forge test
 
 - [Crossmint](https://crossmint.com) - Enterprise wallet infrastructure
 - [Skyfire](https://skyfire.xyz) - Agent identity (KYA) and payments
+- [AWS Bedrock AgentCore](https://aws.amazon.com/bedrock/agentcore/) - AI agent gateway
+- [x402 Protocol](https://x402.org) - HTTP 402 payment protocol by Coinbase
 - [JOLT-Atlas](https://github.com/ICME-Lab/jolt-atlas) - zkML proof generation
 - [Base Sepolia](https://sepolia.basescan.org) - Testnet explorer
 
