@@ -962,52 +962,52 @@ export function AgentCoreWalkthrough() {
           {currentStep.phase === 'intro' && (
             <div className="space-y-4">
               <div className="bg-[#0d1117] border border-gray-700 rounded-xl p-6">
-                <h3 className="text-lg font-bold text-white mb-3">Cedar Policies + zkML Proofs</h3>
+                <h3 className="text-lg font-bold text-white mb-3">Extending AgentCore with zkML</h3>
                 <p className="text-gray-400 text-sm mb-4">
-                  <span className="text-orange-400">AgentCore Policy (Cedar)</span> handles simple rules like{' '}
-                  <code className="text-xs bg-gray-800 px-1 rounded">amount &lt; $15K</code>.
-                  But proving an 8-factor ML risk model was evaluated correctly? That requires{' '}
-                  <span className="text-yellow-400">zkML</span> — and it&apos;s verifiable by any auditor, forever.
+                  <span className="text-orange-400">AgentCore Policy (Cedar)</span> provides powerful deterministic controls.
+                  <span className="text-yellow-400"> zkML</span> extends this by adding cryptographic proofs for ML-based policy decisions —
+                  creating a complete trust layer for autonomous agents.
                 </p>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="p-3 bg-orange-500/5 border border-orange-500/20 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <Shield className="w-4 h-4 text-orange-400" />
-                      <span className="text-orange-400 font-medium text-sm">Cedar Policy</span>
+                      <span className="text-orange-400 font-medium text-sm">AgentCore Policy</span>
+                      <span className="text-[9px] px-1.5 py-0.5 bg-orange-500/20 text-orange-400 rounded">FOUNDATION</span>
                     </div>
                     <p className="text-xs text-gray-400 mb-2">
-                      Deterministic rules enforced at gateway:
+                      Deterministic rules at gateway:
                     </p>
                     <ul className="text-xs text-gray-500 space-y-1">
-                      <li>• amount &lt; maxLimit</li>
-                      <li>• role == &quot;infra-agent&quot;</li>
-                      <li>• category in allowedList</li>
+                      <li>• Spending limits &amp; thresholds</li>
+                      <li>• Role-based access control</li>
+                      <li>• Category restrictions</li>
                     </ul>
                   </div>
                   <div className="p-3 bg-yellow-500/5 border border-yellow-500/20 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <Zap className="w-4 h-4 text-yellow-400" />
-                      <span className="text-yellow-400 font-medium text-sm">zkML Proof</span>
-                      <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/20 text-yellow-400 rounded">MUST-HAVE</span>
+                      <span className="text-yellow-400 font-medium text-sm">zkML Extension</span>
+                      <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/20 text-yellow-400 rounded">EXTENDS</span>
                     </div>
                     <p className="text-xs text-gray-400 mb-2">
-                      ML inference Cedar <span className="text-red-400">cannot</span> compute:
+                      Cryptographic proofs for ML decisions:
                     </p>
                     <ul className="text-xs text-gray-500 space-y-1">
-                      <li>• Vendor risk scoring</li>
-                      <li>• Historical performance</li>
-                      <li>• Multi-factor approval</li>
+                      <li>• Vendor risk scoring models</li>
+                      <li>• Historical performance analysis</li>
+                      <li>• Multi-factor approval matrices</li>
                     </ul>
                   </div>
                 </div>
-                <div className="p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+                <div className="p-3 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border border-orange-500/30 rounded-lg">
                   <div className="flex items-center gap-2 mb-1">
-                    <Building2 className="w-4 h-4 text-indigo-400" />
-                    <span className="text-indigo-400 font-medium text-sm">Delegated Authority Demo</span>
+                    <Sparkles className="w-4 h-4 text-orange-400" />
+                    <span className="text-orange-400 font-medium text-sm">Better Together</span>
                   </div>
                   <p className="text-xs text-gray-400">
-                    CFO delegates $100K/month autonomous spending. Every transaction includes a zkML proof
-                    verifiable by auditors without trusting AWS, the agent, or CloudWatch logs.
+                    Cedar policies + zkML proofs = complete coverage. Deterministic rules enforced at the gateway,
+                    ML-based decisions cryptographically verified. Enterprise-grade autonomous spending with full audit trail.
                   </p>
                 </div>
               </div>
@@ -1085,13 +1085,14 @@ export function AgentCoreWalkthrough() {
                 )}
               </div>
 
-              {/* Cedar vs zkML note */}
-              <div className="bg-gray-800/30 border border-gray-700 rounded-lg p-3">
+              {/* Complementary approach note */}
+              <div className="bg-gradient-to-r from-orange-500/5 to-yellow-500/5 border border-orange-500/20 rounded-lg p-3">
                 <div className="flex items-start gap-2">
-                  <Info className="w-4 h-4 text-gray-500 flex-shrink-0 mt-0.5" />
+                  <Sparkles className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-gray-400">
-                    <span className="text-orange-400">Cedar</span> enforces: amount &lt; $15K ✓ &nbsp;|&nbsp;
-                    <span className="text-yellow-400">zkML</span> proves: 8-factor risk model evaluation ✓
+                    <span className="text-orange-400">AgentCore Policy</span> validates rules &nbsp;→&nbsp;
+                    <span className="text-yellow-400">zkML</span> proves ML evaluation &nbsp;→&nbsp;
+                    <span className="text-green-400">Complete audit trail</span>
                   </p>
                 </div>
               </div>
@@ -1162,7 +1163,7 @@ export function AgentCoreWalkthrough() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-orange-400" />
-                    <span className="text-orange-400 font-medium text-sm">Cedar Policy Check</span>
+                    <span className="text-orange-400 font-medium text-sm">AgentCore Policy</span>
                   </div>
                   <span className="text-[10px] px-2 py-1 bg-green-500/20 text-green-400 rounded">PASSED</span>
                 </div>
@@ -1182,16 +1183,16 @@ export function AgentCoreWalkthrough() {
                 </div>
               </div>
 
-              {/* ML Policy Evaluation (What Cedar CAN'T do) */}
+              {/* ML Policy Evaluation (zkML Extension) */}
               {modelDecision && (
                 <div className="bg-[#0d1117] border border-yellow-500/30 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Scale className="w-5 h-5 text-yellow-400" />
-                      <span className="text-yellow-400 font-medium">ML Policy Evaluation</span>
+                      <span className="text-yellow-400 font-medium">zkML Policy Extension</span>
                     </div>
                     <span className="text-[9px] px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded">
-                      Cedar CANNOT compute this
+                      ML-Based Verification
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-4 mb-4">
@@ -1208,7 +1209,7 @@ export function AgentCoreWalkthrough() {
                       </div>
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500 mb-2">8-Factor Risk Model (requires zkML proof):</div>
+                  <div className="text-xs text-gray-500 mb-2">8-Factor Risk Assessment (cryptographically verified):</div>
                   <div className="space-y-1">
                     {modelDecision.reasons.slice(0, 5).map((reason, i) => (
                       <div key={i} className="flex items-center gap-2 text-xs">
@@ -1220,14 +1221,14 @@ export function AgentCoreWalkthrough() {
                 </div>
               )}
 
-              {/* Why zkML is required */}
-              <div className="bg-gray-800/30 border border-gray-700 rounded-lg p-3">
+              {/* Complementary value */}
+              <div className="bg-gradient-to-r from-orange-500/5 to-yellow-500/5 border border-orange-500/20 rounded-lg p-3">
                 <div className="flex items-start gap-2">
-                  <Zap className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <Sparkles className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-gray-400">
-                    <span className="text-yellow-400 font-medium">Why zkML?</span> The ML model evaluates vendor risk,
-                    historical performance, and compliance — computations Cedar policies cannot perform.
-                    zkML proves the model ran correctly without revealing internal thresholds.
+                    <span className="text-orange-400 font-medium">AgentCore Policy</span> enforces deterministic rules.
+                    <span className="text-yellow-400 font-medium"> zkML</span> adds cryptographic proof that complex ML models
+                    were evaluated correctly — extending trust to ML-based decisions.
                   </p>
                 </div>
               </div>
@@ -1610,61 +1611,63 @@ export function AgentCoreWalkthrough() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Building2 className="w-5 h-5 text-indigo-400" />
-                    <span className="text-sm font-medium text-indigo-400">Delegated Autonomous Authority</span>
+                    <span className="text-sm font-medium text-indigo-400">Enterprise Audit Trail</span>
                   </div>
                   <button
                     onClick={() => setShowAuditView(true)}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/20 text-indigo-400 rounded-lg text-xs hover:bg-indigo-500/30 transition-colors border border-indigo-500/30"
                   >
                     <Eye className="w-3 h-3" />
-                    CFO Audit View
+                    View Audit Dashboard
                   </button>
                 </div>
 
                 <p className="text-gray-300 text-xs mb-3">
                   CFO Sarah Chen delegated <span className="text-indigo-400 font-bold">$100K/month</span> autonomous spending authority to this agent.
-                  Every transaction includes a zkML proof verifiable by anyone, forever.
+                  Every transaction includes a zkML proof for complete audit coverage.
                 </p>
 
                 <div className="grid grid-cols-2 gap-3 mb-3">
-                  <div className="p-2 bg-gray-900/50 rounded-lg">
+                  <div className="p-2 bg-orange-500/5 border border-orange-500/20 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
-                      <Lock className="w-3 h-3 text-red-400" />
-                      <span className="text-[10px] text-red-400 font-medium">Don&apos;t Need to Trust</span>
+                      <Shield className="w-3 h-3 text-orange-400" />
+                      <span className="text-[10px] text-orange-400 font-medium">AgentCore Provides</span>
                     </div>
                     <ul className="text-[10px] text-gray-400 space-y-0.5">
-                      <li>• AWS CloudWatch logs</li>
-                      <li>• Agent operator claims</li>
-                      <li>• Cedar policy logs</li>
+                      <li>• Gateway enforcement</li>
+                      <li>• CloudWatch logging</li>
+                      <li>• Cedar policy audit</li>
                     </ul>
                   </div>
-                  <div className="p-2 bg-gray-900/50 rounded-lg">
+                  <div className="p-2 bg-yellow-500/5 border border-yellow-500/20 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
-                      <Unlock className="w-3 h-3 text-green-400" />
-                      <span className="text-[10px] text-green-400 font-medium">Can Verify Independently</span>
+                      <Zap className="w-3 h-3 text-yellow-400" />
+                      <span className="text-[10px] text-yellow-400 font-medium">zkML Adds</span>
                     </div>
                     <ul className="text-[10px] text-gray-400 space-y-0.5">
-                      <li>• zkML proof (math guarantee)</li>
+                      <li>• ML decision proofs</li>
                       <li>• On-chain attestation</li>
-                      <li>• Transaction history</li>
+                      <li>• Third-party verification</li>
                     </ul>
                   </div>
                 </div>
 
                 <div className="text-[10px] text-gray-400 border-t border-gray-700/50 pt-3">
-                  <span className="text-indigo-400 font-medium">Why this matters:</span> Cedar policies handle simple rules (amount &lt; $15K).
-                  But proving the 8-factor ML risk model was evaluated correctly? That requires zkML — and it&apos;s verifiable by any auditor, forever.
+                  <span className="text-indigo-400 font-medium">Complete coverage:</span> AgentCore Policy enforces rules at the gateway.
+                  zkML extends this with cryptographic proof for ML-based decisions — together providing enterprise-grade audit trails.
                 </div>
               </div>
 
               {/* What This Demonstrates */}
               <div className="bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border border-orange-500/30 rounded-xl p-4 max-w-2xl mb-4">
-                <div className="text-sm font-medium text-orange-400 mb-2">What This Demonstrates</div>
+                <div className="text-sm font-medium text-orange-400 mb-2">AgentCore + zkML Integration</div>
                 <p className="text-gray-300 text-xs mb-3">
-                  An AI agent executed an <span className="text-orange-400 font-bold">$8,500</span> infrastructure procurement with cryptographic proof that the CFO-approved policy model was evaluated correctly — 8 factors checked, mathematically verified, unforgeable.
+                  An AI agent executed an <span className="text-orange-400 font-bold">$8,500</span> infrastructure procurement.
+                  <span className="text-orange-400"> AgentCore Gateway</span> enforced policy rules via MCP.
+                  <span className="text-yellow-400"> zkML</span> provided cryptographic proof of ML-based risk assessment — 8 factors verified, mathematically proven.
                 </p>
                 <div className="text-[10px] text-gray-400 border-t border-gray-700/50 pt-3">
-                  <span className="text-yellow-400 font-medium">Why this matters:</span> AWS AgentCore + MCP protocol enables AI agents to autonomously manage $100K+ budgets with cryptographic compliance verification for every transaction.
+                  <span className="text-orange-400 font-medium">The combination:</span> AgentCore&apos;s powerful gateway infrastructure + zkML&apos;s cryptographic proofs = enterprise-ready autonomous agents with complete policy coverage.
                 </div>
               </div>
 

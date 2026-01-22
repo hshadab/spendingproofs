@@ -201,37 +201,47 @@ export function CFOAuditView({ proofHash, txHash, onClose }: CFOAuditViewProps) 
         </div>
       </div>
 
-      {/* Trust Model - Key Differentiator */}
-      <div className="bg-[#0d1117] border border-yellow-500/30 rounded-xl p-4">
+      {/* Combined Verification - Complementary Approach */}
+      <div className="bg-[#0d1117] border border-orange-500/30 rounded-xl p-4">
         <div className="flex items-center gap-2 mb-3">
-          <Shield className="w-5 h-5 text-yellow-400" />
-          <span className="text-yellow-400 font-medium">Zero-Trust Verification</span>
+          <Shield className="w-5 h-5 text-orange-400" />
+          <span className="text-orange-400 font-medium">Complete Audit Coverage</span>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <EyeOff className="w-4 h-4 text-red-400" />
-              <span className="text-xs text-red-400 font-medium">You Don&apos;t Need to Trust</span>
+              <Shield className="w-4 h-4 text-orange-400" />
+              <span className="text-xs text-orange-400 font-medium">AgentCore Provides</span>
             </div>
             <ul className="space-y-1">
-              {auditData.trustModel.whatYouDontNeedToTrust.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-xs text-gray-400">
-                  <Lock className="w-3 h-3 text-red-400 flex-shrink-0 mt-0.5" />
-                  <span>{item}</span>
-                </li>
-              ))}
+              <li className="flex items-start gap-2 text-xs text-gray-400">
+                <CheckCircle2 className="w-3 h-3 text-orange-400 flex-shrink-0 mt-0.5" />
+                <span>Gateway policy enforcement</span>
+              </li>
+              <li className="flex items-start gap-2 text-xs text-gray-400">
+                <CheckCircle2 className="w-3 h-3 text-orange-400 flex-shrink-0 mt-0.5" />
+                <span>CloudWatch audit logging</span>
+              </li>
+              <li className="flex items-start gap-2 text-xs text-gray-400">
+                <CheckCircle2 className="w-3 h-3 text-orange-400 flex-shrink-0 mt-0.5" />
+                <span>Cedar policy evaluation</span>
+              </li>
+              <li className="flex items-start gap-2 text-xs text-gray-400">
+                <CheckCircle2 className="w-3 h-3 text-orange-400 flex-shrink-0 mt-0.5" />
+                <span>MCP tool orchestration</span>
+              </li>
             </ul>
           </div>
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Eye className="w-4 h-4 text-green-400" />
-              <span className="text-xs text-green-400 font-medium">You Can Independently Verify</span>
+              <Eye className="w-4 h-4 text-yellow-400" />
+              <span className="text-xs text-yellow-400 font-medium">zkML Extends With</span>
             </div>
             <ul className="space-y-1">
               {auditData.trustModel.whatYouCanVerify.map((item, i) => (
                 <li key={i} className="flex items-start gap-2 text-xs text-gray-400">
-                  <Unlock className="w-3 h-3 text-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-3 h-3 text-yellow-400 flex-shrink-0 mt-0.5" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -413,8 +423,8 @@ export function CFOAuditView({ proofHash, txHash, onClose }: CFOAuditViewProps) 
                 </div>
                 {verificationResult.verified && (
                   <p className="text-xs text-gray-400">
-                    This proof cryptographically guarantees the agent followed the delegated spending policy.
-                    No trust in AWS, the agent operator, or any intermediary is required.
+                    This zkML proof extends AgentCore&apos;s audit trail with cryptographic verification
+                    of ML-based policy decisions — providing complete coverage for enterprise compliance.
                   </p>
                 )}
               </div>
@@ -424,17 +434,17 @@ export function CFOAuditView({ proofHash, txHash, onClose }: CFOAuditViewProps) 
       )}
 
       {/* Key Message */}
-      <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl p-4">
+      <div className="bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border border-orange-500/30 rounded-xl p-4">
         <div className="flex items-start gap-3">
-          <FileCheck className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+          <FileCheck className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
           <div>
-            <div className="text-sm font-medium text-green-400 mb-1">
-              Delegated Authority with Cryptographic Accountability
+            <div className="text-sm font-medium text-orange-400 mb-1">
+              AgentCore + zkML: Complete Audit Coverage
             </div>
             <p className="text-xs text-gray-400">
-              The CFO delegated $100K/month autonomous spending authority to this agent.
-              Every transaction includes a zkML proof that the spending policy was evaluated correctly.
-              This proof is verifiable by anyone, forever — no trust in AWS, the agent, or CloudWatch logs required.
+              <span className="text-orange-400">AgentCore</span> provides gateway enforcement, CloudWatch logging, and Cedar policy evaluation.
+              <span className="text-yellow-400"> zkML</span> extends this with cryptographic proofs for ML-based decisions —
+              together delivering enterprise-grade audit trails for autonomous agent spending.
             </p>
           </div>
         </div>

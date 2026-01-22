@@ -249,18 +249,18 @@ export async function GET(request: NextRequest) {
         expiresAt: '2025-12-31T23:59:59Z',
       },
       trustModel: {
-        description: 'Zero-trust verification via zkML proofs and on-chain attestation',
-        whatYouDontNeedToTrust: [
-          'AWS CloudWatch logs (could be modified)',
-          'Agent operator claims (could be fabricated)',
-          'Cedar policy logs (internal to AWS)',
-          'Agent self-reporting (conflict of interest)',
+        description: 'AgentCore + zkML: Complete audit coverage for autonomous agents',
+        agentCoreProvides: [
+          'Gateway policy enforcement via Cedar',
+          'CloudWatch audit logging',
+          'MCP tool orchestration',
+          'SigV4 authentication',
         ],
         whatYouCanVerify: [
-          'zkML proof mathematically guarantees policy was evaluated correctly',
-          'On-chain attestation is immutable and timestamped',
-          'Proof can be verified by any third party',
-          'Transaction amounts match proof commitments',
+          'zkML proof extends Cedar with ML decision verification',
+          'On-chain attestation provides immutable timestamps',
+          'Third-party verification without additional access',
+          'Cryptographic proof of policy compliance',
         ],
         verificationEndpoints: {
           proofVerification: '/api/prove (POST with proof data)',
