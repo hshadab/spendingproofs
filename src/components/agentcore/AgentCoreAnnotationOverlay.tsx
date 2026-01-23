@@ -45,22 +45,25 @@ interface AgentCoreAnnotationOverlayProps {
   annotation: BusinessAnnotation;
   stepTitle: string;
   onContinue: () => void;
+  topOffset?: string; // CSS class for top offset (e.g., "top-16")
 }
 
 /**
- * Full-screen annotation overlay for AgentCore demo
+ * Annotation overlay for AgentCore demo
  * Shows business value metrics between steps
+ * Positioned below the playback controls
  */
 export function AgentCoreAnnotationOverlay({
   annotation,
   stepTitle,
   onContinue,
+  topOffset = "top-0",
 }: AgentCoreAnnotationOverlayProps) {
   const colors = ANNOTATION_COLORS[annotation.color];
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-start justify-center pt-32 bg-black/90 backdrop-blur-sm animate-fadeIn"
+      className={`absolute ${topOffset} left-0 right-0 bottom-0 z-[100] flex items-start justify-center pt-12 bg-black/90 backdrop-blur-sm animate-fadeIn`}
       onClick={onContinue}
     >
       <style>{`

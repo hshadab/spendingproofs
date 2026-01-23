@@ -764,9 +764,9 @@ export function AgentCoreWalkthrough() {
   }'`;
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col relative">
       {/* Playback Controls */}
-      <div className="mb-3 p-3 bg-[#0d1117] rounded-xl border border-gray-700">
+      <div className="mb-3 p-3 bg-[#0d1117] rounded-xl border border-gray-700 relative z-[110]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
@@ -834,12 +834,13 @@ export function AgentCoreWalkthrough() {
         </div>
       </div>
 
-      {/* Full-screen Annotation Overlay */}
+      {/* Annotation Overlay - positioned below playback controls */}
       {showingAnnotation && annotationToShow && (
         <AgentCoreAnnotationOverlay
           annotation={annotationToShow.annotation}
           stepTitle={annotationToShow.stepTitle}
           onContinue={handleAnnotationContinue}
+          topOffset="top-[70px]"
         />
       )}
 
@@ -847,18 +848,19 @@ export function AgentCoreWalkthrough() {
       <div className="flex min-h-[780px] bg-[#0a0a0a] rounded-2xl overflow-hidden border border-gray-800">
         {/* Left Sidebar */}
         <div className="w-80 bg-[#0d1117] border-r border-gray-800 flex flex-col flex-shrink-0">
-          {/* Header */}
+          {/* Header - NovaNet Branding */}
           <div className="p-4 border-b border-gray-800">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-orange-500/20 rounded-lg">
-                <Cloud className="w-5 h-5 text-orange-400" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-white">AWS AgentCore</h2>
-                <p className="text-xs text-gray-400">zkML via MCP Protocol</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 mt-2">
+            {/* NovaNet Logo */}
+            <img
+              src="https://cdn.prod.website-files.com/65d52b07d5bc41614daa723f/665df12739c532f45b665fe7_logo-novanet.svg"
+              alt="NovaNet"
+              className="h-6 mb-2"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              zkML Spending Proofs via<br />
+              <span className="text-orange-400 font-medium">AWS AgentCore + Cedar Policy</span>
+            </p>
+            <div className="flex items-center gap-2 mt-3">
               <a
                 href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
                 target="_blank"
@@ -866,10 +868,17 @@ export function AgentCoreWalkthrough() {
                 className="flex items-center gap-1 text-xs text-orange-400 hover:text-orange-300"
               >
                 <ExternalLink className="w-3 h-3" />
-                Docs
+                AgentCore Docs
               </a>
               <span className="text-gray-600">|</span>
-              <span className="text-xs text-gray-500">{GATEWAY_CONFIG.region}</span>
+              <a
+                href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-xs text-orange-400 hover:text-orange-300"
+              >
+                Cedar Policy
+              </a>
             </div>
           </div>
 
@@ -1522,15 +1531,15 @@ export function AgentCoreWalkthrough() {
           {currentStep.phase === 'complete' && (
             <div>
               {/* Powered By Header */}
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-4 flex-wrap">
                 <div className="flex items-center gap-2 px-2 py-1 bg-orange-500/10 border border-orange-500/30 rounded-lg">
                   <Cloud className="w-3 h-3 text-orange-400" />
-                  <span className="text-orange-400 font-medium text-xs">AWS AgentCore</span>
+                  <span className="text-orange-400 font-medium text-xs">AgentCore + Cedar</span>
                 </div>
                 <span className="text-gray-600 text-xs">+</span>
                 <div className="flex items-center gap-2 px-2 py-1 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
                   <Zap className="w-3 h-3 text-yellow-400" />
-                  <span className="text-yellow-400 font-medium text-xs">Jolt-Atlas</span>
+                  <span className="text-yellow-400 font-medium text-xs">zkML (Jolt-Atlas)</span>
                 </div>
                 <span className="text-gray-600 text-xs">+</span>
                 <div className="flex items-center gap-2 px-2 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
@@ -1544,8 +1553,8 @@ export function AgentCoreWalkthrough() {
               </h2>
               <p className="text-gray-400 max-w-2xl mb-5 text-sm">
                 The Cloud Infrastructure Agent completed an <span className="text-orange-400">$8,500</span> EC2 p4d.24xlarge GPU instance purchase.
-                <span className="text-yellow-400"> Jolt-Atlas</span> generated a SNARK proof verified via <span className="text-orange-400">MCP protocol</span>.
-                8 risk factors evaluated, budget constraints checked, compliance verified - all cryptographically proven, not promised.
+                <span className="text-orange-400"> Cedar policies</span> enforced spending limits at the gateway.
+                <span className="text-yellow-400"> zkML</span> proved the ML-based risk assessment was correct — 8 factors verified, cryptographically proven.
               </p>
 
               {/* Transaction Summary */}
@@ -1585,8 +1594,8 @@ export function AgentCoreWalkthrough() {
                   <div className="flex items-start gap-3 p-3 bg-orange-900/20 rounded-lg border border-orange-500/30">
                     <Cloud className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-orange-400 font-medium">2. MCP Gateway Connected</span>
-                      <p className="text-gray-400 mt-1">AWS AgentCore Gateway authenticated via SigV4, discovered available tools via MCP tools/list, and routed the proof generation request to the Jolt-Atlas prover backend.</p>
+                      <span className="text-orange-400 font-medium">2. AgentCore Gateway + Cedar Policy</span>
+                      <p className="text-gray-400 mt-1">AWS AgentCore Gateway authenticated via SigV4 and evaluated <span className="text-orange-400">Cedar policies</span> at the gateway boundary. Cedar enforced spending limits, role permissions, and category restrictions. The gateway then routed the proof request to Jolt-Atlas.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 p-3 bg-yellow-900/20 rounded-lg border border-yellow-500/30">
@@ -1653,21 +1662,21 @@ export function AgentCoreWalkthrough() {
                 </div>
 
                 <div className="text-[10px] text-gray-400 border-t border-gray-700/50 pt-3">
-                  <span className="text-indigo-400 font-medium">Complete coverage:</span> AgentCore Policy enforces rules at the gateway.
-                  zkML extends this with cryptographic proof for ML-based decisions — together providing enterprise-grade audit trails.
+                  <span className="text-indigo-400 font-medium">Complete coverage:</span> <span className="text-orange-400">Cedar policies</span> enforce deterministic rules at the AgentCore Gateway.
+                  <span className="text-yellow-400">zkML</span> extends this with cryptographic proof for ML-based decisions — together providing enterprise-grade audit trails.
                 </div>
               </div>
 
               {/* What This Demonstrates */}
               <div className="bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border border-orange-500/30 rounded-xl p-4 max-w-2xl mb-4">
-                <div className="text-sm font-medium text-orange-400 mb-2">AgentCore + zkML Integration</div>
+                <div className="text-sm font-medium text-orange-400 mb-2">Cedar Policy + zkML Integration</div>
                 <p className="text-gray-300 text-xs mb-3">
                   An AI agent executed an <span className="text-orange-400 font-bold">$8,500</span> infrastructure procurement.
-                  <span className="text-orange-400"> AgentCore Gateway</span> enforced policy rules via MCP.
+                  <span className="text-orange-400"> Cedar policies</span> enforced spending limits and role permissions at the gateway.
                   <span className="text-yellow-400"> zkML</span> provided cryptographic proof of ML-based risk assessment — 8 factors verified, mathematically proven.
                 </p>
                 <div className="text-[10px] text-gray-400 border-t border-gray-700/50 pt-3">
-                  <span className="text-orange-400 font-medium">The combination:</span> AgentCore&apos;s powerful gateway infrastructure + zkML&apos;s cryptographic proofs = enterprise-ready autonomous agents with complete policy coverage.
+                  <span className="text-orange-400 font-medium">The combination:</span> <span className="text-orange-400">Cedar policies</span> for deterministic rules + <span className="text-yellow-400">zkML proofs</span> for ML decisions = enterprise-ready autonomous agents with complete policy coverage.
                 </div>
               </div>
 
@@ -1710,6 +1719,14 @@ export function AgentCoreWalkthrough() {
                     className="px-2 py-1 bg-orange-500/10 text-orange-400 rounded border border-orange-500/30 hover:border-orange-500 transition-colors flex items-center gap-1"
                   >
                     AgentCore Gateway <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                  <a
+                    href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2 py-1 bg-orange-500/10 text-orange-400 rounded border border-orange-500/30 hover:border-orange-500 transition-colors flex items-center gap-1"
+                  >
+                    Cedar Policy <ExternalLink className="w-2.5 h-2.5" />
                   </a>
                   <a
                     href="https://a16z.github.io/jolt/"
