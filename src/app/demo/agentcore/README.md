@@ -212,9 +212,34 @@ The demo simulates the MCP flow:
 
 ---
 
+## Current Limitations
+
+### Payment Gating
+
+The current demo uses **application-level proof verification**:
+- Proof is generated before payment executes
+- x402 payment proceeds after proof generation completes
+- No on-chain enforcement (contract doesn't verify proof exists)
+
+This differs from the ACK demo which uses **on-chain proof-gated payments**:
+- Proof is attested to `ProofAttestation` contract
+- `SpendingGateWallet.gatedTransfer()` reverts if proof isn't attested
+- True trustless enforcement at the smart contract level
+
+---
+
+## Future Work
+
+- [ ] **On-chain proof-gated x402**: Integrate `SpendingGateWallet` with x402 flow so the contract verifies proof attestation before releasing USDC
+- [ ] **Real Cedar policy evaluation**: Call AgentCore Policy API to evaluate Cedar policies (currently simulated)
+- [ ] **Register MCP tool**: Deploy prover as Lambda and register as AgentCore Gateway target
+
+---
+
 ## Resources
 
 - [AgentCore Gateway Docs](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html)
+- [AgentCore Policy (Cedar)](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy.html)
 - [MCP Protocol Spec](https://modelcontextprotocol.io/)
 - [OpenAPI Spec](../../infra/agentcore/openapi.yaml)
 - [Gateway Setup](../../infra/agentcore/README.md)
