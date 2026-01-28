@@ -12,7 +12,8 @@
  */
 
 import { createLogger } from './metrics';
-import { API_CONFIG } from './config';
+import { API_CONFIG, CHAIN_CONFIGS } from './config';
+import { usdcToWei } from './constants';
 
 const logger = createLogger('lib:crossmint');
 
@@ -155,10 +156,10 @@ export async function getWalletBalance(walletAddress: string): Promise<WalletBal
   const chain = process.env.NEXT_PUBLIC_CROSSMINT_CHAIN || 'base-sepolia';
 
   try {
-    // Base Sepolia RPC and USDC address
-    const BASE_SEPOLIA_RPC = 'https://sepolia.base.org';
-    // Circle's official USDC on Base Sepolia (used by Crossmint)
-    const USDC_ADDRESS = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
+    // Use centralized chain config
+    const baseSepoliaConfig = CHAIN_CONFIGS['base-sepolia'];
+    const BASE_SEPOLIA_RPC = baseSepoliaConfig.rpc;
+    const USDC_ADDRESS = baseSepoliaConfig.usdc;
 
     // balanceOf(address) selector + padded address
     const paddedAddress = walletAddress.slice(2).toLowerCase().padStart(64, '0');
@@ -196,21 +197,7 @@ export async function getWalletBalance(walletAddress: string): Promise<WalletBal
   }
 }
 
-// Chain configurations for direct transfers
-const CHAIN_CONFIGS: Record<string, { id: number; name: string; rpc: string; usdc: string }> = {
-  'arc-testnet': {
-    id: 5042002,
-    name: 'Arc Testnet',
-    rpc: 'https://rpc.testnet.arc.network',
-    usdc: '0x1Fb62895099b7931FFaBEa1AdF92e20Df7F29213',
-  },
-  'base-sepolia': {
-    id: 84532,
-    name: 'Base Sepolia',
-    rpc: 'https://sepolia.base.org',
-    usdc: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // Circle's official USDC
-  },
-};
+// Chain configurations imported from centralized config
 
 /**
  * Transfer USDC via direct on-chain transfer
@@ -253,8 +240,8 @@ export async function transferUsdc(
       transport: http(),
     });
 
-    // Convert USDC amount to wei (6 decimals)
-    const amountWei = BigInt(Math.round(amountUsdc * 1_000_000));
+    // Convert USDC amount to wei (6 decimals) using precision-safe conversion
+    const amountWei = usdcToWei(amountUsdc);
 
     const hash = await client.writeContract({
       address: chainConfig.usdc as `0x${string}`,

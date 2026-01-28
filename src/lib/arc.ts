@@ -10,7 +10,8 @@
 import { createPublicClient, createWalletClient, http, parseAbi, type Hex } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { createLogger } from './metrics';
-import { ARC_CHAIN, ADDRESSES } from './config';
+import { ARC_CHAIN, ADDRESSES, getExplorerTxUrl, getExplorerAddressUrl } from './config';
+import { usdcToWei, weiToUsdc } from './constants';
 
 const logger = createLogger('lib:arc');
 
@@ -32,7 +33,7 @@ export const CONTRACTS = {
 
 // ABIs
 const PROOF_ATTESTATION_ABI = parseAbi([
-  'function isProofValid(bytes32 proofHash) external view returns (bool)',
+  'function isProofHashValid(bytes32 proofHash) external view returns (bool)',
   'function getProofTimestamp(bytes32 proofHash) external view returns (uint256)',
   'function submitProof(bytes32 proofHash, bytes metadata) external',
   'event ProofSubmitted(bytes32 indexed proofHash, address indexed submitter, uint256 timestamp)',
@@ -83,7 +84,7 @@ export async function isProofAttested(proofHash: Hex): Promise<boolean> {
     const isValid = await client.readContract({
       address: CONTRACTS.PROOF_ATTESTATION as Hex,
       abi: PROOF_ATTESTATION_ABI,
-      functionName: 'isProofValid',
+      functionName: 'isProofHashValid',
       args: [proofHash],
     });
     return isValid as boolean;
@@ -195,10 +196,10 @@ export async function getSpendingGateInfo(): Promise<{
     ]);
 
     return {
-      balance: (Number(balance) / 1_000_000).toFixed(2),
-      dailyLimit: (Number(dailyLimit) / 1_000_000).toFixed(2),
-      maxSingleTransfer: (Number(maxSingleTransfer) / 1_000_000).toFixed(2),
-      remainingDaily: (Number(remainingDaily) / 1_000_000).toFixed(2),
+      balance: weiToUsdc(balance as bigint).toFixed(2),
+      dailyLimit: weiToUsdc(dailyLimit as bigint).toFixed(2),
+      maxSingleTransfer: weiToUsdc(maxSingleTransfer as bigint).toFixed(2),
+      remainingDaily: weiToUsdc(remainingDaily as bigint).toFixed(2),
       nonce: Number(nonce),
       owner: owner as string,
     };
@@ -230,8 +231,8 @@ export async function executeGatedTransfer(
     const client = getWalletClient(privateKey);
     const publicClient = getPublicClient();
 
-    // Convert amount to USDC decimals (6)
-    const amountWei = BigInt(Math.round(amountUsdc * 1_000_000));
+    // Convert amount to USDC decimals (6) using precision-safe conversion
+    const amountWei = usdcToWei(amountUsdc);
     const expiry = BigInt(Math.floor(Date.now() / 1000) + expirySeconds);
 
     // Execute gated transfer
@@ -380,7 +381,7 @@ export async function executeDirectTransfer(
   try {
     const client = getWalletClient(privateKey);
 
-    const amountWei = BigInt(Math.round(amountUsdc * 1_000_000));
+    const amountWei = usdcToWei(amountUsdc);
 
     const hash = await client.writeContract({
       address: CONTRACTS.USDC as Hex,
@@ -414,7 +415,7 @@ export async function getUsdcBalance(address: Hex): Promise<string> {
       functionName: 'balanceOf',
       args: [address],
     });
-    return (Number(balance) / 1_000_000).toFixed(2);
+    return weiToUsdc(balance as bigint).toFixed(2);
   } catch (error) {
     logger.error('Error getting USDC balance', { action: 'get_usdc_balance', error });
     return '0.00';
@@ -441,12 +442,12 @@ export function formatProofHash(proofHash: string): Hex {
  * Get Arc Explorer URL for a transaction
  */
 export function getExplorerUrl(txHash: string): string {
-  return `https://testnet.arcscan.app/tx/${txHash}`;
+  return getExplorerTxUrl(txHash);
 }
 
 /**
  * Get Arc Explorer URL for a contract
  */
 export function getContractExplorerUrl(address: string): string {
-  return `https://testnet.arcscan.app/address/${address}`;
+  return getExplorerAddressUrl(address);
 }

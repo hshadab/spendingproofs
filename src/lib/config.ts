@@ -84,6 +84,9 @@ export const AUTH_CONFIG = {
     .split(',')
     .map((addr) => addr.trim().toLowerCase())
     .filter(Boolean),
+
+  /** API key for AgentCore Gateway authentication (optional) */
+  gatewayApiKey: process.env.GATEWAY_API_KEY || '',
 } as const;
 
 /**
@@ -130,6 +133,48 @@ export const PROVER_RETRY_CONFIG = {
   backoffMultiplier: 1.5,
   jitter: 0.2,
 } as const;
+
+/**
+ * Rate Limiting Configuration
+ */
+export const RATE_LIMIT_CONFIG = {
+  /** Maximum requests per window */
+  maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '10', 10),
+
+  /** Window size in milliseconds (1 minute) */
+  windowMs: 60 * 1000,
+} as const;
+
+/**
+ * Base Sepolia Chain Configuration
+ */
+export const BASE_SEPOLIA_CHAIN = {
+  id: 84532,
+  name: 'Base Sepolia',
+  rpcUrl: 'https://sepolia.base.org',
+  explorerUrl: 'https://sepolia.basescan.org',
+} as const;
+
+/**
+ * Chain Configurations
+ * Unified map of all supported chains with their RPC, USDC address, and chain ID.
+ */
+export const CHAIN_CONFIGS: Record<string, { id: number; name: string; rpc: string; usdc: string; explorerUrl: string }> = {
+  'arc-testnet': {
+    id: ARC_CHAIN.id,
+    name: ARC_CHAIN.name,
+    rpc: ARC_CHAIN.rpcUrl,
+    usdc: ADDRESSES.usdc,
+    explorerUrl: ARC_CHAIN.explorerUrl,
+  },
+  'base-sepolia': {
+    id: BASE_SEPOLIA_CHAIN.id,
+    name: BASE_SEPOLIA_CHAIN.name,
+    rpc: BASE_SEPOLIA_CHAIN.rpcUrl,
+    usdc: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+    explorerUrl: BASE_SEPOLIA_CHAIN.explorerUrl,
+  },
+};
 
 /**
  * Environment checks
