@@ -135,7 +135,8 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
+      const errorText = (await response.text()).slice(0, 1000);
+      logger.error('Prover backend error', { action: 'proxy_request', status: response.status });
       return NextResponse.json(
         { success: false, error: `Prover error: ${errorText}` },
         { status: response.status }
@@ -185,7 +186,8 @@ export async function GET() {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch {
+  } catch (error) {
+    logger.error('Prover health check failed', { action: 'health_check', error });
     return NextResponse.json(
       { status: 'unavailable', error: 'Cannot connect to prover' },
       { status: 503 }

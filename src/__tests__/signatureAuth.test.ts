@@ -109,7 +109,7 @@ describe('signatureAuth', () => {
       });
 
       expect(result.valid).toBe(false);
-      expect(result.code).toBe('INVALID_SIGNATURE');
+      expect(result.code).toBe('CLOCK_SKEW');
       expect(result.error).toContain('future');
     });
 
@@ -195,7 +195,7 @@ describe('signatureAuth', () => {
       });
 
       expect(result.valid).toBe(false);
-      expect(result.code).toBe('INVALID_SIGNATURE');
+      expect(result.code).toBe('CLOCK_SKEW');
     });
   });
 

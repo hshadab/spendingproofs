@@ -37,7 +37,7 @@ export async function verifyProveRequest(
   if (now - timestamp > SIGNATURE_EXPIRY_MS) {
     return {
       valid: false,
-      error: `Signature expired. Request was signed ${Math.round((now - timestamp) / 1000)}s ago, max allowed is ${SIGNATURE_EXPIRY_MS / 1000}s`,
+      error: `Signature expired. Request was signed ${Math.round((now - timestamp) / 1000)}s ago, max allowed is ${Math.round(SIGNATURE_EXPIRY_MS / 1000)}s`,
       code: 'SIGNATURE_EXPIRED',
     };
   }
@@ -47,7 +47,7 @@ export async function verifyProveRequest(
     return {
       valid: false,
       error: `Signature timestamp is in the future (max clock skew: ${CLOCK_SKEW_TOLERANCE_MS / 1000}s)`,
-      code: 'INVALID_SIGNATURE',
+      code: 'CLOCK_SKEW',
     };
   }
 

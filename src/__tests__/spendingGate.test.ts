@@ -35,7 +35,7 @@ describe('SpendingGate', () => {
     proofSizeBytes: 48000,
     generationTimeMs: 2100,
     verified: true,
-    txIntentHash: '0xhash',
+    txIntentHash: computeTxIntentHash(validIntent),
   };
 
   beforeEach(() => {
@@ -110,8 +110,9 @@ describe('SpendingGate', () => {
         expiry: Math.floor(Date.now() / 1000) - 3600, // 1 hour ago
         nonce: BigInt(999), // Different nonce to avoid replay check
       };
+      const unboundProof = { ...validProof, txIntentHash: undefined };
 
-      const result = await gatedTransfer(expiredIntent, validProof);
+      const result = await gatedTransfer(expiredIntent, unboundProof);
 
       expect(result.success).toBe(false);
       expect(result.revertReason).toContain('PROOF_EXPIRED');
@@ -123,8 +124,11 @@ describe('SpendingGate', () => {
         policyId: 'unknown-policy',
         nonce: BigInt(888),
       };
+      // Proof without txIntentHash binding to bypass the hash check
+      // (in production, proof would be generated per-intent)
+      const unboundProof = { ...validProof, txIntentHash: undefined };
 
-      const result = await gatedTransfer(unknownPolicyIntent, validProof);
+      const result = await gatedTransfer(unknownPolicyIntent, unboundProof);
 
       expect(result.success).toBe(false);
       expect(result.revertReason).toContain('UNKNOWN_POLICY');
@@ -136,8 +140,9 @@ describe('SpendingGate', () => {
         policyVersion: 2, // Default policy is version 1
         nonce: BigInt(777),
       };
+      const unboundProof = { ...validProof, txIntentHash: undefined };
 
-      const result = await gatedTransfer(wrongVersionIntent, validProof);
+      const result = await gatedTransfer(wrongVersionIntent, unboundProof);
 
       expect(result.success).toBe(false);
       expect(result.revertReason).toContain('VERSION_MISMATCH');

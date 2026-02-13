@@ -11,6 +11,7 @@
 
 import { SpendingProof, TxIntent } from './types';
 import { keccak256, encodePacked } from 'viem';
+import { DEFAULT_GAS_ESTIMATE, GAS_ESTIMATE_VARIANCE } from './constants';
 
 export type { TxIntent };
 
@@ -100,7 +101,15 @@ export async function gatedTransfer(
   // 3. Compute and verify txIntentHash
   const computedHash = computeTxIntentHash(intent);
 
-  // If modifyAmount option is set, simulate amount manipulation
+  // Verify the proof's txIntentHash matches the computed hash
+  if (proof.txIntentHash && proof.txIntentHash !== computedHash) {
+    return {
+      success: false,
+      revertReason: `SpendingGate: INTENT_MISMATCH - txIntentHash mismatch. Proof was generated for different transaction parameters.`,
+    };
+  }
+
+  // If modifyAmount option is set, simulate amount manipulation (demo)
   if (options.modifyAmount) {
     return {
       success: false,
@@ -154,7 +163,7 @@ export async function gatedTransfer(
   return {
     success: true,
     txHash: mockTxHash,
-    gasUsed: 85000 + Math.floor(Math.random() * 10000),
+    gasUsed: DEFAULT_GAS_ESTIMATE + Math.floor(Math.random() * GAS_ESTIMATE_VARIANCE),
   };
 }
 

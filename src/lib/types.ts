@@ -124,10 +124,12 @@ export interface SignedProveRequest {
 export type ProveErrorCode =
   | 'INVALID_SIGNATURE'
   | 'SIGNATURE_EXPIRED'
+  | 'CLOCK_SKEW'
   | 'ADDRESS_NOT_ALLOWED'
   | 'RATE_LIMITED'
   | 'PROVER_UNAVAILABLE'
-  | 'PROOF_GENERATION_FAILED';
+  | 'PROOF_GENERATION_FAILED'
+  | 'INTERNAL_ERROR';
 
 /**
  * Verification step for on-chain proof verification (Crossmint demo)
